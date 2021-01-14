@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -117,7 +118,7 @@ public class MobSpawningUtil {
             for(int k = 0; k < 3; ++k){
                 int spawnX = pos.getX();
                 int spawnZ = pos.getZ();
-                Biome.SpawnListEntry spawner = null;
+                MobSpawnInfo.Spawners spawner = null;
                 ILivingEntityData ilivingentitydata = null;
                 int groupSize = MathHelper.ceil(world.rand.nextFloat() * 4.0F);
                 int entitiesInGroup = 0;
@@ -139,11 +140,11 @@ public class MobSpawningUtil {
                                     break;
                                 }
 
-                                groupSize = spawner.field_76301_c + world.rand.nextInt(1 + spawner.field_76299_d - spawner.field_76301_c);
+                                groupSize = spawner.minCount + world.rand.nextInt(1 + spawner.maxCount - spawner.minCount);
                             }
 
-                            if(canEntitySpawnAt(world, classification, structuremanager, chunkgenerator, spawner, spawnPos, playerDistanceSq) && densityCheck.test(spawner.field_200702_b, spawnPos, chunk)){
-                                MobEntity mobentity = createEntity(world, spawner.field_200702_b);
+                            if(canEntitySpawnAt(world, classification, structuremanager, chunkgenerator, spawner, spawnPos, playerDistanceSq) && densityCheck.test(spawner.type, spawnPos, chunk)){
+                                MobEntity mobentity = createEntity(world, spawner.type);
                                 if(mobentity == null){
                                     return;
                                 }
@@ -155,7 +156,7 @@ public class MobSpawningUtil {
                                         ilivingentitydata = mobentity.onInitialSpawn(world, world.getDifficultyForLocation(mobentity.getPosition()), SpawnReason.NATURAL, ilivingentitydata, (CompoundNBT)null);
                                     entitiesSpawned++;
                                     entitiesInGroup++;
-                                    world.addEntity(mobentity);
+                                    world.func_242417_l(mobentity);
                                     densityAdder.run(mobentity, chunk);
                                     if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(mobentity)){
                                         return;
@@ -185,8 +186,8 @@ public class MobSpawningUtil {
         }
     }
 
-    private static boolean canEntitySpawnAt(ServerWorld world, EntityClassification classification, StructureManager structureManager, ChunkGenerator chunkGenerator, Biome.SpawnListEntry spawners, BlockPos.Mutable pos, double playerDistanceSq){
-        EntityType<?> entityType = spawners.field_200702_b;
+    private static boolean canEntitySpawnAt(ServerWorld world, EntityClassification classification, StructureManager structureManager, ChunkGenerator chunkGenerator, MobSpawnInfo.Spawners spawners, BlockPos.Mutable pos, double playerDistanceSq){
+        EntityType<?> entityType = spawners.type;
         if(entityType.getClassification() == EntityClassification.MISC)
             return false;
 
@@ -202,12 +203,12 @@ public class MobSpawningUtil {
         return false;
     }
 
-    private static boolean isEntityInSpawnListAt(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, Biome.SpawnListEntry spawners, BlockPos pos){
+    private static boolean isEntityInSpawnListAt(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, MobSpawnInfo.Spawners spawners, BlockPos pos){
         Biome biome = world.getBiome(pos);
         return getSpawnList(world, structureManager, chunkGenerator, classification, pos, biome).contains(spawners);
     }
 
-    private static List<Biome.SpawnListEntry> getSpawnList(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, BlockPos pos, Biome biome){
+    private static List<MobSpawnInfo.Spawners> getSpawnList(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, BlockPos pos, Biome biome){
         return classification == EntityClassification.MONSTER &&
             world.getBlockState(pos.down()).getBlock() == Blocks.NETHER_BRICKS &&
             structureManager.getStructureStart(pos, false, Structure.FORTRESS).isValid() ?
@@ -215,12 +216,12 @@ public class MobSpawningUtil {
     }
 
     @Nullable
-    private static Biome.SpawnListEntry getEntitySpawner(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, Random random, BlockPos pos){
+    private static MobSpawnInfo.Spawners getEntitySpawner(ServerWorld world, StructureManager structureManager, ChunkGenerator chunkGenerator, EntityClassification classification, Random random, BlockPos pos){
         Biome biome = world.getBiome(pos);
         if(classification == EntityClassification.WATER_AMBIENT && biome.getCategory() == Biome.Category.RIVER && random.nextFloat() < 0.98F){
             return null;
         }else{
-            List<Biome.SpawnListEntry> list = getSpawnList(world, structureManager, chunkGenerator, classification, pos, biome);
+            List<MobSpawnInfo.Spawners> list = getSpawnList(world, structureManager, chunkGenerator, classification, pos, biome);
             list = net.minecraftforge.event.ForgeEventFactory.getPotentialSpawns(world, classification, pos, list);
             return list.isEmpty() ? null : WeightedRandom.getRandomItem(random, list);
         }

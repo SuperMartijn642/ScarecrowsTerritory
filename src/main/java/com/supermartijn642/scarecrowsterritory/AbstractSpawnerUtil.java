@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.AbstractSpawner;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -171,49 +170,42 @@ public class AbstractSpawnerUtil {
                     double d0 = j >= 1 ? listnbt.getDouble(0) : (double)blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
                     double d1 = j >= 2 ? listnbt.getDouble(1) : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
                     double d2 = j >= 3 ? listnbt.getDouble(2) : (double)blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    if(world.hasNoCollisions(optional.get().getBoundingBoxWithSizeApplied(d0, d1, d2))){
-                        ServerWorld serverworld = (ServerWorld)world;
-                        if(EntitySpawnPlacementRegistry.canSpawnEntity(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
-                            Entity entity = EntityType.loadEntityAndExecute(compoundnbt, world, (p_221408_6_) -> {
-                                p_221408_6_.setLocationAndAngles(d0, d1, d2, p_221408_6_.rotationYaw, p_221408_6_.rotationPitch);
-                                return p_221408_6_;
-                            });
-                            if(entity == null){
-                                resetTimer(spawner);
-                                return;
-                            }
-
-                            int k = world.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).grow(getSpawnRange(spawner))).size();
-                            if(k >= getMaxNearbyEntities(spawner)){
-                                resetTimer(spawner);
-                                return;
-                            }
-
-                            entity.setLocationAndAngles(entity.getPosX(), entity.getPosY(), entity.getPosZ(), world.rand.nextFloat() * 360.0F, 0.0F);
-                            if(entity instanceof MobEntity){
-                                MobEntity mobentity = (MobEntity)entity;
-                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner)){
-                                    continue;
-                                }
-
-                                if(getSpawnData(spawner).getNbt().size() == 1 && getSpawnData(spawner).getNbt().contains("id", 8)){
-                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner, SpawnReason.SPAWNER))
-                                        ((MobEntity)entity).onInitialSpawn(serverworld, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
-                                }
-                            }
-
-                            if(!serverworld.func_242106_g(entity)){
-                                resetTimer(spawner);
-                                return;
-                            }
-
-                            world.playEvent(2004, blockpos, 0);
-                            if(entity instanceof MobEntity){
-                                ((MobEntity)entity).spawnExplosionParticle();
-                            }
-
-                            flag = true;
+                    if(world.hasNoCollisions(optional.get().getBoundingBoxWithSizeApplied(d0, d1, d2)) && EntitySpawnPlacementRegistry.canSpawnEntity(optional.get(), world.getWorld(), SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
+                        Entity entity = EntityType.loadEntityAndExecute(compoundnbt, world, (p_221408_6_) -> {
+                            p_221408_6_.setLocationAndAngles(d0, d1, d2, p_221408_6_.rotationYaw, p_221408_6_.rotationPitch);
+                            return p_221408_6_;
+                        });
+                        if(entity == null){
+                            resetTimer(spawner);
+                            return;
                         }
+
+                        int k = world.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB(blockpos.getX(), blockpos.getY(), blockpos.getZ(), (blockpos.getX() + 1), (blockpos.getY() + 1), (blockpos.getZ() + 1))).grow(getSpawnRange(spawner))).size();
+                        if(k >= getMaxNearbyEntities(spawner)){
+                            resetTimer(spawner);
+                            return;
+                        }
+
+                        entity.setLocationAndAngles(entity.getPosX(), entity.getPosY(), entity.getPosZ(), world.rand.nextFloat() * 360.0F, 0.0F);
+                        if(entity instanceof MobEntity){
+                            MobEntity mobentity = (MobEntity)entity;
+                            if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner)){
+                                continue;
+                            }
+
+                            if(getSpawnData(spawner).getNbt().size() == 1 && getSpawnData(spawner).getNbt().contains("id", 8)){
+                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner, SpawnReason.SPAWNER))
+                                    ((MobEntity)entity).onInitialSpawn(world, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
+                            }
+                        }
+
+                        addEntityWithPassengers(world, entity);
+                        world.playEvent(2004, blockpos, 0);
+                        if(entity instanceof MobEntity){
+                            ((MobEntity)entity).spawnExplosionParticle();
+                        }
+
+                        flag = true;
                     }
                 }
 
@@ -222,6 +214,14 @@ public class AbstractSpawnerUtil {
                 }
             }
 
+        }
+    }
+
+    private static void addEntityWithPassengers(World world, Entity entityIn) {
+        if (world.addEntity(entityIn)) {
+            for(Entity entity : entityIn.getPassengers()) {
+                addEntityWithPassengers(world, entity);
+            }
         }
     }
 

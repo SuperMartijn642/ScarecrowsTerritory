@@ -33,7 +33,7 @@ authors="SuperMartijn642" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''Scarecrow's Territory keeps spawners activated!'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.chunkloaders]] #optional
+[[dependencies.scarecrowsterritory]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -45,7 +45,7 @@ description='''Scarecrow's Territory keeps spawners activated!'''
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.chunkloaders]]
+[[dependencies.scarecrowsterritory]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.16.3,1.17)"

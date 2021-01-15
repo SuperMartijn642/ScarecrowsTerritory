@@ -65,7 +65,7 @@ public class MobSpawningUtil {
         int y = pos.getY();
         BlockState blockstate = chunk.getBlockState(pos);
         if(!blockstate.isNormalCube(chunk, pos)){
-            BlockPos.Mutable spawnPos = new BlockPos.Mutable();
+            BlockPos.MutableBlockPos spawnPos = new BlockPos.MutableBlockPos();
             int entitiesSpawned = 0;
 
             // try spawning a group 3 times
@@ -115,7 +115,7 @@ public class MobSpawningUtil {
                                         return;
                                     }
 
-                                    if(mobentity.isMaxGroupSize(entitiesInGroup)){
+                                    if(mobentity.func_204209_c(entitiesInGroup)){
                                         break;
                                     }
                                 }
@@ -128,7 +128,7 @@ public class MobSpawningUtil {
         }
     }
 
-    private static boolean isFarEnoughFromPlayer(ServerWorld world, IChunk chunk, BlockPos.Mutable pos, double playerDistanceSq){
+    private static boolean isFarEnoughFromPlayer(ServerWorld world, IChunk chunk, BlockPos.MutableBlockPos pos, double playerDistanceSq){
         if(playerDistanceSq <= 24 * 24){
             return false;
         }else if(world.getSpawnPoint().withinDistance(pos, 24.0D)){
@@ -139,7 +139,7 @@ public class MobSpawningUtil {
         }
     }
 
-    private static boolean canEntitySpawnAt(ServerWorld world, EntityClassification classification, ChunkGenerator<?> chunkGenerator, Biome.SpawnListEntry spawner, BlockPos.Mutable pos){
+    private static boolean canEntitySpawnAt(ServerWorld world, EntityClassification classification, ChunkGenerator<?> chunkGenerator, Biome.SpawnListEntry spawner, BlockPos.MutableBlockPos pos){
         EntityType<?> entityType = spawner.entityType;
         if(entityType.getClassification() == EntityClassification.MISC)
             return false;
@@ -150,7 +150,7 @@ public class MobSpawningUtil {
                 !EntitySpawnPlacementRegistry.func_223515_a(entityType, world, SpawnReason.NATURAL, pos, world.rand))
                 return false;
 
-            return world.hasNoCollisions(entityType.getBoundingBoxWithSizeApplied(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
+            return world.areCollisionShapesEmpty(entityType.func_220328_a(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
         }
 
         return false;

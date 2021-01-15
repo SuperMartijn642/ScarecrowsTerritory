@@ -170,10 +170,10 @@ public class AbstractSpawnerUtil {
                     double d0 = j >= 1 ? listnbt.getDouble(0) : (double)blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
                     double d1 = j >= 2 ? listnbt.getDouble(1) : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
                     double d2 = j >= 3 ? listnbt.getDouble(2) : (double)blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    if(world.hasNoCollisions(optional.get().getBoundingBoxWithSizeApplied(d0, d1, d2))){
+                    if(world.areCollisionShapesEmpty(optional.get().func_220328_a(d0, d1, d2))){
                         ServerWorld serverworld = (ServerWorld)world;
                         if(EntitySpawnPlacementRegistry.func_223515_a(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
-                            Entity entity = EntityType.loadEntityAndExecute(compoundnbt, world, (p_221408_6_) -> {
+                            Entity entity = EntityType.func_220335_a(compoundnbt, world, (p_221408_6_) -> {
                                 p_221408_6_.setLocationAndAngles(d0, d1, d2, p_221408_6_.rotationYaw, p_221408_6_.rotationPitch);
                                 return p_221408_6_;
                             });
@@ -188,15 +188,15 @@ public class AbstractSpawnerUtil {
                                 return;
                             }
 
-                            entity.setLocationAndAngles(entity.getPosX(), entity.getPosY(), entity.getPosZ(), world.rand.nextFloat() * 360.0F, 0.0F);
+                            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, world.rand.nextFloat() * 360.0F, 0.0F);
                             if(entity instanceof MobEntity){
                                 MobEntity mobentity = (MobEntity)entity;
-                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner)){
+                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner)){
                                     continue;
                                 }
 
                                 if(getSpawnData(spawner).getNbt().size() == 1 && getSpawnData(spawner).getNbt().contains("id", 8)){
-                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.getPosX(), (float)entity.getPosY(), (float)entity.getPosZ(), spawner, SpawnReason.SPAWNER))
+                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner, SpawnReason.SPAWNER))
                                         ((MobEntity)entity).onInitialSpawn(serverworld, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
                                 }
                             }

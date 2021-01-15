@@ -14,6 +14,7 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -53,21 +54,16 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
+    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
         TileEntity tile = worldIn.getTileEntity(pos);
         if(tile instanceof ScarecrowTile)
-            return ((ScarecrowTile)tile).rightClick(player) ? ActionResultType.CONSUME : ActionResultType.PASS;
-        return ActionResultType.PASS;
+            return ((ScarecrowTile)tile).rightClick(player);
+        return false;
     }
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
         return this.type.getBlockShape(state.get(BlockStateProperties.HORIZONTAL_FACING), state.get(BOTTOM));
-    }
-
-    @Override
-    public boolean isTransparent(BlockState state){
-        return true;
     }
 
     @Override
@@ -159,5 +155,15 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
         components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
 
         return components;
+    }
+
+    @Override
+    public BlockRenderLayer getRenderLayer(){
+        return this.type.getRenderLayer();
+    }
+
+    @Override
+    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos){
+        return false;
     }
 }

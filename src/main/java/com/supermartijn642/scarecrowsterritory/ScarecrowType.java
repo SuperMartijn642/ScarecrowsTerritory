@@ -3,12 +3,12 @@ package com.supermartijn642.scarecrowsterritory;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -118,12 +118,12 @@ public enum ScarecrowType {
         return new ScarecrowTile(this);
     }
 
-    public RenderType getRenderLayer(){
+    public BlockRenderLayer getRenderLayer(){
         switch(this){
             case PRIMITIVE:
-                return RenderType.getTranslucent();
+                return BlockRenderLayer.TRANSLUCENT;
         }
-        return RenderType.getSolid();
+        return BlockRenderLayer.SOLID;
     }
 
     public boolean is2BlocksHigh(){

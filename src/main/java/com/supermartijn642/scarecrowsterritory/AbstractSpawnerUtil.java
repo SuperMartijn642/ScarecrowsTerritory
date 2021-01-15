@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.AbstractSpawner;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -173,7 +172,7 @@ public class AbstractSpawnerUtil {
                     double d2 = j >= 3 ? listnbt.getDouble(2) : (double)blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
                     if(world.hasNoCollisions(optional.get().getBoundingBoxWithSizeApplied(d0, d1, d2))){
                         ServerWorld serverworld = (ServerWorld)world;
-                        if(EntitySpawnPlacementRegistry.canSpawnEntity(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
+                        if(EntitySpawnPlacementRegistry.func_223515_a(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
                             Entity entity = EntityType.loadEntityAndExecute(compoundnbt, world, (p_221408_6_) -> {
                                 p_221408_6_.setLocationAndAngles(d0, d1, d2, p_221408_6_.rotationYaw, p_221408_6_.rotationPitch);
                                 return p_221408_6_;
@@ -202,11 +201,7 @@ public class AbstractSpawnerUtil {
                                 }
                             }
 
-                            if(!serverworld.func_242106_g(entity)){
-                                resetTimer(spawner);
-                                return;
-                            }
-
+                            func_221409_a(world, entity);
                             world.playEvent(2004, blockpos, 0);
                             if(entity instanceof MobEntity){
                                 ((MobEntity)entity).spawnExplosionParticle();
@@ -220,6 +215,15 @@ public class AbstractSpawnerUtil {
                 if(flag){
                     resetTimer(spawner);
                 }
+            }
+
+        }
+    }
+
+    private static void func_221409_a(World world, Entity entityIn){
+        if(world.addEntity(entityIn)){
+            for(Entity entity : entityIn.getPassengers()){
+                world.addEntity(entity);
             }
 
         }

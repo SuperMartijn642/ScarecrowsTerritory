@@ -4,15 +4,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -33,6 +29,10 @@ public class ScarecrowTracker {
     private static final Map<IWorld,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<IWorld,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
+    public static int getScarecrowCount(World world){
+        return SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet()).size();
+    }
+
     @SubscribeEvent
     public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
         if(!STConfig.INSTANCE.passiveMobSpawning.get() || e.getEntity().world.isRemote)
@@ -48,7 +48,7 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
         World world = e.world;
-        if(!world.isRemote || !(world instanceof ServerWorld) || world.isDebug() || world.getDifficulty() == Difficulty.PEACEFUL)
+        if(!world.isRemote || !(world instanceof ServerWorld) || world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES || world.getDifficulty() == Difficulty.PEACEFUL)
             return;
 
         if(!world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
@@ -65,12 +65,9 @@ public class ScarecrowTracker {
     }
 
     private static void spawnEntitiesInChunk(ServerWorld world, Chunk chunk){
-        WorldEntitySpawner.EntityDensityManager entityDensityManager = world.getChunkProvider().func_241101_k_();
-        if(entityDensityManager != null){
-            boolean spawnAnimals = world.getWorldInfo().getGameTime() % 400L == 0L;
-            boolean spawnHostiles = world.getDifficulty() != Difficulty.PEACEFUL;
-            MobSpawningUtil.spawnEntitiesInChunk(world, chunk, entityDensityManager, true, spawnHostiles, spawnAnimals);
-        }
+        boolean spawnAnimals = world.getWorldInfo().getGameTime() % 400L == 0L;
+        boolean spawnHostiles = world.getDifficulty() != Difficulty.PEACEFUL;
+        MobSpawningUtil.spawnEntitiesInChunk(world, chunk, true, spawnHostiles, spawnAnimals);
     }
 
     private static void addScarecrow(IWorld world, BlockPos pos){
@@ -168,7 +165,7 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(World world, Vector3d center, double range){
+    public static boolean isScarecrowInRange(World world, Vec3d center, double range){
         double rangeSquared = range * range;
         Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet());
 

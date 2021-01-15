@@ -1,6 +1,5 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -25,11 +24,11 @@ public enum ScarecrowType {
     PRIMITIVE;
 
     private static final VoxelShape PRIMITIVE_SHAPE = VoxelShapes.or(
-        VoxelShapes.create(7.5 / 16d,0,7.5 / 16d, 8.5 / 16d,   26 / 16d, 8.5 / 16d),
+        VoxelShapes.create(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
         VoxelShapes.create(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
         VoxelShapes.create(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
     private static final VoxelShape TECHNOLOGICAL_SHAPE = VoxelShapes.or(
-        VoxelShapes.create(3 / 16d,       0, 3 / 16d, 13 / 16d,   1 / 16d, 13 / 16d),
+        VoxelShapes.create(3 / 16d, 0, 3 / 16d, 13 / 16d, 1 / 16d, 13 / 16d),
         VoxelShapes.create(4 / 16d, 1 / 16d, 4 / 16d, 12 / 16d, 1.5 / 16d, 12 / 16d));
 
     private static final VoxelShape[] PRIMITIVE_SHAPES_BOTTOM = new VoxelShape[4];
@@ -95,12 +94,12 @@ public enum ScarecrowType {
         return this.name().toLowerCase(Locale.ROOT) + "_scarecrow";
     }
 
-    public AbstractBlock.Properties getBlockProperties(){
+    public Block.Properties getBlockProperties(){
         switch(this){
             case PRIMITIVE:
-                return AbstractBlock.Properties.create(Material.WOOL, DyeColor.BROWN).sound(SoundType.CLOTH);
+                return Block.Properties.create(Material.WOOL, DyeColor.BROWN).sound(SoundType.CLOTH);
         }
-        return AbstractBlock.Properties.create(Material.AIR);
+        return Block.Properties.create(Material.AIR);
     }
 
     public VoxelShape getBlockShape(Direction facing, boolean bottom){

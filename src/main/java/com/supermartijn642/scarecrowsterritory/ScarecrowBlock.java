@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
@@ -73,14 +74,14 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     public BlockState getStateForPlacement(BlockItemUseContext context){
         if(this.type.is2BlocksHigh() && !context.getWorld().isAirBlock(context.getPos().up()) && context.getWorld().getBlockState(context.getPos().up()).getBlock() != Blocks.WATER)
             return null;
-        FluidState fluidState = context.getWorld().getFluidState(context.getPos());
+        IFluidState fluidState = context.getWorld().getFluidState(context.getPos());
         return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite()).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
     }
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
         if(this.type.is2BlocksHigh() && !worldIn.isAirBlock(pos) && worldIn.getBlockState(pos).getBlock() != Blocks.WATER){
-            FluidState fluidState = worldIn.getFluidState(pos.up());
+            IFluidState fluidState = worldIn.getFluidState(pos.up());
             worldIn.setBlockState(pos.up(), state.with(BOTTOM, false).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER));
         }
     }
@@ -113,7 +114,7 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    public FluidState getFluidState(BlockState state){
+    public IFluidState getFluidState(BlockState state){
         return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
     }
 
@@ -150,12 +151,12 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
             if(builder.length() + token.length() + 1 < 25)
                 builder.append(' ').append(token);
             else{
-                components.add(new StringTextComponent(builder.toString()).mergeStyle(color));
+                components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
                 builder = new StringBuilder(token);
             }
         }
 
-        components.add(new StringTextComponent(builder.toString()).mergeStyle(color));
+        components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
 
         return components;
     }

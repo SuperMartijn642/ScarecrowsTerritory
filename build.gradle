@@ -58,7 +58,7 @@ minecraft {
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-            args '--mod', 'chunkloaders', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'scarecrowsterritory', '--all', '--output', file('src/generated/resources/')
 
             mods {
                 scarecrowsterritory {

@@ -76,7 +76,8 @@ public class ScarecrowTracker {
     private static void addScarecrow(IWorld world, BlockPos pos){
         SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
-            s.add(pos); return s;
+            s.add(pos);
+            return s;
         });
 
         int range = (int)Math.ceil(STConfig.INSTANCE.passiveMobRange.get());
@@ -97,7 +98,8 @@ public class ScarecrowTracker {
 
     private static void removeScarecrow(IWorld world, BlockPos pos){
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
-            s.remove(pos); return s;
+            s.remove(pos);
+            return s;
         });
 
         int range = (int)Math.ceil(STConfig.INSTANCE.passiveMobRange.get());

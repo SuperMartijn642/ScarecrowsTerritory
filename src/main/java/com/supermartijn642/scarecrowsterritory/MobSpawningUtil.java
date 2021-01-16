@@ -38,9 +38,9 @@ public class MobSpawningUtil {
     private static final Method func_234990_a_;
 
     static{
-        func_234991_a_ = ReflectionUtil.findMethod("func_234991_a_");
-        func_234989_a_ = ReflectionUtil.findMethod("func_234989_a_");
-        func_234990_a_ = ReflectionUtil.findMethod("func_234990_a_");
+        func_234991_a_ = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234991_a_");
+        func_234989_a_ = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234989_a_");
+        func_234990_a_ = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234990_a_");
     }
 
     private static boolean func_234991_a_(WorldEntitySpawner.EntityDensityManager densityManager, EntityClassification classification){

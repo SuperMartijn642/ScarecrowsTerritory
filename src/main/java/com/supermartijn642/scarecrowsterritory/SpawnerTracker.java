@@ -36,7 +36,8 @@ public class SpawnerTracker {
             if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
                 SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.add(pos); return s;
+                    s.add(pos);
+                    return s;
                 });
             }
         }
@@ -49,7 +50,8 @@ public class SpawnerTracker {
         for(BlockPos pos : chunk.getTileEntitiesPos()){
             if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.remove(pos); return s;
+                    s.remove(pos);
+                    return s;
                 });
             }
         }
@@ -60,7 +62,8 @@ public class SpawnerTracker {
         if(e.getPlacedBlock().getBlock() == Blocks.SPAWNER){
             SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                s.add(e.getPos()); return s;
+                s.add(e.getPos());
+                return s;
             });
         }
     }
@@ -69,7 +72,8 @@ public class SpawnerTracker {
     public static void onBlockBreak(BlockEvent.BreakEvent e){
         if(e.getState().getBlock() == Blocks.SPAWNER){
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                s.remove(e.getPos()); return s;
+                s.remove(e.getPos());
+                return s;
             });
         }
     }

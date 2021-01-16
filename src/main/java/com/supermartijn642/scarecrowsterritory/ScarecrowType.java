@@ -25,16 +25,12 @@ public enum ScarecrowType {
     PRIMITIVE;
 
     private static final VoxelShape PRIMITIVE_SHAPE = VoxelShapes.or(
-        VoxelShapes.create(7.5 / 16d,0,7.5 / 16d, 8.5 / 16d,   26 / 16d, 8.5 / 16d),
+        VoxelShapes.create(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
         VoxelShapes.create(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
         VoxelShapes.create(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
-    private static final VoxelShape TECHNOLOGICAL_SHAPE = VoxelShapes.or(
-        VoxelShapes.create(3 / 16d,       0, 3 / 16d, 13 / 16d,   1 / 16d, 13 / 16d),
-        VoxelShapes.create(4 / 16d, 1 / 16d, 4 / 16d, 12 / 16d, 1.5 / 16d, 12 / 16d));
 
     private static final VoxelShape[] PRIMITIVE_SHAPES_BOTTOM = new VoxelShape[4];
     private static final VoxelShape[] PRIMITIVE_SHAPES_TOP = new VoxelShape[4];
-    private static final VoxelShape[] TECHNOLOGICAL_SHAPES = new VoxelShape[4];
 
     static{
         PRIMITIVE_SHAPES_BOTTOM[Direction.NORTH.getHorizontalIndex()] = PRIMITIVE_SHAPE;
@@ -43,11 +39,6 @@ public enum ScarecrowType {
         PRIMITIVE_SHAPES_BOTTOM[Direction.WEST.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.WEST, PRIMITIVE_SHAPE);
         for(int i = 0; i < 4; i++)
             PRIMITIVE_SHAPES_TOP[i] = PRIMITIVE_SHAPES_BOTTOM[i].withOffset(0, -1, 0);
-
-        TECHNOLOGICAL_SHAPES[Direction.NORTH.getHorizontalIndex()] = TECHNOLOGICAL_SHAPE;
-        TECHNOLOGICAL_SHAPES[Direction.EAST.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.EAST, TECHNOLOGICAL_SHAPE);
-        TECHNOLOGICAL_SHAPES[Direction.SOUTH.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.SOUTH, TECHNOLOGICAL_SHAPE);
-        TECHNOLOGICAL_SHAPES[Direction.WEST.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.WEST, TECHNOLOGICAL_SHAPE);
     }
 
     /**

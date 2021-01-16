@@ -11,9 +11,9 @@ import java.lang.reflect.Method;
  */
 public class ReflectionUtil {
 
-    public static Field findField(String fieldName){
+    public static Field findField(Class<?> classs, String fieldName){
         try{
-            Field field = ObfuscationReflectionHelper.findField(AbstractSpawner.class, fieldName);
+            Field field = ObfuscationReflectionHelper.findField(classs, fieldName);
             field.setAccessible(true);
             return field;
         }catch(Exception e){
@@ -22,9 +22,9 @@ public class ReflectionUtil {
         }
     }
 
-    public static Method findMethod(String methodName){
+    public static Method findMethod(Class<?> classs, String methodName){
         try{
-            Method method = ObfuscationReflectionHelper.findMethod(AbstractSpawner.class, methodName);
+            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName);
             method.setAccessible(true);
             return method;
         }catch(Exception e){

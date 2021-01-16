@@ -76,7 +76,7 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
 
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
-        if(this.type.is2BlocksHigh() && !worldIn.isAirBlock(pos) && worldIn.getBlockState(pos).getBlock() != Blocks.WATER){
+        if(this.type.is2BlocksHigh() && (worldIn.isAirBlock(pos.up()) || worldIn.getBlockState(pos.up()).getBlock() == Blocks.WATER)){
             IFluidState fluidState = worldIn.getFluidState(pos.up());
             worldIn.setBlockState(pos.up(), state.with(BOTTOM, false).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER));
         }

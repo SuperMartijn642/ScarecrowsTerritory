@@ -1,0 +1,16 @@
+[
+{
+  "modid": "scarecrowsterritory",
+  "name": "Scarecrow's Territory",
+  "description": "Scarecrow's Territory keeps spawners activated!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SuperMartijn642"],
+  "credits": "",
+  "logoFile": "scarecrowsterritory.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

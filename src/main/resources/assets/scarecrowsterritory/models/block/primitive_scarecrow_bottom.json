@@ -2,9 +2,9 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"1": "minecraft:block/oak_log",
+		"1": "minecraft:blocks/log_oak",
 		"2": "scarecrowsterritory:primitive_scarecrow",
-		"particle": "minecraft:block/oak_log"
+		"particle": "minecraft:blocks/log_oak"
 	},
 	"elements": [
 		{

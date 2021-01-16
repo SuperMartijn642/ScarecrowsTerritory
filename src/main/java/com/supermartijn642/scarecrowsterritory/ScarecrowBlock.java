@@ -1,60 +1,64 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockFaceShape;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowBlock extends Block implements IWaterLoggable {
+public class ScarecrowBlock extends Block {
 
-    public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final PropertyBool BOTTOM = PropertyBool.create("bottom");
 
     private final ScarecrowType type;
 
     public ScarecrowBlock(ScarecrowType type){
-        super(type.getBlockProperties());
+        super(Material.CLOTH, MapColor.BROWN);
         this.type = type;
 
         this.setRegistryName(type.getRegistryName());
-        this.setDefaultState(this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(BOTTOM, true).with(WATERLOGGED, false));
+        this.setUnlocalizedName("scarecrowsterritory." + type.getRegistryName());
+        this.setDefaultState(this.getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(BOTTOM, true));
+        this.setCreativeTab(CreativeTabs.DECORATIONS);
+        this.setSoundType(SoundType.CLOTH);
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
         TileEntity tile = worldIn.getTileEntity(pos);
         if(tile instanceof ScarecrowTile)
             return ((ScarecrowTile)tile).rightClick(player);
@@ -62,81 +66,88 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
-        return this.type.getBlockShape(state.get(BlockStateProperties.HORIZONTAL_FACING), state.get(BOTTOM));
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState){
+        Arrays.stream(this.type.getBlockShape(state.getValue(BlockHorizontal.FACING), state.getValue(BOTTOM))).forEach(
+            box -> addCollisionBoxToList(pos, entityBox, collidingBoxes, box)
+        );
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context){
-        if(this.type.is2BlocksHigh() && !context.getWorld().isAirBlock(context.getPos().up()) && context.getWorld().getBlockState(context.getPos().up()).getBlock() != Blocks.WATER)
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos){
+        AxisAlignedBB result = null;
+        for(AxisAlignedBB box : this.type.getBlockShape(state.getValue(BlockHorizontal.FACING), state.getValue(BOTTOM))){
+            if(result == null)
+                result = box;
+            else
+                result = new AxisAlignedBB(
+                    Math.min(result.minX, box.minX),
+                    Math.min(result.minY, box.minY),
+                    Math.min(result.minZ, box.minZ),
+                    Math.max(result.maxX, box.maxX),
+                    Math.max(result.maxY, box.maxY),
+                    Math.max(result.maxZ, box.maxZ)
+                );
+        }
+        return result;
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand){
+        if(this.type.is2BlocksHigh() && !world.isAirBlock(pos.up()))
             return null;
-        IFluidState fluidState = context.getWorld().getFluidState(context.getPos());
-        return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite()).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+        return this.getDefaultState().withProperty(BlockHorizontal.FACING, placer.getHorizontalFacing().getOpposite());
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
-        if(this.type.is2BlocksHigh() && !worldIn.isAirBlock(pos) && worldIn.getBlockState(pos).getBlock() != Blocks.WATER){
-            IFluidState fluidState = worldIn.getFluidState(pos.up());
-            worldIn.setBlockState(pos.up(), state.with(BOTTOM, false).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER));
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack){
+        if(this.type.is2BlocksHigh() && !worldIn.isAirBlock(pos)){
+            worldIn.setBlockState(pos.up(), state.withProperty(BOTTOM, false));
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
-        if(this.type.is2BlocksHigh() && state.getBlock() != newState.getBlock()){
-            boolean bottom = state.get(BOTTOM);
-            BlockState state1 = worldIn.getBlockState(bottom ? pos.up() : pos.down());
-            if(state1.getBlock() == state.getBlock() && state1.get(BOTTOM) != bottom)
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state){
+        if(this.type.is2BlocksHigh()){
+            boolean bottom = state.getValue(BOTTOM);
+            IBlockState state1 = worldIn.getBlockState(bottom ? pos.up() : pos.down());
+            if(state1.getBlock() == state.getBlock() && state1.getValue(BOTTOM) != bottom)
                 worldIn.setBlockState(bottom ? pos.up() : pos.down(),
-                    state1.get(WATERLOGGED) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState());
+                    Blocks.AIR.getDefaultState());
         }
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.breakBlock(worldIn, pos, state);
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block,BlockState> builder){
-        builder.add(HorizontalBlock.HORIZONTAL_FACING, BOTTOM, WATERLOGGED);
+    protected BlockStateContainer createBlockState(){
+        return new BlockStateContainer(this, BlockHorizontal.FACING, BOTTOM);
     }
 
     @Override
-    public boolean hasTileEntity(BlockState state){
+    public boolean hasTileEntity(IBlockState state){
         return true;
     }
 
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world){
+    public TileEntity createTileEntity(World world, IBlockState state){
         return this.type.createTileEntity();
     }
 
     @Override
-    public IFluidState getFluidState(BlockState state){
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
-    }
-
-    @Override
-    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos){
-        if(stateIn.get(WATERLOGGED))
-            worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
-        return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
-        boolean spawners = STConfig.INSTANCE.loadSpawners.get();
-        boolean passive = STConfig.INSTANCE.passiveMobSpawning.get();
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced){
+        boolean spawners = STConfig.loadSpawners;
+        boolean passive = STConfig.passiveMobSpawning;
 
         if(spawners && passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.loadSpawnerRange.get()), Math.round(STConfig.INSTANCE.passiveMobRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange), Math.round(STConfig.passiveMobRange)));
         else if(spawners)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.loadSpawnerRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange)));
         else if(passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.passiveMobRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.passiveMobRange)));
     }
 
-    @OnlyIn(Dist.CLIENT)
-    private static List<ITextComponent> wrapTooltip(String translationKey, TextFormatting color, Object... args){
+    @SideOnly(Side.CLIENT)
+    private static List<String> wrapTooltip(String translationKey, TextFormatting color, Object... args){
         List<ITextComponent> components = new ArrayList<>(1);
         String translation = ClientProxy.translate(translationKey, args).trim();
         StringTokenizer tokenizer = new StringTokenizer(translation, " ");
@@ -147,23 +158,43 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
             if(builder.length() + token.length() + 1 < 25)
                 builder.append(' ').append(token);
             else{
-                components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
+                components.add(new TextComponentString(builder.toString()).setStyle(new Style().setColor(color)));
                 builder = new StringBuilder(token);
             }
         }
 
-        components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
+        components.add(new TextComponentString(builder.toString()).setStyle(new Style().setColor(color)));
 
-        return components;
+        return components.stream().map(ITextComponent::getFormattedText).collect(Collectors.toList());
     }
 
     @Override
-    public BlockRenderLayer getRenderLayer(){
+    public BlockRenderLayer getBlockLayer(){
         return this.type.getRenderLayer();
     }
 
     @Override
-    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos){
+    public boolean isOpaqueCube(IBlockState state){
         return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state){
+        return false;
+    }
+
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face){
+        return face == EnumFacing.DOWN && state.getValue(BOTTOM) ? BlockFaceShape.CENTER_SMALL : BlockFaceShape.UNDEFINED;
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state){
+        return state.getValue(BlockHorizontal.FACING).getHorizontalIndex() + (state.getValue(BOTTOM) ? 0 : 4);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta){
+        return this.getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.getHorizontal(meta & 3)).withProperty(BOTTOM, (meta & 4) == 4);
     }
 }

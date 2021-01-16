@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "forge:ore_shaped",
   "pattern": [
     " P ",
     "SHS",
@@ -7,13 +7,14 @@
   ],
   "key": {
     "S": {
-      "tag": "forge:rods/wooden"
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
     },
     "H": {
       "item": "minecraft:hay_block"
     },
     "P": {
-      "item": "minecraft:carved_pumpkin"
+      "item": "minecraft:pumpkin"
     }
   },
   "result": {

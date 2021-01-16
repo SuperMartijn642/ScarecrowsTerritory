@@ -1,16 +1,16 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.tileentity.MobSpawnerTileEntity;
+import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber
 public class SpawnerTracker {
 
-    private static final Map<IWorld,Set<BlockPos>> SPAWNERS_PER_WORLD = new LinkedHashMap<>();
+    private static final Map<World,Set<BlockPos>> SPAWNERS_PER_WORLD = new LinkedHashMap<>();
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload e){
@@ -30,13 +30,13 @@ public class SpawnerTracker {
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load e){
-        IChunk chunk = e.getChunk();
+        Chunk chunk = e.getChunk();
 
-        for(BlockPos pos : chunk.getTileEntitiesPos()){
-            if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
+        for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
+            if(entry.getValue() instanceof TileEntityMobSpawner){
                 SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.add(pos); return s;
+                    s.add(entry.getKey()); return s;
                 });
             }
         }
@@ -44,12 +44,12 @@ public class SpawnerTracker {
 
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload e){
-        IChunk chunk = e.getChunk();
+        Chunk chunk = e.getChunk();
 
-        for(BlockPos pos : chunk.getTileEntitiesPos()){
-            if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
+        for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
+            if(entry.getValue() instanceof TileEntityMobSpawner){
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.remove(pos); return s;
+                    s.remove(entry.getKey()); return s;
                 });
             }
         }
@@ -57,7 +57,7 @@ public class SpawnerTracker {
 
     @SubscribeEvent
     public static void onBlockAdded(BlockEvent.EntityPlaceEvent e){
-        if(e.getPlacedBlock().getBlock() == Blocks.SPAWNER){
+        if(e.getPlacedBlock().getBlock() == Blocks.MOB_SPAWNER){
             SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
                 s.add(e.getPos()); return s;
@@ -67,7 +67,7 @@ public class SpawnerTracker {
 
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent e){
-        if(e.getState().getBlock() == Blocks.SPAWNER){
+        if(e.getState().getBlock() == Blocks.MOB_SPAWNER){
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
                 s.remove(e.getPos()); return s;
             });

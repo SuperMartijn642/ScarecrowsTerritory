@@ -1,7 +1,7 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,9 +11,9 @@ import java.lang.reflect.Method;
  */
 public class ReflectionUtil {
 
-    public static Field findField(String fieldName){
+    public static Field findField(Class<?> classs, String fieldName){
         try{
-            Field field = ObfuscationReflectionHelper.findField(AbstractSpawner.class, fieldName);
+            Field field = ObfuscationReflectionHelper.findField(classs, fieldName);
             field.setAccessible(true);
             return field;
         }catch(Exception e){
@@ -22,9 +22,9 @@ public class ReflectionUtil {
         }
     }
 
-    public static Method findMethod(String methodName){
+    public static Method findMethod(Class<?> classs, String methodName, Class<?> returnType, Class<?>... parameters){
         try{
-            Method method = ObfuscationReflectionHelper.findMethod(AbstractSpawner.class, methodName);
+            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName, returnType, parameters);
             method.setAccessible(true);
             return method;
         }catch(Exception e){

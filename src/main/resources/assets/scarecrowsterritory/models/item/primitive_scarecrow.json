@@ -1,5 +1,5 @@
 {
-    "parent": "scarecrowsterritory:primitive_scarecrow",
+    "parent": "scarecrowsterritory:block/primitive_scarecrow",
     "display": {
         "gui": {
             "rotation": [ 30, 225, 0 ],

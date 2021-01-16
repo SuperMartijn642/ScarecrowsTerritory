@@ -2,36 +2,38 @@ package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Created 7/7/2020 by SuperMartijn642
  */
-@Mod("scarecrowsterritory")
+@Mod(modid = ScarecrowsTerritory.MODID, name = ScarecrowsTerritory.NAME, version = ScarecrowsTerritory.VERSION, dependencies = ScarecrowsTerritory.DEPENDENCIES)
 public class ScarecrowsTerritory {
+
+    public static final String MODID = "scarecrowsterritory";
+    public static final String NAME = "Scarecrow's Territory";
+    public static final String VERSION = "1.0.0";
+    public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,)";
 
     public ScarecrowsTerritory(){
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent e){
+        STConfig.init(e.getModConfigurationDirectory());
+    }
+
+    @Mod.EventBusSubscriber
     public static class RegistryEvents {
         @SubscribeEvent
         public static void onBlockRegistry(final RegistryEvent.Register<Block> e){
-            for(ScarecrowType type : ScarecrowType.values())
+            for(ScarecrowType type : ScarecrowType.values()){
                 type.registerBlock(e);
-        }
-
-        @SubscribeEvent
-        public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
-            for(ScarecrowType type : ScarecrowType.values())
-                type.registerTileType(e);
+                type.registerTileEntity(e);
+            }
         }
 
         @SubscribeEvent

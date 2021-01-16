@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.AbstractSpawner;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -33,16 +32,16 @@ public class AbstractSpawnerUtil {
     private static final Method resetTimer;
 
     static{
-        spawnDelay = ReflectionUtil.findField("field_98286_b");
-        spawnData = ReflectionUtil.findField("field_98282_f");
-        mobRotation = ReflectionUtil.findField("field_98287_c");
-        prevMobRotation = ReflectionUtil.findField("field_98284_d");
-        spawnCount = ReflectionUtil.findField("field_98294_i");
-        maxNearbyEntities = ReflectionUtil.findField("field_98292_k");
-        spawnRange = ReflectionUtil.findField("field_98290_m");
+        spawnDelay = ReflectionUtil.findField(AbstractSpawner.class, "field_98286_b");
+        spawnData = ReflectionUtil.findField(AbstractSpawner.class, "field_98282_f");
+        mobRotation = ReflectionUtil.findField(AbstractSpawner.class, "field_98287_c");
+        prevMobRotation = ReflectionUtil.findField(AbstractSpawner.class, "field_98284_d");
+        spawnCount = ReflectionUtil.findField(AbstractSpawner.class, "field_98294_i");
+        maxNearbyEntities = ReflectionUtil.findField(AbstractSpawner.class, "field_98292_k");
+        spawnRange = ReflectionUtil.findField(AbstractSpawner.class, "field_98290_m");
 
-        isActivated = ReflectionUtil.findMethod("func_98279_f");
-        resetTimer = ReflectionUtil.findMethod("func_98273_j");
+        isActivated = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98279_f");
+        resetTimer = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98273_j");
     }
 
     private static int getSpawnDelay(AbstractSpawner spawner){

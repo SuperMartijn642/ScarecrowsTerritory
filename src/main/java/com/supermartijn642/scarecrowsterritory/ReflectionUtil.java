@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

@@ -5,8 +5,8 @@
 	"textures": {
 		"1": "scarecrowsterritory:primitive_scarecrow",
 		"2": "scarecrowsterritory:primitive_scarecrow_hat",
-		"3": "minecraft:block/oak_log",
-		"particle": "minecraft:block/oak_log"
+		"3": "block/oak_log",
+		"particle": "block/oak_log"
 	},
 	"elements": [
 		{
@@ -75,7 +75,7 @@
 		},
 		{
 			"from": [7, 25, 10],
-			"to": [9, 28, 12],
+			"to": [9, 29, 12],
 			"rotation": {"angle": 45, "axis": "x", "origin": [15, 33, 19]},
 			"faces": {
 				"north": {"uv": [4.25, 0.25, 4.75, 1], "texture": "#2"},

@@ -14,6 +14,7 @@ import java.util.Map;
 /**
  * Created 1/16/2021 by SuperMartijn642
  */
+@IFMLLoadingPlugin.MCVersion("1.12.2")
 public class CoreMod implements IFMLLoadingPlugin {
 
     public CoreMod() {

@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -11,12 +10,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -37,10 +34,10 @@ public class ScarecrowTracker {
     }
 
     public static boolean canDespawn(World world, Vec3d pos){
-        if(!STConfig.passiveMobSpawning)
+        if(!STConfig.passiveMobSpawning.get())
             return true;
 
-        double range = STConfig.passiveMobRange;
+        double range = STConfig.passiveMobRange.get();
         return !isScarecrowInRange(world, pos, range);
     }
 
@@ -65,13 +62,12 @@ public class ScarecrowTracker {
     }
 
     private static void addScarecrow(World world, BlockPos pos){
-        System.out.println("add");
         SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
             s.add(pos); return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange);
+        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
@@ -92,7 +88,7 @@ public class ScarecrowTracker {
             s.remove(pos); return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange);
+        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {

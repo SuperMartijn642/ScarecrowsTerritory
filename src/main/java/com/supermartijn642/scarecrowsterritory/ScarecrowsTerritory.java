@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
@@ -19,11 +18,6 @@ public class ScarecrowsTerritory {
     public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,)";
 
     public ScarecrowsTerritory(){
-    }
-
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent e){
-        STConfig.init(e.getModConfigurationDirectory());
     }
 
     @Mod.EventBusSubscriber

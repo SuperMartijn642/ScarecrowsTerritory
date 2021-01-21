@@ -59,6 +59,10 @@ repositories {
 }
 
 dependencies {
+    // config lib
+//    compile 'curse.maven:supermartijn642s-config-lib:3175648'
+    implementation files('libs/supermartijn642configlib-1.0.1-mc1.12.jar')
+
     provided('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'guava'
         exclude module: 'commons-io'
@@ -83,6 +87,6 @@ jar {
     }
 }
 
-//sourceSets {
-//    main { output.resourcesDir = output.classesDir }
-//}
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}

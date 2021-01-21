@@ -32,8 +32,8 @@ public class ScarecrowTile extends TileEntity implements ITickable {
 
     @Override
     public void update(){
-        if(STConfig.loadSpawners){
-            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.world, this.pos, STConfig.loadSpawnerRange);
+        if(STConfig.loadSpawners.get()){
+            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.world, this.pos, STConfig.loadSpawnerRange.get());
             for(BlockPos spawnerPos : spawners){
                 TileEntity tileEntity = this.world.getTileEntity(spawnerPos);
                 if(tileEntity instanceof TileEntityMobSpawner)

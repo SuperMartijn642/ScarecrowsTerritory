@@ -63,7 +63,6 @@ public enum ScarecrowType {
                 this.block = new ScarecrowBlock(this);
         }
         e.getRegistry().register(this.block);
-        System.out.println("BLOCK: " + this.block.getRegistryName());
     }
 
     public void registerTileEntity(RegistryEvent.Register<Block> e){

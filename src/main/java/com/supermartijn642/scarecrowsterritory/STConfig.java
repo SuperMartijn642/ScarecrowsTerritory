@@ -1,34 +1,33 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraftforge.common.config.Configuration;
+import com.supermartijn642.configlib.ModConfig;
+import com.supermartijn642.configlib.ModConfigBuilder;
 
-import java.io.File;
+import java.util.function.Supplier;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
 public class STConfig {
 
-    private static final String FILE_NAME = "scarecrows-territory.cfg";
+    public static final Supplier<Boolean> loadSpawners;
+    public static final Supplier<Double> loadSpawnerRange;
+    public static final Supplier<Boolean> passiveMobSpawning;
+    public static final Supplier<Double> passiveMobRange;
 
-    public static Configuration instance;
+    static{
+        ModConfigBuilder builder = new ModConfigBuilder("scarecrowsterritory", ModConfig.Type.COMMON);
 
-    public static boolean loadSpawners;
-    public static float loadSpawnerRange;
-    public static boolean passiveMobSpawning;
-    public static float passiveMobRange;
+        builder.push("General");
 
-    public static void init(File dir){
-        instance = new Configuration(new File(dir, FILE_NAME));
-        instance.load();
+        loadSpawners = builder.comment("Should the scarecrows keep spawners in range activated?").define("loadSpawners", true);
+        loadSpawnerRange = builder.comment("In what range will the scarecrows load spawners?").define("loadSpawnerRange", 8, 1, 25d);
+        passiveMobSpawning = builder.comment("Should mobs passively spawn within the scarecrows' range").define("passiveMobSpawning", true);
+        passiveMobRange = builder.comment("In what range will mobs passively spawn?").define("passiveMobRange", 8, 1, 25d);
 
-        loadSpawners = instance.getBoolean("loadSpawners", Configuration.CATEGORY_GENERAL, true, "Should the scarecrows keep spawners in range activated?");
-        loadSpawnerRange = instance.getFloat("loadSpawnerRange", Configuration.CATEGORY_GENERAL, 8, 1, 25, "In what range will the scarecrows load spawners?");
-        passiveMobSpawning = instance.getBoolean("passiveMobSpawning", Configuration.CATEGORY_GENERAL, true, "Should mobs passively spawn within the scarecrows' range");
-        passiveMobRange = instance.getFloat("passiveMobRange", Configuration.CATEGORY_GENERAL, 8, 1, 25, "In what range will mobs passively spawn?");
+        builder.pop();
 
-        if(instance.hasChanged())
-            instance.save();
+        builder.build();
     }
 
 }

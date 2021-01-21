@@ -126,15 +126,15 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
-        boolean spawners = STConfig.INSTANCE.loadSpawners.get();
-        boolean passive = STConfig.INSTANCE.passiveMobSpawning.get();
+        boolean spawners = STConfig.loadSpawners.get();
+        boolean passive = STConfig.passiveMobSpawning.get();
 
         if(spawners && passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.loadSpawnerRange.get()), Math.round(STConfig.INSTANCE.passiveMobRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get()), Math.round(STConfig.passiveMobRange.get())));
         else if(spawners)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.loadSpawnerRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get())));
         else if(passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.INSTANCE.passiveMobRange.get())));
+            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.passiveMobRange.get())));
     }
 
     @OnlyIn(Dist.CLIENT)

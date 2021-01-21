@@ -35,11 +35,11 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
-        if(!STConfig.INSTANCE.passiveMobSpawning.get() || e.getEntity().world.isRemote)
+        if(!STConfig.passiveMobSpawning.get() || e.getEntity().world.isRemote)
             return;
 
         Entity entity = e.getEntity();
-        double range = STConfig.INSTANCE.passiveMobRange.get();
+        double range = STConfig.passiveMobRange.get();
         if(isScarecrowInRange(e.getEntityLiving().world, entity.getPositionVec(), range)){
             e.setResult(Event.Result.DENY);
         }
@@ -76,7 +76,7 @@ public class ScarecrowTracker {
             s.add(pos); return s;
         });
 
-        int range = (int)Math.ceil(STConfig.INSTANCE.passiveMobRange.get());
+        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
@@ -97,7 +97,7 @@ public class ScarecrowTracker {
             s.remove(pos); return s;
         });
 
-        int range = (int)Math.ceil(STConfig.INSTANCE.passiveMobRange.get());
+        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {

@@ -33,12 +33,18 @@ public class SpawnerTracker {
         Chunk chunk = e.getChunk();
 
         for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
-            if(entry.getValue() instanceof TileEntityMobSpawner){
-                SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
-                SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.add(entry.getKey()); return s;
-                });
-            }
+            Runnable task = () -> {
+                if(entry.getValue() instanceof TileEntityMobSpawner){
+                    SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
+                    SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+                        s.add(entry.getKey()); return s;
+                    });
+                }
+            };
+            if(e.getWorld().isRemote)
+                ClientProxy.enqueueTask(task);
+            else
+                e.getWorld().getMinecraftServer().addScheduledTask(task);
         }
     }
 
@@ -60,7 +66,8 @@ public class SpawnerTracker {
         if(e.getPlacedBlock().getBlock() == Blocks.MOB_SPAWNER){
             SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                s.add(e.getPos()); return s;
+                s.add(e.getPos());
+                return s;
             });
         }
     }
@@ -69,7 +76,8 @@ public class SpawnerTracker {
     public static void onBlockBreak(BlockEvent.BreakEvent e){
         if(e.getState().getBlock() == Blocks.MOB_SPAWNER){
             SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                s.remove(e.getPos()); return s;
+                s.remove(e.getPos());
+                return s;
             });
         }
     }

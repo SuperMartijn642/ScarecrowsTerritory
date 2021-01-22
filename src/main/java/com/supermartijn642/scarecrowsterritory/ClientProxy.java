@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
@@ -23,6 +24,10 @@ public class ClientProxy {
 
     public static String translate(String translationKey, Object... args){
         return I18n.format(translationKey, args);
+    }
+
+    public static void enqueueTask(Runnable task){
+        Minecraft.getMinecraft().addScheduledTask(task);
     }
 
 }

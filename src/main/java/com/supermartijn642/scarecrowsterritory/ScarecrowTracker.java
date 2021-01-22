@@ -56,7 +56,7 @@ public class ScarecrowTracker {
     private static void spawnEntitiesInChunks(WorldServer world){
         boolean spawnAnimals = world.getWorldInfo().getWorldTime() % 400L == 0L;
         boolean spawnHostiles = world.getDifficulty() != EnumDifficulty.PEACEFUL;
-        Set<Map.Entry<ChunkPos, Integer>> entries = CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).entrySet();
+        Set<Map.Entry<ChunkPos,Integer>> entries = CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).entrySet();
         Set<ChunkPos> chunks = entries.stream().filter(entry -> entry.getValue() > 0).map(Map.Entry::getKey).collect(Collectors.toSet());
         MobSpawningUtil.spawnEntitiesInChunks(world, chunks, true, spawnHostiles, spawnAnimals);
     }
@@ -64,7 +64,8 @@ public class ScarecrowTracker {
     private static void addScarecrow(World world, BlockPos pos){
         SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
-            s.add(pos); return s;
+            s.add(pos);
+            return s;
         });
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
@@ -85,7 +86,8 @@ public class ScarecrowTracker {
 
     private static void removeScarecrow(World world, BlockPos pos){
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
-            s.remove(pos); return s;
+            s.remove(pos);
+            return s;
         });
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
@@ -115,8 +117,14 @@ public class ScarecrowTracker {
         Chunk chunk = e.getChunk();
 
         for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
-            if(entry.getValue() instanceof ScarecrowTile)
-                addScarecrow(e.getWorld(), entry.getKey());
+            Runnable task = () -> {
+                if(entry.getValue() instanceof ScarecrowTile)
+                    addScarecrow(e.getWorld(), entry.getKey());
+            };
+            if(e.getWorld().isRemote)
+                ClientProxy.enqueueTask(task);
+            else
+                e.getWorld().getMinecraftServer().addScheduledTask(task);
         }
     }
 

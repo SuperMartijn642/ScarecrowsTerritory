@@ -2,6 +2,7 @@ package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.MobSpawnerTileEntity;
+import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -33,13 +34,19 @@ public class SpawnerTracker {
         IChunk chunk = e.getChunk();
 
         for(BlockPos pos : chunk.getTileEntitiesPos()){
-            if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
-                SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
-                SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.add(pos);
-                    return s;
-                });
-            }
+            Runnable task = () -> {
+                if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
+                    SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
+                    SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+                        s.add(pos);
+                        return s;
+                    });
+                }
+            };
+            if(e.getWorld().isRemote())
+                ClientProxy.enqueueTask(task);
+            else if(e.getWorld() instanceof World)
+                ((World)e.getWorld()).getServer().enqueue(new TickDelayedTask(0, task));
         }
     }
 

@@ -1,16 +1,12 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-
-import java.util.Iterator;
 
 /**
  * Created 7/11/2020 by SuperMartijn642
@@ -26,6 +22,10 @@ public class ClientProxy {
 
     public static String translate(String translationKey, Object... args){
         return I18n.format(translationKey, args);
+    }
+
+    public static void enqueueTask(Runnable task){
+        Minecraft.getInstance().enqueue(task);
     }
 
 }

@@ -2,6 +2,7 @@ package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.vector.Vector3d;
@@ -129,8 +130,14 @@ public class ScarecrowTracker {
         IChunk chunk = e.getChunk();
 
         for(BlockPos pos : chunk.getTileEntitiesPos()){
-            if(chunk.getTileEntity(pos) instanceof ScarecrowTile)
-                addScarecrow(e.getWorld(), pos);
+            Runnable task = () -> {
+                if(chunk.getTileEntity(pos) instanceof ScarecrowTile)
+                    addScarecrow(e.getWorld(), pos);
+            };
+            if(e.getWorld().isRemote())
+                ClientProxy.enqueueTask(task);
+            else if(e.getWorld() instanceof World)
+                ((World)e.getWorld()).getServer().enqueue(new TickDelayedTask(0, task));
         }
     }
 

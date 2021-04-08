@@ -15,6 +15,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraftforge.event.RegistryEvent;
 
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Locale;
 
 /**
@@ -58,38 +60,41 @@ public enum ScarecrowType {
         return buffer[0];
     }
 
-    public ScarecrowBlock block;
+    public final EnumMap<DyeColor,ScarecrowBlock> blocks = new EnumMap<>(DyeColor.class);
     public TileEntityType<? extends ScarecrowTile> tileTileEntityType;
-    private BlockItem item;
+    private final EnumMap<DyeColor,BlockItem> items = new EnumMap<>(DyeColor.class);
 
     public void registerBlock(RegistryEvent.Register<Block> e){
         switch(this){
             case PRIMITIVE:
-                this.block = new ScarecrowBlock(this);
+                Arrays.stream(DyeColor.values()).forEach(color -> this.blocks.put(color, new ScarecrowBlock(this, color)));
         }
-        e.getRegistry().register(this.block);
+        this.blocks.values().forEach(e.getRegistry()::register);
     }
 
     public void registerTileType(RegistryEvent.Register<TileEntityType<?>> e){
-        this.tileTileEntityType = TileEntityType.Builder.create(this::createTileEntity, this.block).build(null);
-        this.tileTileEntityType.setRegistryName(this.getRegistryName() + "_tile");
+        this.tileTileEntityType = TileEntityType.Builder.create(this::createTileEntity, this.blocks.values().toArray(new Block[0])).build(null);
+        this.tileTileEntityType.setRegistryName(this.name().toLowerCase(Locale.ROOT) + "_tile");
         e.getRegistry().register(this.tileTileEntityType);
     }
 
     public void registerItem(RegistryEvent.Register<Item> e){
-        this.item = new BlockItem(this.block, new Item.Properties().group(ItemGroup.SEARCH));
-        this.item.setRegistryName(this.getRegistryName());
-        e.getRegistry().register(this.item);
+        this.blocks.forEach((color, block) -> {
+            BlockItem item = new BlockItem(block, new Item.Properties().group(ItemGroup.DECORATIONS));
+            item.setRegistryName(this.getRegistryName(color));
+            this.items.put(color, item);
+        });
+        this.items.values().forEach(e.getRegistry()::register);
     }
 
-    public String getRegistryName(){
-        return this.name().toLowerCase(Locale.ROOT) + "_scarecrow";
+    public String getRegistryName(DyeColor color){
+        return (color == DyeColor.PURPLE ? this.name().toLowerCase(Locale.ROOT) : color.getTranslationKey()) + "_scarecrow";
     }
 
-    public AbstractBlock.Properties getBlockProperties(){
+    public AbstractBlock.Properties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return AbstractBlock.Properties.create(Material.WOOL, DyeColor.BROWN).sound(SoundType.CLOTH);
+                return AbstractBlock.Properties.create(Material.WOOL, color).sound(SoundType.CLOTH);
         }
         return AbstractBlock.Properties.create(Material.AIR);
     }

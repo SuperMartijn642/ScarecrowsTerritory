@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.ClientUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.MobSpawnerTileEntity;
 import net.minecraft.util.concurrent.TickDelayedTask;
@@ -44,7 +45,7 @@ public class SpawnerTracker {
                 }
             };
             if(e.getWorld().isRemote())
-                ClientProxy.enqueueTask(task);
+                ClientUtils.queueTask(task);
             else if(e.getWorld() instanceof World)
                 ((World)e.getWorld()).getServer().enqueue(new TickDelayedTask(0, task));
         }

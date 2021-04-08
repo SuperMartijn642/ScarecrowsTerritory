@@ -60,7 +60,10 @@ repositories {
 
 dependencies {
     // config lib
-    compileOnly 'curse.maven:supermartijn642s-config-lib:3176333'
+    compileOnly 'curse.maven:supermartijn642s-config-lib:3211007'
+
+    // core lib
+    compileOnly files('libs/supermartijn642corelib-1.0.1a-mc1.12.jar')//'curse.maven:supermartijn642s-core-lib:3269640'
 
     provided('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'guava'

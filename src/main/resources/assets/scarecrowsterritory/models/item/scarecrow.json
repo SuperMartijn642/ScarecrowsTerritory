@@ -3,10 +3,42 @@
 	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "scarecrowsterritory:primitive_scarecrow",
-		"2": "scarecrowsterritory:primitive_scarecrow_hat",
-		"3": "minecraft:blocks/log_oak",
-		"particle": "minecraft:blocks/log_oak"
+		"1": "#main",
+		"2": "#hat",
+		"3": "blocks/log_oak",
+		"particle": "blocks/log_oak"
+	},
+	"display": {
+		"gui": {
+			"rotation": [ 30, 225, 0 ],
+			"translation": [ 0, -3.8, 0],
+			"scale":[ 0.45, 0.45, 0.45 ]
+		},
+		"ground": {
+			"rotation": [ 0, 0, 0 ],
+			"translation": [ 0, 3, 0],
+			"scale":[ 0.25, 0.25, 0.25 ]
+		},
+		"fixed": {
+			"rotation": [ 0, 0, 0 ],
+			"translation": [ 0, -4.5, 0],
+			"scale":[ 0.5, 0.5, 0.5 ]
+		},
+		"thirdperson_righthand": {
+			"rotation": [ 55, 10, 0 ],
+			"translation": [ 0, 1, 2.5],
+			"scale": [ 0.375, 0.375, 0.375 ]
+		},
+		"firstperson_righthand": {
+			"rotation": [ 0, 45, 0 ],
+			"translation": [ 0, 0, 0 ],
+			"scale": [ 0.40, 0.40, 0.40 ]
+		},
+		"firstperson_lefthand": {
+			"rotation": [ 0, 225, 0 ],
+			"translation": [ 0, 0, 0 ],
+			"scale": [ 0.40, 0.40, 0.40 ]
+		}
 	},
 	"elements": [
 		{
@@ -75,7 +107,7 @@
 		},
 		{
 			"from": [7, 25, 10],
-			"to": [9, 28, 12],
+			"to": [9, 29, 12],
 			"rotation": {"angle": 45, "axis": "x", "origin": [15, 33, 19]},
 			"faces": {
 				"north": {"uv": [4.25, 0.25, 4.75, 1], "texture": "#2"},

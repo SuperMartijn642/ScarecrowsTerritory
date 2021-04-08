@@ -15,7 +15,7 @@ public class ScarecrowsTerritory {
     public static final String MODID = "scarecrowsterritory";
     public static final String NAME = "Scarecrow's Territory";
     public static final String VERSION = "1.0.4a";
-    public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,);required-after:supermartijn642configlib@[1.0.1,)";
+    public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,);required-after:supermartijn642configlib@[1.0.5,);required-after:supermartijn642corelib@[1.0.1a,)";
 
     public ScarecrowsTerritory(){
     }

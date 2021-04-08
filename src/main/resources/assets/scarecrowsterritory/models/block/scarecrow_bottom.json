@@ -3,7 +3,7 @@
 	"parent": "block/block",
 	"textures": {
 		"1": "minecraft:blocks/log_oak",
-		"2": "scarecrowsterritory:primitive_scarecrow",
+		"2": "#main",
 		"particle": "minecraft:blocks/log_oak"
 	},
 	"elements": [

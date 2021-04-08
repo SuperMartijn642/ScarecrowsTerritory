@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.ClientUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -122,7 +123,7 @@ public class ScarecrowTracker {
                     addScarecrow(e.getWorld(), entry.getKey());
             };
             if(e.getWorld().isRemote)
-                ClientProxy.enqueueTask(task);
+                ClientUtils.queueTask(task);
             else
                 e.getWorld().getMinecraftServer().addScheduledTask(task);
         }

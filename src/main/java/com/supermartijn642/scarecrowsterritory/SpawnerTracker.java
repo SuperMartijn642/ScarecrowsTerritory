@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.ClientUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityMobSpawner;
@@ -37,12 +38,13 @@ public class SpawnerTracker {
                 if(entry.getValue() instanceof TileEntityMobSpawner){
                     SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
                     SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                        s.add(entry.getKey()); return s;
+                        s.add(entry.getKey());
+                        return s;
                     });
                 }
             };
             if(e.getWorld().isRemote)
-                ClientProxy.enqueueTask(task);
+                ClientUtils.queueTask(task);
             else
                 e.getWorld().getMinecraftServer().addScheduledTask(task);
         }
@@ -55,7 +57,8 @@ public class SpawnerTracker {
         for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
             if(entry.getValue() instanceof TileEntityMobSpawner){
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
-                    s.remove(entry.getKey()); return s;
+                    s.remove(entry.getKey());
+                    return s;
                 });
             }
         }

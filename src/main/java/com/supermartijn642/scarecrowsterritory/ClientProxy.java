@@ -1,6 +1,5 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.Item;
@@ -19,15 +18,13 @@ public class ClientProxy {
     @SubscribeEvent
     public static void onModelRegistry(ModelRegistryEvent e){
         for(ScarecrowType type : ScarecrowType.values())
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(type.block), 0, new ModelResourceLocation(type.block.getRegistryName(), "inventory"));
+            type.blocks.values().forEach(
+                block -> ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"))
+            );
     }
 
     public static String translate(String translationKey, Object... args){
         return I18n.format(translationKey, args);
-    }
-
-    public static void enqueueTask(Runnable task){
-        Minecraft.getMinecraft().addScheduledTask(task);
     }
 
 }

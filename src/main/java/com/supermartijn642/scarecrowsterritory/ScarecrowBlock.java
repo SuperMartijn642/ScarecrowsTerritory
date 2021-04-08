@@ -1,10 +1,7 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.Block;
+import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
@@ -15,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -40,28 +38,26 @@ import java.util.stream.Collectors;
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowBlock extends Block {
+public class ScarecrowBlock extends BaseBlock {
 
     public static final PropertyBool BOTTOM = PropertyBool.create("bottom");
 
     private final ScarecrowType type;
 
-    public ScarecrowBlock(ScarecrowType type){
-        super(Material.CLOTH, MapColor.BROWN);
+    public ScarecrowBlock(ScarecrowType type, EnumDyeColor color){
+        super(type.getRegistryName(color), false, type.getBlockProperties(color));
+        this.setUnlocalizedName("scarecrowsterritory." + type.getRegistryName(color));
         this.type = type;
 
-        this.setRegistryName(type.getRegistryName());
-        this.setUnlocalizedName("scarecrowsterritory." + type.getRegistryName());
         this.setDefaultState(this.getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(BOTTOM, true));
         this.setCreativeTab(CreativeTabs.DECORATIONS);
-        this.setSoundType(SoundType.CLOTH);
     }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
         TileEntity tile = worldIn.getTileEntity(pos);
         if(tile instanceof ScarecrowTile)
-            return ((ScarecrowTile)tile).rightClick(player);
+            return ((ScarecrowTile)tile).rightClick(player, hand);
         return false;
     }
 

@@ -1,6 +1,11 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.BlockRenderLayer;
@@ -10,6 +15,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Locale;
 
 /**
@@ -54,30 +61,42 @@ public enum ScarecrowType {
         return result;
     }
 
-    public ScarecrowBlock block;
-    private ItemBlock item;
+    public final EnumMap<EnumDyeColor,ScarecrowBlock> blocks = new EnumMap<>(EnumDyeColor.class);
+    private final EnumMap<EnumDyeColor,ItemBlock> items = new EnumMap<>(EnumDyeColor.class);
 
     public void registerBlock(RegistryEvent.Register<Block> e){
         switch(this){
             case PRIMITIVE:
-                this.block = new ScarecrowBlock(this);
+                Arrays.stream(EnumDyeColor.values()).forEach(color -> this.blocks.put(color, new ScarecrowBlock(this, color)));
         }
-        e.getRegistry().register(this.block);
+        this.blocks.values().forEach(e.getRegistry()::register);
     }
 
     public void registerTileEntity(RegistryEvent.Register<Block> e){
-        GameRegistry.registerTileEntity(ScarecrowTile.PrimitiveScarecrowTile.class, new ResourceLocation("scarecrowsterritory", this.getRegistryName() + "_tile"));
+        GameRegistry.registerTileEntity(ScarecrowTile.PrimitiveScarecrowTile.class, new ResourceLocation("scarecrowsterritory", this.name().toLowerCase(Locale.ROOT) + "_tile"));
     }
 
     public void registerItem(RegistryEvent.Register<Item> e){
-        this.item = new ItemBlock(this.block);
-        this.item.setRegistryName(this.getRegistryName());
-
-        e.getRegistry().register(this.item);
+        this.blocks.forEach((color, block) -> {
+            ItemBlock item = new ItemBlock(block);
+            item.setRegistryName(this.getRegistryName(color));
+            item.setCreativeTab(CreativeTabs.DECORATIONS);
+            this.items.put(color, item);
+        });
+        this.items.values().forEach(e.getRegistry()::register);
     }
 
-    public String getRegistryName(){
-        return this.name().toLowerCase(Locale.ROOT) + "_scarecrow";
+    public String getRegistryName(EnumDyeColor color){
+        return (color == EnumDyeColor.PURPLE ? this.name().toLowerCase(Locale.ROOT) :
+            color == EnumDyeColor.SILVER ? "light_gray" : color.getName()) + "_scarecrow";
+    }
+
+    public BaseBlock.Properties getBlockProperties(EnumDyeColor color){
+        switch(this){
+            case PRIMITIVE:
+                return BaseBlock.Properties.create(Material.CLOTH, color).sound(SoundType.CLOTH);
+        }
+        return BaseBlock.Properties.create(Material.AIR);
     }
 
     public AxisAlignedBB[] getBlockShape(EnumFacing facing, boolean bottom){

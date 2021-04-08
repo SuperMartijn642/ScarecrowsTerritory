@@ -27,6 +27,8 @@ minecraft {
 
     runs {
         client {
+//            properties 'mixin.env.disableRefMap': 'true'
+
             workingDirectory project.file('run')
 
             // Recommended logging data for a userdev environment
@@ -89,7 +91,10 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
 
     // config lib
-    compileOnly fg.deobf("curse.maven:supermartijn642s-config-lib:3175652")
+    compile fg.deobf("curse.maven:supermartijn642s-config-lib:3184787")
+
+    // core lib
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3269643")
 
     // compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-1.16.1:7.0.1.10:api")

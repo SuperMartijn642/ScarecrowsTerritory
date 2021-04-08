@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -7,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
@@ -35,18 +37,17 @@ import java.util.StringTokenizer;
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowBlock extends Block implements IWaterLoggable {
+public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
 
     public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private final ScarecrowType type;
 
-    public ScarecrowBlock(ScarecrowType type){
-        super(type.getBlockProperties());
+    public ScarecrowBlock(ScarecrowType type, DyeColor color){
+        super(type.getRegistryName(color), false, type.getBlockProperties(color));
         this.type = type;
 
-        this.setRegistryName(type.getRegistryName());
         this.setDefaultState(this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(BOTTOM, true).with(WATERLOGGED, false));
     }
 
@@ -54,7 +55,7 @@ public class ScarecrowBlock extends Block implements IWaterLoggable {
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
         TileEntity tile = worldIn.getTileEntity(pos);
         if(tile instanceof ScarecrowTile)
-            return ((ScarecrowTile)tile).rightClick(player) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            return ((ScarecrowTile)tile).rightClick(player, handIn) ? ActionResultType.SUCCESS : ActionResultType.PASS;
         return ActionResultType.PASS;
     }
 

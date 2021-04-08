@@ -3,9 +3,9 @@
 	"parent": "block/block",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "scarecrowsterritory:primitive_scarecrow",
-		"2": "scarecrowsterritory:primitive_scarecrow_hat",
-		"particle": "scarecrowsterritory:primitive_scarecrow"
+		"1": "#main",
+		"2": "#hat",
+		"particle": "#main"
 	},
 	"elements": [
 		{

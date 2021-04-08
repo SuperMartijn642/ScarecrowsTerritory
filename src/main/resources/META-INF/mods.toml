@@ -55,6 +55,13 @@ description='''Scarecrow's Territory keeps spawners activated!'''
 [[dependencies.scarecrowsterritory]]
     modId="supermartijn642configlib"
     mandatory=true
-    versionRange="[1.0.1,)"
+    versionRange="[1.0.5,)"
+    ordering="NONE"
+    side="BOTH"
+# Add a dependency on SuperMartijn642's Core Lib
+[[dependencies.scarecrowsterritory]]
+    modId="supermartijn642corelib"
+    mandatory=true
+    versionRange="[1.0.1,1.1.0)"
     ordering="NONE"
     side="BOTH"

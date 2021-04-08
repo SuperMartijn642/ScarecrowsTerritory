@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.ClientUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.concurrent.TickDelayedTask;
@@ -135,7 +136,7 @@ public class ScarecrowTracker {
                     addScarecrow(e.getWorld(), pos);
             };
             if(e.getWorld().isRemote())
-                ClientProxy.enqueueTask(task);
+                ClientUtils.queueTask(task);
             else if(e.getWorld() instanceof World)
                 ((World)e.getWorld()).getServer().enqueue(new TickDelayedTask(0, task));
         }

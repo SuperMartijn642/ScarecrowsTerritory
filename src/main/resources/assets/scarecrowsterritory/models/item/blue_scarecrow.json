@@ -1,0 +1,7 @@
+{
+  "parent": "scarecrowsterritory:item/scarecrow",
+  "textures": {
+    "main": "scarecrowsterritory:blue_scarecrow",
+    "hat": "scarecrowsterritory:blue_scarecrow_hat"
+  }
+}

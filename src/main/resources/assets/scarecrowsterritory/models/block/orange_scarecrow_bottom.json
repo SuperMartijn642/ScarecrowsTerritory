@@ -1,0 +1,6 @@
+{
+	"parent": "scarecrowsterritory:block/scarecrow_bottom",
+	"textures": {
+		"main": "scarecrowsterritory:orange_scarecrow"
+	}
+}

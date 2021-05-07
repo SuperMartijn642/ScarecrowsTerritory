@@ -105,7 +105,7 @@ dependencies {
 //    runtimeOnly fg.deobf("curse.maven:chunk-loaders:3121214")
 
     // Block Renderer
-//    runtimeOnly fg.deobf("curse.maven:block-renderer:3149419")
+    runtimeOnly fg.deobf("curse.maven:block-renderer:3203574")
 
     // Quark
 //    compile fg.deobf("curse.maven:quark:3176375")

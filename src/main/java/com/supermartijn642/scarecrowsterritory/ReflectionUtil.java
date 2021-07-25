@@ -1,6 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,9 +21,9 @@ public class ReflectionUtil {
         }
     }
 
-    public static <T> Method findMethod(Class<? super T> classs, String methodName){
+    public static <T> Method findMethod(Class<? super T> classs, String methodName, Class<?>... parameters){
         try{
-            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName);
+            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName, parameters);
             method.setAccessible(true);
             return method;
         }catch(Exception e){

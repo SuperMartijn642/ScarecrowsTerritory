@@ -1,35 +1,34 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.block.BaseTileEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.MobSpawnerTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.Set;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity {
+public class ScarecrowTile extends BaseTileEntity {
 
     private final ScarecrowType type;
 
-    public ScarecrowTile(ScarecrowType type){
-        super(type.tileTileEntityType);
+    public ScarecrowTile(ScarecrowType type, BlockPos pos, BlockState state){
+        super(type.tileTileEntityType, pos, state);
         this.type = type;
     }
 
-    public boolean rightClick(PlayerEntity player, Hand hand){
+    public boolean rightClick(Player player, InteractionHand hand){
         ItemStack stack = player.getItemInHand(hand);
         if(!stack.isEmpty() && stack.getItem() instanceof DyeItem){
             DyeColor color = ((DyeItem)stack.getItem()).getDyeColor();
@@ -37,7 +36,7 @@ public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity
             if(state.getBlock() instanceof ScarecrowBlock){
                 this.level.setBlockAndUpdate(this.worldPosition,
                     this.type.blocks.get(color).defaultBlockState()
-                        .setValue(HorizontalBlock.FACING, state.getValue(HorizontalBlock.FACING))
+                        .setValue(HorizontalDirectionalBlock.FACING, state.getValue(HorizontalDirectionalBlock.FACING))
                         .setValue(ScarecrowBlock.BOTTOM, state.getValue(ScarecrowBlock.BOTTOM))
                         .setValue(ScarecrowBlock.WATERLOGGED, state.getValue(ScarecrowBlock.WATERLOGGED))
                 );
@@ -47,7 +46,7 @@ public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity
                 if(state2.getBlock() instanceof ScarecrowBlock || state2.isAir() || state2.getFluidState().getType().isSame(Fluids.WATER)){
                     this.level.setBlockAndUpdate(pos2,
                         this.type.blocks.get(color).defaultBlockState()
-                            .setValue(HorizontalBlock.FACING, state.getValue(HorizontalBlock.FACING))
+                            .setValue(HorizontalDirectionalBlock.FACING, state.getValue(HorizontalDirectionalBlock.FACING))
                             .setValue(ScarecrowBlock.BOTTOM, !state.getValue(ScarecrowBlock.BOTTOM))
                             .setValue(ScarecrowBlock.WATERLOGGED, state2.getFluidState().getType().isSame(Fluids.WATER))
                     );
@@ -58,24 +57,23 @@ public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity
         return false;
     }
 
-    @Override
     public void tick(){
         if(STConfig.loadSpawners.get()){
             Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.level, this.worldPosition, STConfig.loadSpawnerRange.get());
             for(BlockPos spawnerPos : spawners){
-                TileEntity tileEntity = this.level.getBlockEntity(spawnerPos);
-                if(tileEntity instanceof MobSpawnerTileEntity)
-                    AbstractSpawnerUtil.tickAbstractSpawner(((MobSpawnerTileEntity)tileEntity).getSpawner());
+                BlockEntity tileEntity = this.level.getBlockEntity(spawnerPos);
+                if(tileEntity instanceof SpawnerBlockEntity)
+                    AbstractSpawnerUtil.tickAbstractSpawner(((SpawnerBlockEntity)tileEntity).getSpawner(), this.level, spawnerPos);
             }
         }
     }
 
     @Override
-    protected CompoundNBT writeData(){
+    protected CompoundTag writeData(){
         return null;
     }
 
     @Override
-    protected void readData(CompoundNBT compoundNBT){
+    protected void readData(CompoundTag compoundNBT){
     }
 }

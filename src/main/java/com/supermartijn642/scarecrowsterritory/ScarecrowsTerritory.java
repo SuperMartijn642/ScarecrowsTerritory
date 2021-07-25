@@ -1,8 +1,8 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,7 +25,7 @@ public class ScarecrowsTerritory {
         }
 
         @SubscribeEvent
-        public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
+        public static void onTileRegistry(final RegistryEvent.Register<BlockEntityType<?>> e){
             for(ScarecrowType type : ScarecrowType.values())
                 type.registerTileType(e);
         }

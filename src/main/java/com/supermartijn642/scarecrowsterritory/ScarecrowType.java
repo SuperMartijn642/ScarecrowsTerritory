@@ -1,18 +1,20 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.event.RegistryEvent;
 
 import java.util.Arrays;
@@ -26,10 +28,10 @@ public enum ScarecrowType {
 
     PRIMITIVE;
 
-    private static final VoxelShape PRIMITIVE_SHAPE = VoxelShapes.or(
-        VoxelShapes.box(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
-        VoxelShapes.box(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
-        VoxelShapes.box(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
+    private static final VoxelShape PRIMITIVE_SHAPE = Shapes.or(
+        Shapes.box(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
+        Shapes.box(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
+        Shapes.box(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
 
     private static final VoxelShape[] PRIMITIVE_SHAPES_BOTTOM = new VoxelShape[4];
     private static final VoxelShape[] PRIMITIVE_SHAPES_TOP = new VoxelShape[4];
@@ -48,20 +50,20 @@ public enum ScarecrowType {
      * @see <a href="https://forums.minecraftforge.net/topic/74979-1144-rotate-voxel-shapes/?do=findComment&comment=391969">Minecraft Forge forum post</a>
      */
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape){
-        VoxelShape[] buffer = new VoxelShape[]{shape, VoxelShapes.empty()};
+        VoxelShape[] buffer = new VoxelShape[]{shape, Shapes.empty()};
 
         int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
         for(int i = 0; i < times; i++){
-            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = VoxelShapes.or(buffer[1], VoxelShapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = Shapes.or(buffer[1], Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
             buffer[0] = buffer[1];
-            buffer[1] = VoxelShapes.empty();
+            buffer[1] = Shapes.empty();
         }
 
         return buffer[0];
     }
 
     public final EnumMap<DyeColor,ScarecrowBlock> blocks = new EnumMap<>(DyeColor.class);
-    public TileEntityType<? extends ScarecrowTile> tileTileEntityType;
+    public BlockEntityType<? extends ScarecrowTile> tileTileEntityType;
     private final EnumMap<DyeColor,BlockItem> items = new EnumMap<>(DyeColor.class);
 
     public void registerBlock(RegistryEvent.Register<Block> e){
@@ -72,15 +74,15 @@ public enum ScarecrowType {
         this.blocks.values().forEach(e.getRegistry()::register);
     }
 
-    public void registerTileType(RegistryEvent.Register<TileEntityType<?>> e){
-        this.tileTileEntityType = TileEntityType.Builder.of(this::createTileEntity, this.blocks.values().toArray(new Block[0])).build(null);
+    public void registerTileType(RegistryEvent.Register<BlockEntityType<?>> e){
+        this.tileTileEntityType = BlockEntityType.Builder.of(this::createTileEntity, this.blocks.values().toArray(new Block[0])).build(null);
         this.tileTileEntityType.setRegistryName(this.name().toLowerCase(Locale.ROOT) + "_tile");
         e.getRegistry().register(this.tileTileEntityType);
     }
 
     public void registerItem(RegistryEvent.Register<Item> e){
         this.blocks.forEach((color, block) -> {
-            BlockItem item = new BlockItem(block, new Item.Properties().tab(ItemGroup.TAB_DECORATIONS));
+            BlockItem item = new BlockItem(block, new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS));
             item.setRegistryName(this.getRegistryName(color));
             this.items.put(color, item);
         });
@@ -91,12 +93,12 @@ public enum ScarecrowType {
         return (color == DyeColor.PURPLE ? this.name().toLowerCase(Locale.ROOT) : color.getName()) + "_scarecrow";
     }
 
-    public AbstractBlock.Properties getBlockProperties(DyeColor color){
+    public BlockBehaviour.Properties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return AbstractBlock.Properties.of(Material.WOOL, color).sound(SoundType.WOOL);
+                return BlockBehaviour.Properties.of(Material.WOOL, color).sound(SoundType.WOOL);
         }
-        return AbstractBlock.Properties.of(Material.AIR);
+        return BlockBehaviour.Properties.of(Material.AIR);
     }
 
     public VoxelShape getBlockShape(Direction facing, boolean bottom){
@@ -104,15 +106,15 @@ public enum ScarecrowType {
             case PRIMITIVE:
                 return bottom ? PRIMITIVE_SHAPES_BOTTOM[facing.get2DDataValue()] : PRIMITIVE_SHAPES_TOP[facing.get2DDataValue()];
         }
-        return VoxelShapes.block();
+        return Shapes.block();
     }
 
-    public ScarecrowTile createTileEntity(){
+    public ScarecrowTile createTileEntity(BlockPos pos, BlockState state){
         switch(this){
             case PRIMITIVE:
                 break;
         }
-        return new ScarecrowTile(this);
+        return new ScarecrowTile(this, pos, state);
     }
 
     public RenderType getRenderLayer(){

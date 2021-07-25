@@ -1,7 +1,7 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -16,7 +16,7 @@ public class ClientProxy {
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent e){
         for(ScarecrowType type : ScarecrowType.values())
-            type.blocks.values().forEach(block -> RenderTypeLookup.setRenderLayer(block, type.getRenderLayer()));
+            type.blocks.values().forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, type.getRenderLayer()));
     }
 
     public static String translate(String translationKey, Object... args){

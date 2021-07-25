@@ -1,20 +1,16 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.ClientUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.concurrent.TickDelayedTask;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.TickTask;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.spawner.WorldEntitySpawner;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -32,8 +28,8 @@ import java.util.*;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ScarecrowTracker {
 
-    private static final Map<IWorld,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
-    private static final Map<IWorld,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
+    private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
+    private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
     @SubscribeEvent
     public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
@@ -49,8 +45,8 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
-        World world = e.world;
-        if(!world.isClientSide || !(world instanceof ServerWorld) || world.isDebug() || world.getDifficulty() == Difficulty.PEACEFUL)
+        Level world = e.world;
+        if(!world.isClientSide || !(world instanceof ServerLevel) || world.isDebug() || world.getDifficulty() == Difficulty.PEACEFUL)
             return;
 
         if(!world.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
@@ -58,16 +54,16 @@ public class ScarecrowTracker {
 
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(world);
         for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-            if(entry.getValue() > 0 && world.getChunkSource().isEntityTickingChunk(entry.getKey())){
-                Chunk chunk = world.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+            if(entry.getValue() > 0 && ((ServerLevel)world).getChunkSource().isPositionTicking(entry.getKey().toLong())){
+                LevelChunk chunk = world.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
                 if(chunk != null && !chunk.isEmpty() && world.getWorldBorder().isWithinBounds(entry.getKey()))
-                    spawnEntitiesInChunk((ServerWorld)world, chunk);
+                    spawnEntitiesInChunk((ServerLevel)world, chunk);
             }
         }
     }
 
-    private static void spawnEntitiesInChunk(ServerWorld world, Chunk chunk){
-        WorldEntitySpawner.EntityDensityManager entityDensityManager = world.getChunkSource().getLastSpawnState();
+    private static void spawnEntitiesInChunk(ServerLevel world, LevelChunk chunk){
+        NaturalSpawner.SpawnState entityDensityManager = world.getChunkSource().getLastSpawnState();
         if(entityDensityManager != null){
             boolean spawnAnimals = world.getLevelData().getGameTime() % 400L == 0L;
             boolean spawnHostiles = world.getDifficulty() != Difficulty.PEACEFUL;
@@ -75,7 +71,7 @@ public class ScarecrowTracker {
         }
     }
 
-    private static void addScarecrow(IWorld world, BlockPos pos){
+    private static void addScarecrow(LevelAccessor world, BlockPos pos){
         SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
             s.add(pos);
@@ -98,7 +94,7 @@ public class ScarecrowTracker {
         });
     }
 
-    private static void removeScarecrow(IWorld world, BlockPos pos){
+    private static void removeScarecrow(LevelAccessor world, BlockPos pos){
         SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
             s.remove(pos);
             return s;
@@ -128,7 +124,7 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load e){
-        IChunk chunk = e.getChunk();
+        ChunkAccess chunk = e.getChunk();
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
@@ -137,14 +133,14 @@ public class ScarecrowTracker {
             };
             if(e.getWorld().isClientSide())
                 ClientUtils.queueTask(task);
-            else if(e.getWorld() instanceof World)
-                ((World)e.getWorld()).getServer().tell(new TickDelayedTask(0, task));
+            else if(e.getWorld() instanceof Level)
+                ((Level)e.getWorld()).getServer().tell(new TickTask(0, task));
         }
     }
 
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload e){
-        IChunk chunk = e.getChunk();
+        ChunkAccess chunk = e.getChunk();
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             if(chunk.getBlockEntity(pos) instanceof ScarecrowTile)
@@ -178,7 +174,7 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(World world, Vector3d center, double range){
+    public static boolean isScarecrowInRange(Level world, Vec3 center, double range){
         double rangeSquared = range * range;
         Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet());
 

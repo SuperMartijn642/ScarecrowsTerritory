@@ -32,16 +32,16 @@ public class AbstractSpawnerUtil {
     private static final Method delay;
 
     static{
-        spawnDelay = ReflectionUtil.findField(BaseSpawner.class, "spawnDelay");
-        nextSpawnData = ReflectionUtil.findField(BaseSpawner.class, "nextSpawnData");
-        spin = ReflectionUtil.findField(BaseSpawner.class, "spin");
-        oSpin = ReflectionUtil.findField(BaseSpawner.class, "oSpin");
-        spawnCount = ReflectionUtil.findField(BaseSpawner.class, "spawnCount");
-        maxNearbyEntities = ReflectionUtil.findField(BaseSpawner.class, "maxNearbyEntities");
-        spawnRange = ReflectionUtil.findField(BaseSpawner.class, "spawnRange");
+        spawnDelay = ReflectionUtil.findField(BaseSpawner.class, "f_45442_");
+        nextSpawnData = ReflectionUtil.findField(BaseSpawner.class, "f_45444_");
+        spin = ReflectionUtil.findField(BaseSpawner.class, "f_45445_");
+        oSpin = ReflectionUtil.findField(BaseSpawner.class, "f_45446_");
+        spawnCount = ReflectionUtil.findField(BaseSpawner.class, "f_45449_");
+        maxNearbyEntities = ReflectionUtil.findField(BaseSpawner.class, "f_45451_");
+        spawnRange = ReflectionUtil.findField(BaseSpawner.class, "f_45453_");
 
-        isNearPlayer = ReflectionUtil.findMethod(BaseSpawner.class, "isNearPlayer", Level.class, BlockPos.class);
-        delay = ReflectionUtil.findMethod(BaseSpawner.class, "delay", Level.class, BlockPos.class);
+        isNearPlayer = ReflectionUtil.findMethod(BaseSpawner.class, "m_151343_", Level.class, BlockPos.class);
+        delay = ReflectionUtil.findMethod(BaseSpawner.class, "m_151350_", Level.class, BlockPos.class);
     }
 
     private static int getSpawnDelay(BaseSpawner spawner){

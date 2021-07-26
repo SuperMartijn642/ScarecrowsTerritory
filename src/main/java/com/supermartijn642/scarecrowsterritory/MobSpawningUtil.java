@@ -35,14 +35,14 @@ public class MobSpawningUtil {
     private static final Method getRandomPosWithin;
 
     static{
-        canSpawnForCategory = ReflectionUtil.findMethod(NaturalSpawner.class, "canSpawnForCategory", MobCategory.class);
-        canSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "canSpawn", EntityType.class, BlockPos.class, ChunkAccess.class);
-        afterSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "afterSpawn", Mob.class, ChunkAccess.class);
-        getRandomSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "getRandomSpawnMobAt", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, Random.class, BlockPos.class);
-        canSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "canSpawnMobAt", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, MobSpawnSettings.SpawnerData.class, BlockPos.class);
-        getMobForSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "getMobForSpawn", ServerLevel.class, EntityType.class);
-        isRightDistanceToPlayerAndSpawnPoint = ReflectionUtil.findMethod(NaturalSpawner.class, "isRightDistanceToPlayerAndSpawnPoint", ServerLevel.class, ChunkAccess.class, BlockPos.MutableBlockPos.class, double.class);
-        getRandomPosWithin = ReflectionUtil.findMethod(NaturalSpawner.class, "getRandomPosWithin", Level.class, LevelChunk.class);
+        canSpawnForCategory = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47134_", MobCategory.class);
+        canSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47127_", EntityType.class, BlockPos.class, ChunkAccess.class);
+        afterSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47131_", Mob.class, ChunkAccess.class);
+        getRandomSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_151598_", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, Random.class, BlockPos.class);
+        canSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47003_", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, MobSpawnSettings.SpawnerData.class, BlockPos.class);
+        getMobForSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_46988_", ServerLevel.class, EntityType.class);
+        isRightDistanceToPlayerAndSpawnPoint = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47024_", ServerLevel.class, ChunkAccess.class, BlockPos.MutableBlockPos.class, double.class);
+        getRandomPosWithin = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47062_", Level.class, LevelChunk.class);
     }
 
     /**

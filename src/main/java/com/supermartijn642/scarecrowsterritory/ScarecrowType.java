@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 
 import java.util.Arrays;
@@ -93,7 +94,7 @@ public enum ScarecrowType {
     public Block.Properties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return Block.Properties.create(Material.WOOL, color).sound(SoundType.CLOTH);
+                return Block.Properties.create(Material.WOOL, color).sound(SoundType.CLOTH).harvestTool(ToolType.AXE).hardnessAndResistance(0.5f);
         }
         return Block.Properties.create(Material.AIR);
     }

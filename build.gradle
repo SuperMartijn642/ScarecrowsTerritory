@@ -77,9 +77,9 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.0'
 
     // Core lib
-    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3351871')
+    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3413422')
     // Config lib
-    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3357667')
+    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3413938')
 
     // Block Renderer
     runtimeOnly fg.deobf("curse.maven:block-renderer-380456:3294692")

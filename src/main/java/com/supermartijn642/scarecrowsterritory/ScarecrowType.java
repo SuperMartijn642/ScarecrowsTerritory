@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.ToolType;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -94,7 +95,7 @@ public enum ScarecrowType {
     public BaseBlock.Properties getBlockProperties(EnumDyeColor color){
         switch(this){
             case PRIMITIVE:
-                return BaseBlock.Properties.create(Material.CLOTH, color).sound(SoundType.CLOTH);
+                return BaseBlock.Properties.create(Material.CLOTH, color).sound(SoundType.CLOTH).harvestTool(ToolType.AXE).hardnessAndResistance(0.5f);
         }
         return BaseBlock.Properties.create(Material.AIR);
     }

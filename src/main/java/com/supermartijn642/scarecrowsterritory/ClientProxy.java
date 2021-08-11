@@ -20,7 +20,7 @@ public class ClientProxy {
     }
 
     public static String translate(String translationKey, Object... args){
-        return I18n.format(translationKey, args);
+        return I18n.get(translationKey, args);
     }
 
 }

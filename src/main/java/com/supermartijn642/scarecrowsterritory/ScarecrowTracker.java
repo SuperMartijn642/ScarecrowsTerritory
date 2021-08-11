@@ -50,18 +50,20 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
         World world = e.world;
-        if(!world.isClientSide || !(world instanceof ServerWorld) || world.isDebug() || world.getDifficulty() == Difficulty.PEACEFUL)
+        if(world.isClientSide || !(world instanceof ServerWorld) || world.isDebug())
             return;
 
         if(!world.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
             return;
 
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(world);
-        for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-            if(entry.getValue() > 0 && world.getChunkSource().isEntityTickingChunk(entry.getKey())){
-                Chunk chunk = world.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
-                if(chunk != null && !chunk.isEmpty() && world.getWorldBorder().isWithinBounds(entry.getKey()))
-                    spawnEntitiesInChunk((ServerWorld)world, chunk);
+        if(chunks != null){
+            for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
+                if(entry.getValue() > 0 && world.getChunkSource().isEntityTickingChunk(entry.getKey())){
+                    Chunk chunk = world.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+                    if(chunk != null && !chunk.isEmpty() && world.getWorldBorder().isWithinBounds(entry.getKey()))
+                        spawnEntitiesInChunk((ServerWorld)world, chunk);
+                }
             }
         }
     }
@@ -84,12 +86,12 @@ public class ScarecrowTracker {
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
-        int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
+        int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
-                for(int y = minY; y <= maxY; y++){
-                    ChunkPos chunk = new ChunkPos(x, y);
+                for(int z = minZ; z <= maxZ; z++){
+                    ChunkPos chunk = new ChunkPos(x, z);
                     s.putIfAbsent(chunk, 0);
                     s.computeIfPresent(chunk, (c, i) -> i + 1);
                 }
@@ -106,11 +108,11 @@ public class ScarecrowTracker {
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
-        int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
+        int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
-                for(int y = minY; y <= maxY; y++){
-                    ChunkPos chunk = new ChunkPos(x, y);
+                for(int z = minZ; z <= maxZ; z++){
+                    ChunkPos chunk = new ChunkPos(x, z);
                     if(s.containsKey(chunk) && s.get(chunk) == 1)
                         s.remove(chunk);
                     else

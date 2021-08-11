@@ -21,9 +21,9 @@ public class ReflectionUtil {
         }
     }
 
-    public static <T> Method findMethod(Class<? super T> classs, String methodName){
+    public static <T> Method findMethod(Class<? super T> classs, String methodName, Class<?>... parameters){
         try{
-            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName);
+            Method method = ObfuscationReflectionHelper.findMethod(classs, methodName, parameters);
             method.setAccessible(true);
             return method;
         }catch(Exception e){

@@ -48,12 +48,12 @@ public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
         super(type.getRegistryName(color), false, type.getBlockProperties(color));
         this.type = type;
 
-        this.setDefaultState(this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, Direction.NORTH).with(BOTTOM, true).with(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(HorizontalBlock.FACING, Direction.NORTH).setValue(BOTTOM, true).setValue(WATERLOGGED, false));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
-        TileEntity tile = worldIn.getTileEntity(pos);
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
+        TileEntity tile = worldIn.getBlockEntity(pos);
         if(tile instanceof ScarecrowTile)
             return ((ScarecrowTile)tile).rightClick(player, handIn) ? ActionResultType.SUCCESS : ActionResultType.PASS;
         return ActionResultType.PASS;
@@ -61,45 +61,45 @@ public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context){
-        return this.type.getBlockShape(state.get(BlockStateProperties.HORIZONTAL_FACING), state.get(BOTTOM));
+        return this.type.getBlockShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING), state.getValue(BOTTOM));
     }
 
     @Override
-    public boolean isTransparent(BlockState state){
+    public boolean useShapeForLightOcclusion(BlockState state){
         return true;
     }
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context){
-        if(this.type.is2BlocksHigh() && !context.getWorld().isAirBlock(context.getPos().up()) && context.getWorld().getBlockState(context.getPos().up()).getBlock() != Blocks.WATER)
+        if(this.type.is2BlocksHigh() && !context.getLevel().isEmptyBlock(context.getClickedPos().above()) && context.getLevel().getBlockState(context.getClickedPos().above()).getBlock() != Blocks.WATER)
             return null;
-        IFluidState fluidState = context.getWorld().getFluidState(context.getPos());
-        return this.getDefaultState().with(HorizontalBlock.HORIZONTAL_FACING, context.getPlacementHorizontalFacing().getOpposite()).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+        IFluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+        return this.defaultBlockState().setValue(HorizontalBlock.FACING, context.getHorizontalDirection().getOpposite()).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
-        if(this.type.is2BlocksHigh() && (worldIn.isAirBlock(pos.up()) || worldIn.getBlockState(pos.up()).getBlock() == Blocks.WATER)){
-            IFluidState fluidState = worldIn.getFluidState(pos.up());
-            worldIn.setBlockState(pos.up(), state.with(BOTTOM, false).with(WATERLOGGED, fluidState.getFluid() == Fluids.WATER));
+    public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
+        if(this.type.is2BlocksHigh() && (worldIn.isEmptyBlock(pos.above()) || worldIn.getBlockState(pos.above()).getBlock() == Blocks.WATER)){
+            IFluidState fluidState = worldIn.getFluidState(pos.above());
+            worldIn.setBlockAndUpdate(pos.above(), state.setValue(BOTTOM, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER));
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
+    public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
         if(this.type.is2BlocksHigh() && state.getBlock() != newState.getBlock()){
-            boolean bottom = state.get(BOTTOM);
-            BlockState state1 = worldIn.getBlockState(bottom ? pos.up() : pos.down());
-            if(state1.getBlock() == state.getBlock() && state1.get(BOTTOM) != bottom)
-                worldIn.setBlockState(bottom ? pos.up() : pos.down(),
-                    state1.get(WATERLOGGED) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState());
+            boolean bottom = state.getValue(BOTTOM);
+            BlockState state1 = worldIn.getBlockState(bottom ? pos.above() : pos.below());
+            if(state1.getBlock() == state.getBlock() && state1.getValue(BOTTOM) != bottom)
+                worldIn.setBlockAndUpdate(bottom ? pos.above() : pos.below(),
+                    state1.getValue(WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState());
         }
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block,BlockState> builder){
-        builder.add(HorizontalBlock.HORIZONTAL_FACING, BOTTOM, WATERLOGGED);
+    protected void createBlockStateDefinition(StateContainer.Builder<Block,BlockState> builder){
+        builder.add(HorizontalBlock.FACING, BOTTOM, WATERLOGGED);
     }
 
     @Override
@@ -114,19 +114,19 @@ public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
 
     @Override
     public IFluidState getFluidState(BlockState state){
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
-    public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos){
-        if(stateIn.get(WATERLOGGED))
-            worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
-        return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos){
+        if(stateIn.getValue(WATERLOGGED))
+            worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+        return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
+    public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
         boolean spawners = STConfig.loadSpawners.get();
         boolean passive = STConfig.passiveMobSpawning.get();
 
@@ -150,12 +150,12 @@ public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
             if(builder.length() + token.length() + 1 < 25)
                 builder.append(' ').append(token);
             else{
-                components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
+                components.add(new StringTextComponent(builder.toString()).withStyle(color));
                 builder = new StringBuilder(token);
             }
         }
 
-        components.add(new StringTextComponent(builder.toString()).applyTextStyle(color));
+        components.add(new StringTextComponent(builder.toString()).withStyle(color));
 
         return components;
     }

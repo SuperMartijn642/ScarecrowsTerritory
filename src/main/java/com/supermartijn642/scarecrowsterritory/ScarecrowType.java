@@ -27,20 +27,20 @@ public enum ScarecrowType {
     PRIMITIVE;
 
     private static final VoxelShape PRIMITIVE_SHAPE = VoxelShapes.or(
-        VoxelShapes.create(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
-        VoxelShapes.create(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
-        VoxelShapes.create(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
+        VoxelShapes.box(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
+        VoxelShapes.box(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
+        VoxelShapes.box(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d));
 
     private static final VoxelShape[] PRIMITIVE_SHAPES_BOTTOM = new VoxelShape[4];
     private static final VoxelShape[] PRIMITIVE_SHAPES_TOP = new VoxelShape[4];
 
     static{
-        PRIMITIVE_SHAPES_BOTTOM[Direction.NORTH.getHorizontalIndex()] = PRIMITIVE_SHAPE;
-        PRIMITIVE_SHAPES_BOTTOM[Direction.EAST.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.EAST, PRIMITIVE_SHAPE);
-        PRIMITIVE_SHAPES_BOTTOM[Direction.SOUTH.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.SOUTH, PRIMITIVE_SHAPE);
-        PRIMITIVE_SHAPES_BOTTOM[Direction.WEST.getHorizontalIndex()] = rotateShape(Direction.NORTH, Direction.WEST, PRIMITIVE_SHAPE);
+        PRIMITIVE_SHAPES_BOTTOM[Direction.NORTH.get2DDataValue()] = PRIMITIVE_SHAPE;
+        PRIMITIVE_SHAPES_BOTTOM[Direction.EAST.get2DDataValue()] = rotateShape(Direction.NORTH, Direction.EAST, PRIMITIVE_SHAPE);
+        PRIMITIVE_SHAPES_BOTTOM[Direction.SOUTH.get2DDataValue()] = rotateShape(Direction.NORTH, Direction.SOUTH, PRIMITIVE_SHAPE);
+        PRIMITIVE_SHAPES_BOTTOM[Direction.WEST.get2DDataValue()] = rotateShape(Direction.NORTH, Direction.WEST, PRIMITIVE_SHAPE);
         for(int i = 0; i < 4; i++)
-            PRIMITIVE_SHAPES_TOP[i] = PRIMITIVE_SHAPES_BOTTOM[i].withOffset(0, -1, 0);
+            PRIMITIVE_SHAPES_TOP[i] = PRIMITIVE_SHAPES_BOTTOM[i].move(0, -1, 0);
     }
 
     /**
@@ -50,9 +50,9 @@ public enum ScarecrowType {
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape){
         VoxelShape[] buffer = new VoxelShape[]{shape, VoxelShapes.empty()};
 
-        int times = (to.getHorizontalIndex() - from.getHorizontalIndex() + 4) % 4;
+        int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
         for(int i = 0; i < times; i++){
-            buffer[0].forEachBox((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = VoxelShapes.or(buffer[1], VoxelShapes.create(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = VoxelShapes.or(buffer[1], VoxelShapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
             buffer[0] = buffer[1];
             buffer[1] = VoxelShapes.empty();
         }
@@ -73,14 +73,14 @@ public enum ScarecrowType {
     }
 
     public void registerTileType(RegistryEvent.Register<TileEntityType<?>> e){
-        this.tileTileEntityType = TileEntityType.Builder.create(this::createTileEntity, this.blocks.values().toArray(new Block[0])).build(null);
+        this.tileTileEntityType = TileEntityType.Builder.of(this::createTileEntity, this.blocks.values().toArray(new Block[0])).build(null);
         this.tileTileEntityType.setRegistryName(this.name().toLowerCase(Locale.ROOT) + "_tile");
         e.getRegistry().register(this.tileTileEntityType);
     }
 
     public void registerItem(RegistryEvent.Register<Item> e){
         this.blocks.forEach((color, block) -> {
-            BlockItem item = new BlockItem(block, new Item.Properties().group(ItemGroup.DECORATIONS));
+            BlockItem item = new BlockItem(block, new Item.Properties().tab(ItemGroup.TAB_DECORATIONS));
             item.setRegistryName(this.getRegistryName(color));
             this.items.put(color, item);
         });
@@ -88,23 +88,23 @@ public enum ScarecrowType {
     }
 
     public String getRegistryName(DyeColor color){
-        return (color == DyeColor.PURPLE ? this.name().toLowerCase(Locale.ROOT) : color.getTranslationKey()) + "_scarecrow";
+        return (color == DyeColor.PURPLE ? this.name().toLowerCase(Locale.ROOT) : color.getName()) + "_scarecrow";
     }
 
     public Block.Properties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return Block.Properties.create(Material.WOOL, color).sound(SoundType.CLOTH).harvestTool(ToolType.AXE).hardnessAndResistance(0.5f);
+                return Block.Properties.of(Material.WOOL, color).sound(SoundType.WOOL).harvestTool(ToolType.AXE).strength(0.5f);
         }
-        return Block.Properties.create(Material.AIR);
+        return Block.Properties.of(Material.AIR);
     }
 
     public VoxelShape getBlockShape(Direction facing, boolean bottom){
         switch(this){
             case PRIMITIVE:
-                return bottom ? PRIMITIVE_SHAPES_BOTTOM[facing.getHorizontalIndex()] : PRIMITIVE_SHAPES_TOP[facing.getHorizontalIndex()];
+                return bottom ? PRIMITIVE_SHAPES_BOTTOM[facing.get2DDataValue()] : PRIMITIVE_SHAPES_TOP[facing.get2DDataValue()];
         }
-        return VoxelShapes.fullCube();
+        return VoxelShapes.block();
     }
 
     public ScarecrowTile createTileEntity(){
@@ -118,9 +118,9 @@ public enum ScarecrowType {
     public RenderType getRenderLayer(){
         switch(this){
             case PRIMITIVE:
-                return RenderType.getTranslucent();
+                return RenderType.translucent();
         }
-        return RenderType.getSolid();
+        return RenderType.solid();
     }
 
     public boolean is2BlocksHigh(){

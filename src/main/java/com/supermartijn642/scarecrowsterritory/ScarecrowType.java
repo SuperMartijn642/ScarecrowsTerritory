@@ -96,7 +96,7 @@ public enum ScarecrowType {
     public BlockBehaviour.Properties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return BlockBehaviour.Properties.of(Material.WOOL, color).sound(SoundType.WOOL);
+                return BlockBehaviour.Properties.of(Material.WOOL, color).sound(SoundType.WOOL).strength(0.5f);
         }
         return BlockBehaviour.Properties.of(Material.AIR);
     }

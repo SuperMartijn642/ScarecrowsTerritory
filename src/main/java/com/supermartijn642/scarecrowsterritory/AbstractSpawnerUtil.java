@@ -21,27 +21,29 @@ import java.util.Optional;
 public class AbstractSpawnerUtil {
 
     private static final Field spawnDelay;
-    private static final Field spawnData;
-    private static final Field mobRotation;
-    private static final Field prevMobRotation;
+    private static final Field nextSpawnData;
+    private static final Field spin;
+    private static final Field oSpin;
     private static final Field spawnCount;
     private static final Field maxNearbyEntities;
     private static final Field spawnRange;
 
-    private static final Method isActivated;
-    private static final Method resetTimer;
+    private static final Method isNearPlayer;
+    private static final Method delay;
+    private static final Method addWithPassengers;
 
     static{
-        spawnDelay = ReflectionUtil.findField(AbstractSpawner.class, "spawnDelay");
-        spawnData = ReflectionUtil.findField(AbstractSpawner.class, "nextSpawnData");
-        mobRotation = ReflectionUtil.findField(AbstractSpawner.class, "spin");
-        prevMobRotation = ReflectionUtil.findField(AbstractSpawner.class, "oSpin");
-        spawnCount = ReflectionUtil.findField(AbstractSpawner.class, "spawnCount");
-        maxNearbyEntities = ReflectionUtil.findField(AbstractSpawner.class, "maxNearbyEntities");
-        spawnRange = ReflectionUtil.findField(AbstractSpawner.class, "spawnRange");
+        spawnDelay = ReflectionUtil.findField(AbstractSpawner.class, "field_98286_b");
+        nextSpawnData = ReflectionUtil.findField(AbstractSpawner.class, "field_98282_f");
+        spin = ReflectionUtil.findField(AbstractSpawner.class, "field_98287_c");
+        oSpin = ReflectionUtil.findField(AbstractSpawner.class, "field_98284_d");
+        spawnCount = ReflectionUtil.findField(AbstractSpawner.class, "field_98294_i");
+        maxNearbyEntities = ReflectionUtil.findField(AbstractSpawner.class, "field_98292_k");
+        spawnRange = ReflectionUtil.findField(AbstractSpawner.class, "field_98290_m");
 
-        isActivated = ReflectionUtil.findMethod(AbstractSpawner.class, "isNearPlayer");
-        resetTimer = ReflectionUtil.findMethod(AbstractSpawner.class, "delay");
+        isNearPlayer = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98279_f");
+        delay = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98273_j");
+        addWithPassengers = ReflectionUtil.findMethod(AbstractSpawner.class, "func_221409_a", Entity.class);
     }
 
     private static int getSpawnDelay(AbstractSpawner spawner){
@@ -61,26 +63,26 @@ public class AbstractSpawnerUtil {
         }
     }
 
-    private static WeightedSpawnerEntity getSpawnData(AbstractSpawner spawner){
+    private static WeightedSpawnerEntity getNextSpawnData(AbstractSpawner spawner){
         try{
-            return (WeightedSpawnerEntity)spawnData.get(spawner);
+            return (WeightedSpawnerEntity)nextSpawnData.get(spawner);
         }catch(Exception e){
             e.printStackTrace();
             return null;
         }
     }
 
-    private static void setMobRotation(AbstractSpawner spawner, double value){
+    private static void setSpin(AbstractSpawner spawner, double value){
         try{
-            mobRotation.setDouble(spawner, value);
+            spin.setDouble(spawner, value);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    private static void setPrevMobRotation(AbstractSpawner spawner, double value){
+    private static void setOSpin(AbstractSpawner spawner, double value){
         try{
-            prevMobRotation.setDouble(spawner, value);
+            oSpin.setDouble(spawner, value);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -113,25 +115,42 @@ public class AbstractSpawnerUtil {
         }
     }
 
-    private static boolean isActivated(AbstractSpawner spawner){
+    /**
+     * {@link AbstractSpawner#isNearPlayer()}
+     */
+    private static boolean isNearPlayer(AbstractSpawner spawner){
         try{
-            return (boolean)isActivated.invoke(spawner);
+            return (boolean)isNearPlayer.invoke(spawner);
         }catch(Exception e){
             e.printStackTrace();
             return false;
         }
     }
 
-    private static void resetTimer(AbstractSpawner spawner){
+    /**
+     * {@link AbstractSpawner#delay()}
+     */
+    private static void delay(AbstractSpawner spawner){
         try{
-            resetTimer.invoke(spawner);
+            delay.invoke(spawner);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * {@link AbstractSpawner#addWithPassengers(Entity)}
+     */
+    private static void addWithPassengers(AbstractSpawner spawner, Entity entity){
+        try{
+            addWithPassengers.invoke(spawner, entity);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
     public static void tickAbstractSpawner(AbstractSpawner spawner){
-        if(!isActivated(spawner)){
+        if(!isNearPlayer(spawner)){
             World world = spawner.getLevel();
             BlockPos blockpos = spawner.getPos();
             if(!(world instanceof ServerWorld)){
@@ -143,11 +162,11 @@ public class AbstractSpawnerUtil {
                 if(getSpawnDelay(spawner) > 0)
                     setSpawnDelay(spawner, getSpawnDelay(spawner) - 1);
 
-                setPrevMobRotation(spawner, spawner.getSpin());
-                setMobRotation(spawner, (spawner.getSpin() + (double)(1000.0F / ((float)getSpawnDelay(spawner) + 200.0F))) % 360.0D);
+                setOSpin(spawner, spawner.getSpin());
+                setSpin(spawner, (spawner.getSpin() + (double)(1000.0F / ((float)getSpawnDelay(spawner) + 200.0F))) % 360.0D);
             }else{
                 if(getSpawnDelay(spawner) == -1){
-                    resetTimer(spawner);
+                    delay(spawner);
                 }
 
                 if(getSpawnDelay(spawner) > 0){
@@ -158,10 +177,10 @@ public class AbstractSpawnerUtil {
                 boolean flag = false;
 
                 for(int i = 0; i < getSpawnCount(spawner); ++i){
-                    CompoundNBT compoundnbt = getSpawnData(spawner).getTag();
+                    CompoundNBT compoundnbt = getNextSpawnData(spawner).getTag();
                     Optional<EntityType<?>> optional = EntityType.by(compoundnbt);
                     if(!optional.isPresent()){
-                        resetTimer(spawner);
+                        delay(spawner);
                         return;
                     }
 
@@ -178,13 +197,13 @@ public class AbstractSpawnerUtil {
                                 return p_221408_6_;
                             });
                             if(entity == null){
-                                resetTimer(spawner);
+                                delay(spawner);
                                 return;
                             }
 
                             int k = world.getEntitiesOfClass(entity.getClass(), (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).inflate(getSpawnRange(spawner))).size();
                             if(k >= getMaxNearbyEntities(spawner)){
-                                resetTimer(spawner);
+                                delay(spawner);
                                 return;
                             }
 
@@ -195,13 +214,13 @@ public class AbstractSpawnerUtil {
                                     continue;
                                 }
 
-                                if(getSpawnData(spawner).getTag().size() == 1 && getSpawnData(spawner).getTag().contains("id", 8)){
+                                if(getNextSpawnData(spawner).getTag().size() == 1 && getNextSpawnData(spawner).getTag().contains("id", 8)){
                                     if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, SpawnReason.SPAWNER))
-                                        ((MobEntity)entity).finalizeSpawn(serverworld, world.getCurrentDifficultyAt(entity.getCommandSenderBlockPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
+                                        ((MobEntity)entity).finalizeSpawn(serverworld, world.getCurrentDifficultyAt(entity.getCommandSenderBlockPosition()), SpawnReason.SPAWNER, null, null);
                                 }
                             }
 
-                            addWithPassengers(world, entity);
+                            addWithPassengers(spawner, entity);
                             world.levelEvent(2004, blockpos, 0);
                             if(entity instanceof MobEntity){
                                 ((MobEntity)entity).spawnAnim();
@@ -213,19 +232,9 @@ public class AbstractSpawnerUtil {
                 }
 
                 if(flag){
-                    resetTimer(spawner);
+                    delay(spawner);
                 }
             }
-
-        }
-    }
-
-    private static void addWithPassengers(World world, Entity entityIn){
-        if(world.addFreshEntity(entityIn)){
-            for(Entity entity : entityIn.getPassengers()){
-                world.addFreshEntity(entity);
-            }
-
         }
     }
 

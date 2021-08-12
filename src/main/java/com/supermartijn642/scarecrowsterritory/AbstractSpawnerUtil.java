@@ -32,16 +32,16 @@ public class AbstractSpawnerUtil {
     private static final Method resetTimer;
 
     static{
-        spawnDelay = ReflectionUtil.findField(AbstractSpawner.class, "field_98286_b");
-        spawnData = ReflectionUtil.findField(AbstractSpawner.class, "field_98282_f");
-        mobRotation = ReflectionUtil.findField(AbstractSpawner.class, "field_98287_c");
-        prevMobRotation = ReflectionUtil.findField(AbstractSpawner.class, "field_98284_d");
-        spawnCount = ReflectionUtil.findField(AbstractSpawner.class, "field_98294_i");
-        maxNearbyEntities = ReflectionUtil.findField(AbstractSpawner.class, "field_98292_k");
-        spawnRange = ReflectionUtil.findField(AbstractSpawner.class, "field_98290_m");
+        spawnDelay = ReflectionUtil.findField(AbstractSpawner.class, "spawnDelay");
+        spawnData = ReflectionUtil.findField(AbstractSpawner.class, "nextSpawnData");
+        mobRotation = ReflectionUtil.findField(AbstractSpawner.class, "spin");
+        prevMobRotation = ReflectionUtil.findField(AbstractSpawner.class, "oSpin");
+        spawnCount = ReflectionUtil.findField(AbstractSpawner.class, "spawnCount");
+        maxNearbyEntities = ReflectionUtil.findField(AbstractSpawner.class, "maxNearbyEntities");
+        spawnRange = ReflectionUtil.findField(AbstractSpawner.class, "spawnRange");
 
-        isActivated = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98279_f");
-        resetTimer = ReflectionUtil.findMethod(AbstractSpawner.class, "func_98273_j");
+        isActivated = ReflectionUtil.findMethod(AbstractSpawner.class, "isNearPlayer");
+        resetTimer = ReflectionUtil.findMethod(AbstractSpawner.class, "delay");
     }
 
     private static int getSpawnDelay(AbstractSpawner spawner){
@@ -132,19 +132,19 @@ public class AbstractSpawnerUtil {
 
     public static void tickAbstractSpawner(AbstractSpawner spawner){
         if(!isActivated(spawner)){
-            World world = spawner.getWorld();
-            BlockPos blockpos = spawner.getSpawnerPosition();
+            World world = spawner.getLevel();
+            BlockPos blockpos = spawner.getPos();
             if(!(world instanceof ServerWorld)){
-                double d3 = (double)blockpos.getX() + world.rand.nextDouble();
-                double d4 = (double)blockpos.getY() + world.rand.nextDouble();
-                double d5 = (double)blockpos.getZ() + world.rand.nextDouble();
+                double d3 = (double)blockpos.getX() + world.random.nextDouble();
+                double d4 = (double)blockpos.getY() + world.random.nextDouble();
+                double d5 = (double)blockpos.getZ() + world.random.nextDouble();
                 world.addParticle(ParticleTypes.SMOKE, d3, d4, d5, 0.0D, 0.0D, 0.0D);
                 world.addParticle(ParticleTypes.FLAME, d3, d4, d5, 0.0D, 0.0D, 0.0D);
                 if(getSpawnDelay(spawner) > 0)
                     setSpawnDelay(spawner, getSpawnDelay(spawner) - 1);
 
-                setPrevMobRotation(spawner, spawner.getMobRotation());
-                setMobRotation(spawner, (spawner.getMobRotation() + (double)(1000.0F / ((float)getSpawnDelay(spawner) + 200.0F))) % 360.0D);
+                setPrevMobRotation(spawner, spawner.getSpin());
+                setMobRotation(spawner, (spawner.getSpin() + (double)(1000.0F / ((float)getSpawnDelay(spawner) + 200.0F))) % 360.0D);
             }else{
                 if(getSpawnDelay(spawner) == -1){
                     resetTimer(spawner);
@@ -158,8 +158,8 @@ public class AbstractSpawnerUtil {
                 boolean flag = false;
 
                 for(int i = 0; i < getSpawnCount(spawner); ++i){
-                    CompoundNBT compoundnbt = getSpawnData(spawner).getNbt();
-                    Optional<EntityType<?>> optional = EntityType.readEntityType(compoundnbt);
+                    CompoundNBT compoundnbt = getSpawnData(spawner).getTag();
+                    Optional<EntityType<?>> optional = EntityType.by(compoundnbt);
                     if(!optional.isPresent()){
                         resetTimer(spawner);
                         return;
@@ -167,14 +167,14 @@ public class AbstractSpawnerUtil {
 
                     ListNBT listnbt = compoundnbt.getList("Pos", 6);
                     int j = listnbt.size();
-                    double d0 = j >= 1 ? listnbt.getDouble(0) : (double)blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    double d1 = j >= 2 ? listnbt.getDouble(1) : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
-                    double d2 = j >= 3 ? listnbt.getDouble(2) : (double)blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    if(world.areCollisionShapesEmpty(optional.get().func_220328_a(d0, d1, d2))){
+                    double d0 = j >= 1 ? listnbt.getDouble(0) : (double)blockpos.getX() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    double d1 = j >= 2 ? listnbt.getDouble(1) : (double)(blockpos.getY() + world.random.nextInt(3) - 1);
+                    double d2 = j >= 3 ? listnbt.getDouble(2) : (double)blockpos.getZ() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    if(world.noCollision(optional.get().getAABB(d0, d1, d2))){
                         ServerWorld serverworld = (ServerWorld)world;
-                        if(EntitySpawnPlacementRegistry.func_223515_a(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
-                            Entity entity = EntityType.func_220335_a(compoundnbt, world, (p_221408_6_) -> {
-                                p_221408_6_.setLocationAndAngles(d0, d1, d2, p_221408_6_.rotationYaw, p_221408_6_.rotationPitch);
+                        if(EntitySpawnPlacementRegistry.checkSpawnRules(optional.get(), serverworld, SpawnReason.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
+                            Entity entity = EntityType.loadEntityRecursive(compoundnbt, world, (p_221408_6_) -> {
+                                p_221408_6_.moveTo(d0, d1, d2, p_221408_6_.yRot, p_221408_6_.xRot);
                                 return p_221408_6_;
                             });
                             if(entity == null){
@@ -182,29 +182,29 @@ public class AbstractSpawnerUtil {
                                 return;
                             }
 
-                            int k = world.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).grow(getSpawnRange(spawner))).size();
+                            int k = world.getEntitiesOfClass(entity.getClass(), (new AxisAlignedBB((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ(), (double)(blockpos.getX() + 1), (double)(blockpos.getY() + 1), (double)(blockpos.getZ() + 1))).inflate(getSpawnRange(spawner))).size();
                             if(k >= getMaxNearbyEntities(spawner)){
                                 resetTimer(spawner);
                                 return;
                             }
 
-                            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, world.rand.nextFloat() * 360.0F, 0.0F);
+                            entity.moveTo(entity.x, entity.y, entity.z, world.random.nextFloat() * 360.0F, 0.0F);
                             if(entity instanceof MobEntity){
                                 MobEntity mobentity = (MobEntity)entity;
-                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner)){
+                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mobentity, world, (float)entity.x, (float)entity.y, (float)entity.z, spawner)){
                                     continue;
                                 }
 
-                                if(getSpawnData(spawner).getNbt().size() == 1 && getSpawnData(spawner).getNbt().contains("id", 8)){
-                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner, SpawnReason.SPAWNER))
-                                        ((MobEntity)entity).onInitialSpawn(serverworld, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
+                                if(getSpawnData(spawner).getTag().size() == 1 && getSpawnData(spawner).getTag().contains("id", 8)){
+                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)entity.x, (float)entity.y, (float)entity.z, spawner, SpawnReason.SPAWNER))
+                                        ((MobEntity)entity).finalizeSpawn(serverworld, world.getCurrentDifficultyAt(entity.getCommandSenderBlockPosition()), SpawnReason.SPAWNER, (ILivingEntityData)null, (CompoundNBT)null);
                                 }
                             }
 
-                            func_221409_a(world, entity);
-                            world.playEvent(2004, blockpos, 0);
+                            addWithPassengers(world, entity);
+                            world.levelEvent(2004, blockpos, 0);
                             if(entity instanceof MobEntity){
-                                ((MobEntity)entity).spawnExplosionParticle();
+                                ((MobEntity)entity).spawnAnim();
                             }
 
                             flag = true;
@@ -220,10 +220,10 @@ public class AbstractSpawnerUtil {
         }
     }
 
-    private static void func_221409_a(World world, Entity entityIn){
-        if(world.addEntity(entityIn)){
+    private static void addWithPassengers(World world, Entity entityIn){
+        if(world.addFreshEntity(entityIn)){
             for(Entity entity : entityIn.getPassengers()){
-                world.addEntity(entity);
+                world.addFreshEntity(entity);
             }
 
         }

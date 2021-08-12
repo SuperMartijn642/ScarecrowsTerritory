@@ -34,9 +34,9 @@ public class SpawnerTracker {
     public static void onChunkLoad(ChunkEvent.Load e){
         IChunk chunk = e.getChunk();
 
-        for(BlockPos pos : chunk.getTileEntitiesPos()){
+        for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
-                if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
+                if(chunk.getBlockEntity(pos) instanceof MobSpawnerTileEntity){
                     SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
                     SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
                         s.add(pos);
@@ -44,10 +44,10 @@ public class SpawnerTracker {
                     });
                 }
             };
-            if(e.getWorld().isRemote())
+            if(e.getWorld().isClientSide())
                 ClientUtils.queueTask(task);
             else if(e.getWorld() instanceof World)
-                ((World)e.getWorld()).getServer().enqueue(new TickDelayedTask(0, task));
+                ((World)e.getWorld()).getServer().tell(new TickDelayedTask(0, task));
         }
     }
 
@@ -55,8 +55,8 @@ public class SpawnerTracker {
     public static void onChunkUnload(ChunkEvent.Unload e){
         IChunk chunk = e.getChunk();
 
-        for(BlockPos pos : chunk.getTileEntitiesPos()){
-            if(chunk.getTileEntity(pos) instanceof MobSpawnerTileEntity){
+        for(BlockPos pos : chunk.getBlockEntitiesPos()){
+            if(chunk.getBlockEntity(pos) instanceof MobSpawnerTileEntity){
                 SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
                     s.remove(pos);
                     return s;
@@ -89,7 +89,7 @@ public class SpawnerTracker {
     public static Set<BlockPos> getSpawnersInRange(World world, BlockPos center, double range){
         double rangeSquared = range * range;
         return SPAWNERS_PER_WORLD.getOrDefault(world, Collections.emptySet())
-            .stream().filter(pos -> center.distanceSq(pos) <= rangeSquared).collect(Collectors.toSet());
+            .stream().filter(pos -> center.distSqr(pos) <= rangeSquared).collect(Collectors.toSet());
     }
 
 }

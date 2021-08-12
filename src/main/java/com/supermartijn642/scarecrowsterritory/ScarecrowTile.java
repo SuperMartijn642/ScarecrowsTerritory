@@ -30,26 +30,26 @@ public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity
     }
 
     public boolean rightClick(PlayerEntity player, Hand hand){
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
         if(!stack.isEmpty() && stack.getItem() instanceof DyeItem){
             DyeColor color = ((DyeItem)stack.getItem()).getDyeColor();
-            BlockState state = this.world.getBlockState(this.pos);
+            BlockState state = this.level.getBlockState(this.worldPosition);
             if(state.getBlock() instanceof ScarecrowBlock){
-                this.world.setBlockState(this.pos,
-                    this.type.blocks.get(color).getDefaultState()
-                        .with(HorizontalBlock.HORIZONTAL_FACING, state.get(HorizontalBlock.HORIZONTAL_FACING))
-                        .with(ScarecrowBlock.BOTTOM, state.get(ScarecrowBlock.BOTTOM))
-                        .with(ScarecrowBlock.WATERLOGGED, state.get(ScarecrowBlock.WATERLOGGED))
+                this.level.setBlockAndUpdate(this.worldPosition,
+                    this.type.blocks.get(color).defaultBlockState()
+                        .setValue(HorizontalBlock.FACING, state.getValue(HorizontalBlock.FACING))
+                        .setValue(ScarecrowBlock.BOTTOM, state.getValue(ScarecrowBlock.BOTTOM))
+                        .setValue(ScarecrowBlock.WATERLOGGED, state.getValue(ScarecrowBlock.WATERLOGGED))
                 );
                 // other half
-                BlockPos pos2 = state.get(ScarecrowBlock.BOTTOM) ? this.pos.up() : this.pos.down();
-                BlockState state2 = this.world.getBlockState(pos2);
-                if(state2.getBlock() instanceof ScarecrowBlock || state2.isAir() || state2.getFluidState().getFluid().isEquivalentTo(Fluids.WATER)){
-                    this.world.setBlockState(pos2,
-                        this.type.blocks.get(color).getDefaultState()
-                            .with(HorizontalBlock.HORIZONTAL_FACING, state.get(HorizontalBlock.HORIZONTAL_FACING))
-                            .with(ScarecrowBlock.BOTTOM, !state.get(ScarecrowBlock.BOTTOM))
-                            .with(ScarecrowBlock.WATERLOGGED, state2.getFluidState().getFluid().isEquivalentTo(Fluids.WATER))
+                BlockPos pos2 = state.getValue(ScarecrowBlock.BOTTOM) ? this.worldPosition.above() : this.worldPosition.below();
+                BlockState state2 = this.level.getBlockState(pos2);
+                if(state2.getBlock() instanceof ScarecrowBlock || state2.isAir() || state2.getFluidState().getType().isSame(Fluids.WATER)){
+                    this.level.setBlockAndUpdate(pos2,
+                        this.type.blocks.get(color).defaultBlockState()
+                            .setValue(HorizontalBlock.FACING, state.getValue(HorizontalBlock.FACING))
+                            .setValue(ScarecrowBlock.BOTTOM, !state.getValue(ScarecrowBlock.BOTTOM))
+                            .setValue(ScarecrowBlock.WATERLOGGED, state2.getFluidState().getType().isSame(Fluids.WATER))
                     );
                 }
             }
@@ -61,11 +61,11 @@ public class ScarecrowTile extends BaseTileEntity implements ITickableTileEntity
     @Override
     public void tick(){
         if(STConfig.loadSpawners.get()){
-            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.world, this.pos, STConfig.loadSpawnerRange.get());
+            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.level, this.worldPosition, STConfig.loadSpawnerRange.get());
             for(BlockPos spawnerPos : spawners){
-                TileEntity tileEntity = this.world.getTileEntity(spawnerPos);
+                TileEntity tileEntity = this.level.getBlockEntity(spawnerPos);
                 if(tileEntity instanceof MobSpawnerTileEntity)
-                    AbstractSpawnerUtil.tickAbstractSpawner(((MobSpawnerTileEntity)tileEntity).getSpawnerBaseLogic());
+                    AbstractSpawnerUtil.tickAbstractSpawner(((MobSpawnerTileEntity)tileEntity).getSpawner());
             }
         }
     }

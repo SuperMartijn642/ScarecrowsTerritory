@@ -3,55 +3,70 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = 'https://plugins.gradle.org/m2'}
+        maven { url = 'https://plugins.gradle.org/m2' }
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.4'
-        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply plugin: 'com.wynprice.cursemaven'
 apply plugin: 'org.spongepowered.mixin'
 
 version = '1.1.0-mc1.12'
 group = 'com.supermartijn642.scarecrowsterritory' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'scarecrowsterritory'
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    version = "1.12.2-14.23.5.2847"
-    runDir = "run"
-
-    mappings = "snapshot_20171003"
+    mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     String resolved_core_plugin = "com.supermartijn642.scarecrowsterritory.core.CoreMod"
-    clientJvmArgs += "-Dfml.coreMods.load=${resolved_core_plugin}"
-    serverJvmArgs += "-Dfml.coreMods.load=${resolved_core_plugin}"
     String resolved_core_config = "mixins.scarecrowsterritory.json"
-    clientRunArgs += "--mixin ${resolved_core_config}"
-    serverRunArgs += "--mixin ${resolved_core_config}"
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'fml.coreMods.load', resolved_core_plugin
+
+            args '--mixin', resolved_core_config
+
+            mods {
+                wirelesschargers {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'fml.coreMods.load', resolved_core_plugin
+
+            args '--mixin', resolved_core_config
+
+            mods {
+                wirelesschargers {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
 }
 
 repositories {
     maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
+        url "https://www.cursemaven.com"
     }
     maven {
         url = "https://repo.spongepowered.org/maven"
@@ -59,13 +74,14 @@ repositories {
 }
 
 dependencies {
-    // config lib
-    compileOnly 'curse.maven:supermartijn642s-config-lib:3211007'
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
 
-    // core lib
-    compileOnly files('libs/supermartijn642corelib-1.0.1a-mc1.12.jar')//'curse.maven:supermartijn642s-core-lib:3269640'
+    // Core lib
+    implementation fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3413418')
+    // Config lib
+    implementation fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3413933')
 
-    provided('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+    implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
         exclude module: 'guava'
         exclude module: 'commons-io'
         exclude module: 'gson'
@@ -73,7 +89,7 @@ dependencies {
 }
 
 jar {
-    from(configurations.provided.collect {
+    from(configurations.compileOnly.collect {
         it.isDirectory() ? it : zipTree(it)
     }) {
         exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
@@ -89,6 +105,13 @@ jar {
     }
 }
 
-//sourceSets {
-//    main { output.resourcesDir = output.classesDir }
-//}
+mixin {
+    add sourceSets.main, "mixins.scarecrowsterritory.json"
+}
+
+sourceSets {
+    main {
+        resources { srcDir 'src/generated/resources' }
+        output.resourcesDir = output.classesDirs.asPath
+    }
+}

@@ -3,7 +3,6 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = 'https://plugins.gradle.org/m2' }
         maven { url = "https://repo.spongepowered.org/maven" }
     }
     dependencies {
@@ -13,10 +12,10 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
 
-version = '1.1.0-mc1.12'
+version = '1.1.1-mc1.12'
 group = 'com.supermartijn642.scarecrowsterritory' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'scarecrowsterritory'
 
@@ -81,7 +80,8 @@ dependencies {
     // Config lib
     implementation fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3413933')
 
-    implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+    // This needs to be compile, so it gets included in the build jar
+    compile('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
         exclude module: 'guava'
         exclude module: 'commons-io'
         exclude module: 'gson'
@@ -89,9 +89,11 @@ dependencies {
 }
 
 jar {
-    from(configurations.compileOnly.collect {
-        it.isDirectory() ? it : zipTree(it)
-    }) {
+    from {
+        configurations.compile
+                .filter { "mixin-0.8.3-SNAPSHOT.jar" == it.name }
+                .collect { it.isDirectory() ? it : zipTree(it) }
+    } {
         exclude "LICENSE.txt", "META-INF/MANIFSET.MF", "META-INF/maven/**", "META-INF/*.RSA", "META-INF/*.SF"
     }
 
@@ -107,6 +109,7 @@ jar {
 
 mixin {
     add sourceSets.main, "mixins.scarecrowsterritory.json"
+    disableAnnotationProcessorCheck()
 }
 
 sourceSets {
@@ -115,3 +118,5 @@ sourceSets {
         output.resourcesDir = output.classesDirs.asPath
     }
 }
+
+jar.finalizedBy('reobfJar')

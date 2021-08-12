@@ -45,7 +45,7 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
         World world = e.world;
-        if(!world.isRemote || !(world instanceof WorldServer) || world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES || world.getDifficulty() == EnumDifficulty.PEACEFUL)
+        if(world.isRemote || !(world instanceof WorldServer) || world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
             return;
 
         if(!CHUNKS_TO_SPAWN_MOBS.containsKey(world) || !world.getGameRules().getBoolean("doMobSpawning"))
@@ -71,12 +71,12 @@ public class ScarecrowTracker {
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
-        int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
+        int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
-                for(int y = minY; y <= maxY; y++){
-                    ChunkPos chunk = new ChunkPos(x, y);
+                for(int z = minZ; z <= maxZ; z++){
+                    ChunkPos chunk = new ChunkPos(x, z);
                     s.putIfAbsent(chunk, 0);
                     s.computeIfPresent(chunk, (c, i) -> i + 1);
                 }
@@ -93,11 +93,11 @@ public class ScarecrowTracker {
 
         int range = (int)Math.ceil(STConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
-        int minY = (pos.getY() - range) >> 4, maxY = (pos.getY() + range) >> 4;
+        int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
         CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
-                for(int y = minY; y <= maxY; y++){
-                    ChunkPos chunk = new ChunkPos(x, y);
+                for(int z = minZ; z <= maxZ; z++){
+                    ChunkPos chunk = new ChunkPos(x, z);
                     if(s.containsKey(chunk) && s.get(chunk) == 1)
                         s.remove(chunk);
                     else

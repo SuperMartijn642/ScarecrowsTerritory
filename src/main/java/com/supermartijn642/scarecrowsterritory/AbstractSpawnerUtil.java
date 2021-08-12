@@ -114,6 +114,9 @@ public class AbstractSpawnerUtil {
         }
     }
 
+    /**
+     * {@link MobSpawnerBaseLogic#isActivated()}
+     */
     private static boolean isActivated(MobSpawnerBaseLogic spawner){
         try{
             return (boolean)isActivated.invoke(spawner);
@@ -123,6 +126,9 @@ public class AbstractSpawnerUtil {
         }
     }
 
+    /**
+     * {@link MobSpawnerBaseLogic#resetTimer()}
+     */
     private static void resetTimer(MobSpawnerBaseLogic spawner){
         try{
             resetTimer.invoke(spawner);
@@ -160,6 +166,7 @@ public class AbstractSpawnerUtil {
 
                 for(int i = 0; i < getSpawnCount(spawner); ++i){
                     NBTTagCompound compound = getSpawnData(spawner).getNbt();
+
                     NBTTagList nbttaglist = compound.getTagList("Pos", 6);
                     int j = nbttaglist.tagCount();
                     double d0 = j >= 1 ? nbttaglist.getDoubleAt(0) : (double)blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
@@ -200,7 +207,6 @@ public class AbstractSpawnerUtil {
                     resetTimer(spawner);
                 }
             }
-
         }
     }
 

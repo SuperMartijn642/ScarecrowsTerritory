@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,8 +22,26 @@ import java.util.stream.Collectors;
  */
 public class MobSpawningUtil {
 
+    private static final Method getRandomChunkPosition;
+
+    static{
+        getRandomChunkPosition = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_180621_a", BlockPos.class, World.class, int.class, int.class);
+    }
+
+    /**
+     * {@link WorldEntitySpawner#getRandomChunkPosition(World, int, int)}
+     */
+    private static BlockPos getRandomChunkPosition(World world, int x, int z){
+        try{
+            return (BlockPos)getRandomChunkPosition.invoke(null, world, x, z);
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void spawnEntitiesInChunks(WorldServer world, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
-        if(spawnHostiles || spawnPassives){
+        if(spawnHostiles || spawnPassives || spawnAnimals){
             chunks = chunks.stream().filter(pos -> world.isAreaLoaded(pos.getBlock(0, 0, 0), 0)).collect(Collectors.toSet());
             if(chunks.size() > 0)
                 trySpawnEntitiesInChunks(world, chunks, spawnPassives, spawnHostiles, spawnAnimals);
@@ -31,7 +49,7 @@ public class MobSpawningUtil {
     }
 
     private static void trySpawnEntitiesInChunks(WorldServer worldServerIn, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
-        int i = chunks.size();
+        int i = chunks.size() + worldServerIn.getChunkProvider().getLoadedChunkCount();
 
         int entitiesSpawned = 0;
         BlockPos worldSpawnPoint = worldServerIn.getSpawnPoint();
@@ -75,7 +93,7 @@ public class MobSpawningUtil {
                                     float spawnXCenter = (float)spawnX + 0.5F;
                                     float spawnZCenter = (float)spawnZ + 0.5F;
 
-                                    if(!worldServerIn.isAnyPlayerWithinRangeAt(spawnXCenter, spawnY, spawnZCenter, 24.0D) && worldSpawnPoint.distanceSq((double)spawnXCenter, (double)spawnY, (double)spawnZCenter) >= 576.0D){
+                                    if(worldSpawnPoint.distanceSq(spawnXCenter, spawnY, spawnZCenter) >= 576.0D){
                                         if(spawnEntry == null){
                                             spawnEntry = worldServerIn.getSpawnListEntryForTypeAt(enumcreaturetype, spawnPos);
 
@@ -123,16 +141,6 @@ public class MobSpawningUtil {
                 }
             }
         }
-    }
-
-
-    private static BlockPos getRandomChunkPosition(World worldIn, int x, int z){
-        Chunk chunk = worldIn.getChunkFromChunkCoords(x, z);
-        int i = x * 16 + worldIn.rand.nextInt(16);
-        int j = z * 16 + worldIn.rand.nextInt(16);
-        int k = MathHelper.roundUp(chunk.getHeight(new BlockPos(i, 0, j)) + 1, 16);
-        int l = worldIn.rand.nextInt(k > 0 ? k : chunk.getTopFilledSegment() + 16 - 1);
-        return new BlockPos(i, l, j);
     }
 
 }

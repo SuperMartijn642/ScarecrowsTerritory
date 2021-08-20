@@ -23,7 +23,7 @@ public class STConfig {
         loadSpawners = builder.comment("Should the scarecrows keep spawners in range activated?").define("loadSpawners", true);
         loadSpawnerRange = builder.comment("In what range will the scarecrows load spawners?").define("loadSpawnerRange", 8, 1, 25d);
         passiveMobSpawning = builder.comment("Should mobs passively spawn within the scarecrows' range").define("passiveMobSpawning", true);
-        passiveMobRange = builder.comment("In what range will mobs passively spawn?").define("passiveMobRange", 8, 1, 25d);
+        passiveMobRange = builder.comment("In what range will mobs passively spawn?").define("passiveMobRange", 8, 1, 128d);
 
         builder.pop();
 

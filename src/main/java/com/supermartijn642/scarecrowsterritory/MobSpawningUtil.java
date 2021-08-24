@@ -49,7 +49,7 @@ public class MobSpawningUtil {
     }
 
     private static void trySpawnEntitiesInChunks(WorldServer worldServerIn, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
-        int i = chunks.size() + worldServerIn.getChunkProvider().getLoadedChunkCount();
+        int i = chunks.size() + Math.max(worldServerIn.getChunkProvider().getLoadedChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(worldServerIn));
 
         int entitiesSpawned = 0;
         BlockPos worldSpawnPoint = worldServerIn.getSpawnPoint();

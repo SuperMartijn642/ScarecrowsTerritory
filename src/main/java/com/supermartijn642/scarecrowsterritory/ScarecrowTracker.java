@@ -30,10 +30,6 @@ public class ScarecrowTracker {
     private static final Map<World,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<World,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
-    public static int getScarecrowCount(World world){
-        return SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet()).size();
-    }
-
     public static boolean canDespawn(World world, Vec3d pos){
         if(!STConfig.passiveMobSpawning.get())
             return true;
@@ -175,5 +171,9 @@ public class ScarecrowTracker {
         }
 
         return false;
+    }
+
+    public static int getNumberOfChunksToSpawnMobsIn(World world){
+        return CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).size();
     }
 }

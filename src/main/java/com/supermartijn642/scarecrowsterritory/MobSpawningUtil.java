@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.chunk.Chunk;
@@ -22,7 +23,6 @@ import java.util.Random;
  */
 public class MobSpawningUtil {
 
-    private static final Method canSpawnForCategory;
     private static final Method canSpawn;
     private static final Method afterSpawn;
     private static final Method getRandomSpawnMobAt;
@@ -31,25 +31,12 @@ public class MobSpawningUtil {
     private static final Method getRandomPosWithin;
 
     static{
-        canSpawnForCategory = ReflectionUtil.findMethod(WorldEntitySpawner.EntityDensityManager.class, "func_234991_a_", EntityClassification.class);
         canSpawn = ReflectionUtil.findMethod(WorldEntitySpawner.EntityDensityManager.class, "func_234989_a_", EntityType.class, BlockPos.class, IChunk.class);
         afterSpawn = ReflectionUtil.findMethod(WorldEntitySpawner.EntityDensityManager.class, "func_234990_a_", MobEntity.class, IChunk.class);
         getRandomSpawnMobAt = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234977_a_", ServerWorld.class, StructureManager.class, ChunkGenerator.class, EntityClassification.class, Random.class, BlockPos.class);
         canSpawnMobAt = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234976_a_", ServerWorld.class, StructureManager.class, ChunkGenerator.class, EntityClassification.class, MobSpawnInfo.Spawners.class, BlockPos.class);
         getMobForSpawn = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234973_a_", ServerWorld.class, EntityType.class);
         getRandomPosWithin = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_222262_a", World.class, Chunk.class);
-    }
-
-    /**
-     * {@link WorldEntitySpawner.EntityDensityManager#canSpawnForCategory(EntityClassification)}
-     */
-    private static boolean canSpawnForCategory(WorldEntitySpawner.EntityDensityManager densityManager, EntityClassification classification){
-        try{
-            return (boolean)canSpawnForCategory.invoke(densityManager, classification);
-        }catch(IllegalAccessException | InvocationTargetException e){
-            e.printStackTrace();
-            return false;
-        }
     }
 
     /**
@@ -134,7 +121,7 @@ public class MobSpawningUtil {
                 (spawnPassives || !classification.isFriendly()) &&
                 (spawnHostiles || classification.isFriendly()) &&
                 (spawnAnimals || !classification.isPersistent()) &&
-                canSpawnForCategory(densityManager, classification)){
+                canSpawnForCategory(densityManager, classification, world)){
 
                 spawnCategoryForChunk(classification, world, chunk,
                     (type, pos, c) -> canSpawn(densityManager, type, pos, c),
@@ -241,6 +228,14 @@ public class MobSpawningUtil {
         }
 
         return false;
+    }
+
+    /**
+     * {@link WorldEntitySpawner.EntityDensityManager#canSpawnForCategory(EntityClassification)}
+     */
+    private static boolean canSpawnForCategory(WorldEntitySpawner.EntityDensityManager densityManager, EntityClassification classification, IWorld world){
+        int i = classification.getMaxInstancesPerChunk() * Math.max(densityManager.getSpawnableChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / 17 * 17;
+        return densityManager.getMobCategoryCounts().getInt(classification) < i;
     }
 
 }

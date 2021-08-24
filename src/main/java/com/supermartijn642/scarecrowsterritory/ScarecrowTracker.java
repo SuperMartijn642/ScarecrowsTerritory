@@ -187,4 +187,8 @@ public class ScarecrowTracker {
 
         return false;
     }
+
+    public static int getNumberOfChunksToSpawnMobsIn(LevelAccessor world){
+        return CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).size();
+    }
 }

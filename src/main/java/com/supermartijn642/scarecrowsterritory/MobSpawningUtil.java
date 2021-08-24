@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -24,7 +25,6 @@ import java.util.Random;
  */
 public class MobSpawningUtil {
 
-    private static final Method canSpawnForCategory;
     private static final Method canSpawn;
     private static final Method afterSpawn;
     private static final Method getRandomSpawnMobAt;
@@ -33,25 +33,12 @@ public class MobSpawningUtil {
     private static final Method getRandomPosWithin;
 
     static{
-        canSpawnForCategory = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47134_", MobCategory.class);
-        canSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47127_", EntityType.class, BlockPos.class, ChunkAccess.class);
-        afterSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47131_", Mob.class, ChunkAccess.class);
+        canSpawn = ReflectionUtil.findMethod(NaturalSpawner.SpawnState.class, "m_47127_", EntityType.class, BlockPos.class, ChunkAccess.class);
+        afterSpawn = ReflectionUtil.findMethod(NaturalSpawner.SpawnState.class, "m_47131_", Mob.class, ChunkAccess.class);
         getRandomSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_151598_", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, Random.class, BlockPos.class);
         canSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47003_", ServerLevel.class, StructureFeatureManager.class, ChunkGenerator.class, MobCategory.class, MobSpawnSettings.SpawnerData.class, BlockPos.class);
         getMobForSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_46988_", ServerLevel.class, EntityType.class);
         getRandomPosWithin = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47062_", Level.class, LevelChunk.class);
-    }
-
-    /**
-     * {@link NaturalSpawner.SpawnState#canSpawnForCategory(MobCategory)}
-     */
-    private static boolean canSpawnForCategory(NaturalSpawner.SpawnState densityManager, MobCategory classification){
-        try{
-            return (boolean)canSpawnForCategory.invoke(densityManager, classification);
-        }catch(IllegalAccessException | InvocationTargetException e){
-            e.printStackTrace();
-            return false;
-        }
     }
 
     /**
@@ -137,7 +124,7 @@ public class MobSpawningUtil {
                 (spawnPassives || !classification.isFriendly()) &&
                 (spawnHostiles || classification.isFriendly()) &&
                 (spawnAnimals || !classification.isPersistent()) &&
-                canSpawnForCategory(densityManager, classification)){
+                canSpawnForCategory(densityManager, classification, world)){
 
                 spawnCategoryForChunk(classification, world, chunk,
                     (type, pos, c) -> canSpawn(densityManager, type, pos, c),
@@ -192,8 +179,8 @@ public class MobSpawningUtil {
                             break;
                         }
 
-                        MobSpawnSettings.SpawnerData spawnerData = optional.get();
-                        groupSize = spawnerData.minCount + world.random.nextInt(1 + spawnerData.maxCount - spawnerData.minCount);
+                        spawner = optional.get();
+                        groupSize = spawner.minCount + world.random.nextInt(1 + spawner.maxCount - spawner.minCount);
                     }
 
                     if(isValidSpawnPositionForType(world, classification, structuremanager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
@@ -245,6 +232,14 @@ public class MobSpawningUtil {
         }
 
         return false;
+    }
+
+    /**
+     * {@link NaturalSpawner.SpawnState#canSpawnForCategory(MobCategory)}
+     */
+    private static boolean canSpawnForCategory(NaturalSpawner.SpawnState densityManager, MobCategory classification, LevelAccessor world){
+        int i = classification.getMaxInstancesPerChunk() * Math.max(densityManager.getSpawnableChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / 17 * 17;
+        return densityManager.getMobCategoryCounts().getInt(classification) < i;
     }
 
 }

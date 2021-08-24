@@ -109,10 +109,9 @@ public class MobSpawningUtil {
 
                 Object2IntMap<EntityClassification> categoryCounts = world.getMobCategoryCounts();
                 int spawnChunkCount = getDistanceManager(world.getChunkSource()).getNaturalSpawnChunkCount();
-                int categoryMobCap = classification.getMaxInstancesPerChunk() * spawnChunkCount / MAGIC_NUMBER;
-                if(categoryCounts.getInt(classification) <= categoryMobCap){
+                int categoryMobCap = classification.getMaxInstancesPerChunk() * Math.max(spawnChunkCount, ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / MAGIC_NUMBER;
+                if(categoryCounts.getInt(classification) <= categoryMobCap)
                     spawnCategoryForChunk(classification, world, chunk);
-                }
             }
         }
 

@@ -31,10 +31,6 @@ public class ScarecrowTracker {
     private static final Map<IWorld,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<IWorld,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
-    public static int getScarecrowCount(World world){
-        return SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet()).size();
-    }
-
     @SubscribeEvent
     public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
         if(!STConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
@@ -187,5 +183,9 @@ public class ScarecrowTracker {
         }
 
         return false;
+    }
+
+    public static int getNumberOfChunksToSpawnMobsIn(IWorld world){
+        return CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).size();
     }
 }

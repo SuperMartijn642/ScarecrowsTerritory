@@ -14,6 +14,7 @@ import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -29,6 +30,7 @@ public class MobSpawningUtil {
     private static final Method canSpawnMobAt;
     private static final Method getMobForSpawn;
     private static final Method getRandomPosWithin;
+    private static final Field spawnableChunkCount;
 
     static{
         canSpawn = ReflectionUtil.findMethod(WorldEntitySpawner.EntityDensityManager.class, "func_234989_a_", EntityType.class, BlockPos.class, IChunk.class);
@@ -37,6 +39,7 @@ public class MobSpawningUtil {
         canSpawnMobAt = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234976_a_", ServerWorld.class, StructureManager.class, ChunkGenerator.class, EntityClassification.class, MobSpawnInfo.Spawners.class, BlockPos.class);
         getMobForSpawn = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_234973_a_", ServerWorld.class, EntityType.class);
         getRandomPosWithin = ReflectionUtil.findMethod(WorldEntitySpawner.class, "func_222262_a", World.class, Chunk.class);
+        spawnableChunkCount = ReflectionUtil.findField(WorldEntitySpawner.EntityDensityManager.class, "field_234981_a_");
     }
 
     /**
@@ -107,6 +110,18 @@ public class MobSpawningUtil {
         }catch(IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * {@link WorldEntitySpawner.EntityDensityManager#spawnableChunkCount}
+     */
+    public static int getSpawnableChunkCount(WorldEntitySpawner.EntityDensityManager densityManager){
+        try{
+            return (int) spawnableChunkCount.get(densityManager);
+        }catch(IllegalAccessException e){
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -234,7 +249,7 @@ public class MobSpawningUtil {
      * {@link WorldEntitySpawner.EntityDensityManager#canSpawnForCategory(EntityClassification)}
      */
     private static boolean canSpawnForCategory(WorldEntitySpawner.EntityDensityManager densityManager, EntityClassification classification, IWorld world){
-        int i = classification.getMaxInstancesPerChunk() * Math.max(densityManager.getSpawnableChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / 17 * 17;
+        int i = classification.getMaxInstancesPerChunk() * Math.max(getSpawnableChunkCount(densityManager), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / 17 * 17;
         return densityManager.getMobCategoryCounts().getInt(classification) < i;
     }
 

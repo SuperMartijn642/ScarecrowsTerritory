@@ -5,9 +5,11 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.phys.AABB;
 
@@ -170,7 +172,7 @@ public class AbstractSpawnerUtil {
                 boolean flag = false;
 
                 for(int i = 0; i < getSpawnCount(spawner); ++i){
-                    CompoundTag compoundTag = getNextSpawnData(spawner).getTag();
+                    CompoundTag compoundTag = getNextSpawnData(spawner).getEntityToSpawn();
                     Optional<EntityType<?>> optional = EntityType.by(compoundTag);
                     if(!optional.isPresent()){
                         delay(spawner, world, pos);
@@ -182,48 +184,60 @@ public class AbstractSpawnerUtil {
                     double d0 = j >= 1 ? listTag.getDouble(0) : (double)pos.getX() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
                     double d1 = j >= 2 ? listTag.getDouble(1) : (double)(pos.getY() + world.random.nextInt(3) - 1);
                     double d2 = j >= 3 ? listTag.getDouble(2) : (double)pos.getZ() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    if(world.noCollision(optional.get().getAABB(d0, d1, d2)) && SpawnPlacements.checkSpawnRules(optional.get(), world, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
-                        if(SpawnPlacements.checkSpawnRules(optional.get(), world, MobSpawnType.SPAWNER, new BlockPos(d0, d1, d2), world.getRandom())){
-                            Entity entity = EntityType.loadEntityRecursive(compoundTag, world, (p_221408_6_) -> {
-                                p_221408_6_.moveTo(d0, d1, d2, p_221408_6_.getYRot(), p_221408_6_.getXRot());
-                                return p_221408_6_;
-                            });
-                            if(entity == null){
-                                delay(spawner, world, pos);
-                                return;
+                    if(world.noCollision(optional.get().getAABB(d0, d1, d2))){
+                        BlockPos blockpos = new BlockPos(d0, d1, d2);
+                        if(getNextSpawnData(spawner).getCustomSpawnRules().isPresent()){
+                            if(!optional.get().getCategory().isFriendly() && world.getDifficulty() == Difficulty.PEACEFUL){
+                                continue;
                             }
 
-                            int k = world.getEntitiesOfClass(entity.getClass(), (new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)).inflate(getSpawnRange(spawner))).size();
-                            if(k >= getMaxNearbyEntities(spawner)){
-                                delay(spawner, world, pos);
-                                return;
+                            SpawnData.CustomSpawnRules spawndata$customspawnrules = getNextSpawnData(spawner).getCustomSpawnRules().get();
+                            if(!spawndata$customspawnrules.blockLightLimit().isValueInRange(world.getBrightness(LightLayer.BLOCK, blockpos)) || !spawndata$customspawnrules.skyLightLimit().isValueInRange(world.getBrightness(LightLayer.SKY, blockpos))){
+                                continue;
                             }
-
-                            entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), world.random.nextFloat() * 360.0F, 0.0F);
-                            if(entity instanceof Mob){
-                                Mob mob = (Mob)entity;
-                                if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner)){
-                                    continue;
-                                }
-
-                                if(getNextSpawnData(spawner).getTag().size() == 1 && getNextSpawnData(spawner).getTag().contains("id", 8)){
-                                    if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))
-                                        ((Mob)entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
-                                }
-                            }
-
-                            if(!world.tryAddFreshEntityWithPassengers(entity)){
-                                delay(spawner, world, pos);
-                                return;
-                            }
-
-                            world.levelEvent(2004, pos, 0);
-                            if(entity instanceof Mob){
-                                ((Mob)entity).spawnAnim();
-                            }
-
-                            flag = true;
+                        }else if(!SpawnPlacements.checkSpawnRules(optional.get(), world, MobSpawnType.SPAWNER, blockpos, world.getRandom())){
+                            continue;
                         }
+
+                        Entity entity = EntityType.loadEntityRecursive(compoundTag, world, (p_221408_6_) -> {
+                            p_221408_6_.moveTo(d0, d1, d2, p_221408_6_.getYRot(), p_221408_6_.getXRot());
+                            return p_221408_6_;
+                        });
+                        if(entity == null){
+                            delay(spawner, world, pos);
+                            return;
+                        }
+
+                        int k = world.getEntitiesOfClass(entity.getClass(), (new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)).inflate(getSpawnRange(spawner))).size();
+                        if(k >= getMaxNearbyEntities(spawner)){
+                            delay(spawner, world, pos);
+                            return;
+                        }
+
+                        entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), world.random.nextFloat() * 360.0F, 0.0F);
+                        if(entity instanceof Mob){
+                            Mob mob = (Mob)entity;
+                            if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner)){
+                                continue;
+                            }
+
+                            if(getNextSpawnData(spawner).getEntityToSpawn().size() == 1 && getNextSpawnData(spawner).getEntityToSpawn().contains("id", 8)){
+                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))
+                                    ((Mob)entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
+                            }
+                        }
+
+                        if(!world.tryAddFreshEntityWithPassengers(entity)){
+                            delay(spawner, world, pos);
+                            return;
+                        }
+
+                        world.levelEvent(2004, pos, 0);
+                        if(entity instanceof Mob){
+                            ((Mob)entity).spawnAnim();
+                        }
+
+                        flag = true;
                     }
                 }
 

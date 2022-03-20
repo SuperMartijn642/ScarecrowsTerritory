@@ -1,11 +1,11 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,13 +30,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
@@ -125,39 +121,21 @@ public class ScarecrowBlock extends BaseBlock implements EntityBlock, SimpleWate
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn){
         boolean spawners = STConfig.loadSpawners.get();
         boolean passive = STConfig.passiveMobSpawning.get();
 
-        if(spawners && passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", ChatFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get()), Math.round(STConfig.passiveMobRange.get())));
-        else if(spawners)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", ChatFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get())));
-        else if(passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", ChatFormatting.AQUA, Math.round(STConfig.passiveMobRange.get())));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static List<Component> wrapTooltip(String translationKey, ChatFormatting color, Object... args){
-        List<Component> components = new ArrayList<>(1);
-        String translation = ClientProxy.translate(translationKey, args).trim();
-        StringTokenizer tokenizer = new StringTokenizer(translation, " ");
-        StringBuilder builder = new StringBuilder(tokenizer.nextToken());
-
-        while(tokenizer.hasMoreTokens()){
-            String token = tokenizer.nextToken();
-            if(builder.length() + token.length() + 1 < 25)
-                builder.append(' ').append(token);
-            else{
-                components.add(new TextComponent(builder.toString()).withStyle(color));
-                builder = new StringBuilder(token);
-            }
+        if(spawners && passive){
+            Component spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
+            Component passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.both", spawnerRange, passiveRange).color(ChatFormatting.GRAY).get());
+        }else if(spawners){
+            Component spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", spawnerRange).color(ChatFormatting.GRAY).get());
+        }else if(passive){
+            Component passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.passive", passiveRange).color(ChatFormatting.GRAY).get());
         }
-
-        components.add(new TextComponent(builder.toString()).withStyle(color));
-
-        return components;
     }
 
     @Nullable

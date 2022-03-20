@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -82,7 +81,7 @@ public enum ScarecrowType {
 
     public void registerItem(RegistryEvent.Register<Item> e){
         this.blocks.forEach((color, block) -> {
-            BlockItem item = new BlockItem(block, new Item.Properties().tab(CreativeModeTab.TAB_DECORATIONS));
+            BlockItem item = new BlockItem(block, new Item.Properties().tab(ScarecrowsTerritory.GROUP));
             item.setRegistryName(this.getRegistryName(color));
             this.items.put(color, item);
         });

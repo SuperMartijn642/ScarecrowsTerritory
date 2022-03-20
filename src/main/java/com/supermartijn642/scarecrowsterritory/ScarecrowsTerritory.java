@@ -1,6 +1,9 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
@@ -12,6 +15,13 @@ import net.minecraftforge.fml.common.Mod;
  */
 @Mod("scarecrowsterritory")
 public class ScarecrowsTerritory {
+
+    public static final CreativeModeTab GROUP = new CreativeModeTab("scarecrowsterritory") {
+        @Override
+        public ItemStack makeIcon(){
+            return new ItemStack(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE));
+        }
+    };
 
     public ScarecrowsTerritory(){
     }

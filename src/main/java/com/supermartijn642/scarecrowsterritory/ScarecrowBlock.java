@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.*;
 import net.minecraft.client.util.ITooltipFlag;
@@ -22,7 +23,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -30,9 +30,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
@@ -130,33 +128,16 @@ public class ScarecrowBlock extends BaseBlock implements IWaterLoggable {
         boolean spawners = STConfig.loadSpawners.get();
         boolean passive = STConfig.passiveMobSpawning.get();
 
-        if(spawners && passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get()), Math.round(STConfig.passiveMobRange.get())));
-        else if(spawners)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get())));
-        else if(passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.passiveMobRange.get())));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static List<ITextComponent> wrapTooltip(String translationKey, TextFormatting color, Object... args){
-        List<ITextComponent> components = new ArrayList<>(1);
-        String translation = ClientProxy.translate(translationKey, args).trim();
-        StringTokenizer tokenizer = new StringTokenizer(translation, " ");
-        StringBuilder builder = new StringBuilder(tokenizer.nextToken());
-
-        while(tokenizer.hasMoreTokens()){
-            String token = tokenizer.nextToken();
-            if(builder.length() + token.length() + 1 < 25)
-                builder.append(' ').append(token);
-            else{
-                components.add(new StringTextComponent(builder.toString()).withStyle(color));
-                builder = new StringBuilder(token);
-            }
+        if(spawners && passive){
+            ITextComponent spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(TextFormatting.GOLD).get();
+            ITextComponent passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.both", spawnerRange, passiveRange).color(TextFormatting.GRAY).get());
+        }else if(spawners){
+            ITextComponent spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", spawnerRange).color(TextFormatting.GRAY).get());
+        }else if(passive){
+            ITextComponent passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.passive", passiveRange).color(TextFormatting.GRAY).get());
         }
-
-        components.add(new StringTextComponent(builder.toString()).withStyle(color));
-
-        return components;
     }
 }

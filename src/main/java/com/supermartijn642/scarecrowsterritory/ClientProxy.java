@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -18,9 +17,4 @@ public class ClientProxy {
         for(ScarecrowType type : ScarecrowType.values())
             type.blocks.values().forEach(block -> RenderTypeLookup.setRenderLayer(block, type.getRenderLayer()));
     }
-
-    public static String translate(String translationKey, Object... args){
-        return I18n.get(translationKey, args);
-    }
-
 }

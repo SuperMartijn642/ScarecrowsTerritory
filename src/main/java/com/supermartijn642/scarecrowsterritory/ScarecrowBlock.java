@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.properties.PropertyBool;
@@ -21,19 +22,12 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
@@ -129,39 +123,21 @@ public class ScarecrowBlock extends BaseBlock {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced){
         boolean spawners = STConfig.loadSpawners.get();
         boolean passive = STConfig.passiveMobSpawning.get();
 
-        if(spawners && passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.both", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get()), Math.round(STConfig.passiveMobRange.get())));
-        else if(spawners)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.spawners", TextFormatting.AQUA, Math.round(STConfig.loadSpawnerRange.get())));
-        else if(passive)
-            tooltip.addAll(wrapTooltip("scarecrowsterritory.primitive_scarecrow.info.passive", TextFormatting.AQUA, Math.round(STConfig.passiveMobRange.get())));
-    }
-
-    @SideOnly(Side.CLIENT)
-    private static List<String> wrapTooltip(String translationKey, TextFormatting color, Object... args){
-        List<ITextComponent> components = new ArrayList<>(1);
-        String translation = ClientProxy.translate(translationKey, args).trim();
-        StringTokenizer tokenizer = new StringTokenizer(translation, " ");
-        StringBuilder builder = new StringBuilder(tokenizer.nextToken());
-
-        while(tokenizer.hasMoreTokens()){
-            String token = tokenizer.nextToken();
-            if(builder.length() + token.length() + 1 < 25)
-                builder.append(' ').append(token);
-            else{
-                components.add(new TextComponentString(builder.toString()).setStyle(new Style().setColor(color)));
-                builder = new StringBuilder(token);
-            }
+        if(spawners && passive){
+            ITextComponent spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(TextFormatting.GOLD).get();
+            ITextComponent passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.both", spawnerRange, passiveRange).color(TextFormatting.GRAY).format());
+        }else if(spawners){
+            ITextComponent spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", spawnerRange).color(TextFormatting.GRAY).format());
+        }else if(passive){
+            ITextComponent passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(TextFormatting.GOLD).get();
+            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.passive", passiveRange).color(TextFormatting.GRAY).format());
         }
-
-        components.add(new TextComponentString(builder.toString()).setStyle(new Style().setColor(color)));
-
-        return components.stream().map(ITextComponent::getFormattedText).collect(Collectors.toList());
     }
 
     @Override

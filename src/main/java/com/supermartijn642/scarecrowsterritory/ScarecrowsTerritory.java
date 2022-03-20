@@ -1,7 +1,10 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -16,6 +19,13 @@ public class ScarecrowsTerritory {
     public static final String NAME = "Scarecrow's Territory";
     public static final String VERSION = "1.1.3";
     public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,);required-after:supermartijn642configlib@[1.0.9,);required-after:supermartijn642corelib@[1.0.12,1.1.0)";
+
+    public static final CreativeTabs GROUP = new CreativeTabs("scarecrowsterritory") {
+        @Override
+        public ItemStack getTabIconItem(){
+            return new ItemStack(ScarecrowType.PRIMITIVE.blocks.get(EnumDyeColor.PURPLE));
+        }
+    };
 
     public ScarecrowsTerritory(){
     }

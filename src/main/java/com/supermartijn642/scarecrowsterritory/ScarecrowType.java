@@ -5,7 +5,6 @@ import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -81,7 +80,7 @@ public enum ScarecrowType {
         this.blocks.forEach((color, block) -> {
             ItemBlock item = new ItemBlock(block);
             item.setRegistryName(this.getRegistryName(color));
-            item.setCreativeTab(CreativeTabs.DECORATIONS);
+            item.setCreativeTab(ScarecrowsTerritory.GROUP);
             this.items.put(color, item);
         });
         this.items.values().forEach(e.getRegistry()::register);

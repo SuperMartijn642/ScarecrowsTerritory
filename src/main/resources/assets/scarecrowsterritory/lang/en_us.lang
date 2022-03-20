@@ -17,3 +17,4 @@ tile.scarecrowsterritory.black_scarecrow.name=Black Scarecrow
 scarecrowsterritory.primitive_scarecrow.info.spawners=Keeps spawners in a %1$d block range activated
 scarecrowsterritory.primitive_scarecrow.info.passive=Allows passive mob spawning in a %1$d block range
 scarecrowsterritory.primitive_scarecrow.info.both=Keeps spawners in a %1$d block range activated and allows passive mob spawning in a %2$d block range
+scarecrowsterritory.itemGroup=Scarecrows' Territory

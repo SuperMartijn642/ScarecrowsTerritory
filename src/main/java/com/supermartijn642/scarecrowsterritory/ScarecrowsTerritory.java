@@ -1,7 +1,10 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,6 +15,13 @@ import net.minecraftforge.fml.common.Mod;
  */
 @Mod("scarecrowsterritory")
 public class ScarecrowsTerritory {
+
+    public static final ItemGroup GROUP = new ItemGroup("scarecrowsterritory") {
+        @Override
+        public ItemStack makeIcon(){
+            return new ItemStack(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE));
+        }
+    };
 
     public ScarecrowsTerritory(){
     }

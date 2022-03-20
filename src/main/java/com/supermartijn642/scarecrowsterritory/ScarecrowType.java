@@ -6,7 +6,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
@@ -80,7 +79,7 @@ public enum ScarecrowType {
 
     public void registerItem(RegistryEvent.Register<Item> e){
         this.blocks.forEach((color, block) -> {
-            BlockItem item = new BlockItem(block, new Item.Properties().tab(ItemGroup.TAB_DECORATIONS));
+            BlockItem item = new BlockItem(block, new Item.Properties().tab(ScarecrowsTerritory.GROUP));
             item.setRegistryName(this.getRegistryName(color));
             this.items.put(color, item);
         });

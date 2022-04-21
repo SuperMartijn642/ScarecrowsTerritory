@@ -15,7 +15,7 @@ public class CoreMod implements IFMLLoadingPlugin {
 
     public CoreMod(){
         MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.scarecrowsterritory.json");
+        Mixins.addConfiguration("scarecrowsterritory.mixins.json");
     }
 
     @Override

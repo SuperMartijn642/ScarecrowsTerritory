@@ -39,11 +39,12 @@ dependencies {
     // Config library
     implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:${project.config_library_file}")
 
-    // Mixin
-    implementation('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
-        exclude module: 'guava'
-        exclude module: 'commons-io'
-        exclude module: 'gson'
+    // SpongePowered Mixin
+    annotationProcessor "org.spongepowered:mixin:0.8.3-SNAPSHOT:processor"
+    implementation("org.spongepowered:mixin:0.8.3-SNAPSHOT") {
+        exclude module: "guava"
+        exclude module: "commons-io"
+        exclude module: "gson"
     }
 }
 
@@ -102,9 +103,13 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.main, "${project.mod_id}.mixins.refmap.json"
+}
+
 jar {
     from {
-        configurations.compile
+        configurations.compileClasspath
                 .filter { "mixin-0.8.3-SNAPSHOT.jar" == it.name }
                 .collect { it.isDirectory() ? it : zipTree(it) }
     } {
@@ -119,10 +124,6 @@ jar {
         attributes "TweakOrder": "0"
         attributes "MixinConfigs": "scarecrowsterritory.mixins.json"
     }
-}
-
-mixin {
-    add sourceSets.main, "scarecrowsterritory.refmap.json"
 }
 
 sourceSets {

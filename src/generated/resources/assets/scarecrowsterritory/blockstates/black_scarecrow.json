@@ -1,8 +1,8 @@
 {
   "variants": {
-    "bottom=false,facing=south": {
-      "model": "scarecrowsterritory:black_scarecrow_top",
-      "y": 180
+    "bottom=true,facing=east": {
+      "model": "scarecrowsterritory:black_scarecrow_bottom",
+      "y": 90
     },
     "bottom=false,facing=east": {
       "model": "scarecrowsterritory:black_scarecrow_top",
@@ -12,9 +12,15 @@
       "model": "scarecrowsterritory:black_scarecrow_top",
       "y": 270
     },
-    "bottom=true,facing=east": {
-      "model": "scarecrowsterritory:black_scarecrow_bottom",
-      "y": 90
+    "bottom=true,facing=north": {
+      "model": "scarecrowsterritory:black_scarecrow_bottom"
+    },
+    "bottom=false,facing=north": {
+      "model": "scarecrowsterritory:black_scarecrow_top"
+    },
+    "bottom=false,facing=south": {
+      "model": "scarecrowsterritory:black_scarecrow_top",
+      "y": 180
     },
     "bottom=true,facing=west": {
       "model": "scarecrowsterritory:black_scarecrow_bottom",
@@ -23,12 +29,6 @@
     "bottom=true,facing=south": {
       "model": "scarecrowsterritory:black_scarecrow_bottom",
       "y": 180
-    },
-    "bottom=true,facing=north": {
-      "model": "scarecrowsterritory:black_scarecrow_bottom"
-    },
-    "bottom=false,facing=north": {
-      "model": "scarecrowsterritory:black_scarecrow_top"
     }
   }
 }

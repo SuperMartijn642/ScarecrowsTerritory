@@ -4,6 +4,10 @@
       "model": "scarecrowsterritory:yellow_scarecrow_top",
       "y": 90
     },
+    "bottom=false,facing=west": {
+      "model": "scarecrowsterritory:yellow_scarecrow_top",
+      "y": 270
+    },
     "bottom=true,facing=north": {
       "model": "scarecrowsterritory:yellow_scarecrow_bottom"
     },
@@ -18,10 +22,6 @@
     "bottom=true,facing=south": {
       "model": "scarecrowsterritory:yellow_scarecrow_bottom",
       "y": 180
-    },
-    "bottom=false,facing=west": {
-      "model": "scarecrowsterritory:yellow_scarecrow_top",
-      "y": 270
     },
     "bottom=false,facing=south": {
       "model": "scarecrowsterritory:yellow_scarecrow_top",

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "BCB",
+    " B "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:carved_pumpkin"
+    },
+    "B": {
+      "tag": "forge:rods/wooden"
+    },
+    "C": {
+      "item": "minecraft:hay_block"
+    }
+  },
+  "result": {
+    "item": "scarecrowsterritory:primitive_scarecrow"
+  }
+}

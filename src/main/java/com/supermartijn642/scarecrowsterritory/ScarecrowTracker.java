@@ -33,11 +33,11 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
-        if(!STConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
             return;
 
         Entity entity = e.getEntity();
-        double range = STConfig.passiveMobRange.get();
+        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
         if(isScarecrowInRange(e.getEntityLiving().level, entity.position(), range)){
             e.setResult(Event.Result.DENY);
         }
@@ -45,46 +45,46 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
-        Level world = e.world;
-        if(world.isClientSide || !(world instanceof ServerLevel) || world.isDebug())
+        Level level = e.world;
+        if(level.isClientSide || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
-        if(!world.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
+        if(!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
             return;
 
-        Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(world);
+        Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
         if(chunks != null){
             for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-                if(entry.getValue() > 0 && ((ServerLevel)world).getChunkSource().isPositionTicking(entry.getKey().toLong())){
-                    LevelChunk chunk = world.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
-                    if(chunk != null && !chunk.isEmpty() && world.getWorldBorder().isWithinBounds(entry.getKey()))
-                        spawnEntitiesInChunk((ServerLevel)world, chunk);
+                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().toLong())){
+                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+                    if(chunk != null && !chunk.isEmpty() && level.getWorldBorder().isWithinBounds(entry.getKey()))
+                        spawnEntitiesInChunk((ServerLevel)level, chunk);
                 }
             }
         }
     }
 
-    private static void spawnEntitiesInChunk(ServerLevel world, LevelChunk chunk){
-        NaturalSpawner.SpawnState entityDensityManager = world.getChunkSource().getLastSpawnState();
+    private static void spawnEntitiesInChunk(ServerLevel level, LevelChunk chunk){
+        NaturalSpawner.SpawnState entityDensityManager = level.getChunkSource().getLastSpawnState();
         if(entityDensityManager != null){
-            boolean spawnAnimals = world.getLevelData().getGameTime() % 400L == 0L;
-            boolean spawnHostiles = world.getDifficulty() != Difficulty.PEACEFUL;
-            MobSpawningUtil.spawnEntitiesInChunk(world, chunk, entityDensityManager, true, spawnHostiles, spawnAnimals);
+            boolean spawnAnimals = level.getLevelData().getGameTime() % 400L == 0L;
+            boolean spawnHostiles = level.getDifficulty() != Difficulty.PEACEFUL;
+            MobSpawningUtil.spawnEntitiesInChunk(level, chunk, entityDensityManager, true, spawnHostiles, spawnAnimals);
         }
     }
 
-    private static void addScarecrow(LevelAccessor world, BlockPos pos){
-        SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
-        SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
+    private static void addScarecrow(LevelAccessor level, BlockPos pos){
+        SCARECROWS_PER_WORLD.putIfAbsent(level, new HashSet<>());
+        SCARECROWS_PER_WORLD.computeIfPresent(level, (w, s) -> {
             s.add(pos);
             return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
+        int range = (int)Math.ceil(ScarecrowsTerritoryConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
-        CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
-        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
+        CHUNKS_TO_SPAWN_MOBS.putIfAbsent(level, new LinkedHashMap<>());
+        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(level, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
                 for(int z = minZ; z <= maxZ; z++){
                     ChunkPos chunk = new ChunkPos(x, z);
@@ -96,16 +96,16 @@ public class ScarecrowTracker {
         });
     }
 
-    private static void removeScarecrow(LevelAccessor world, BlockPos pos){
-        SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
+    private static void removeScarecrow(LevelAccessor level, BlockPos pos){
+        SCARECROWS_PER_WORLD.computeIfPresent(level, (w, s) -> {
             s.remove(pos);
             return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
+        int range = (int)Math.ceil(ScarecrowsTerritoryConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
-        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
+        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(level, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
                 for(int z = minZ; z <= maxZ; z++){
                     ChunkPos chunk = new ChunkPos(x, z);
@@ -130,7 +130,7 @@ public class ScarecrowTracker {
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
-                if(chunk.getBlockEntity(pos) instanceof ScarecrowTile)
+                if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
                     addScarecrow(e.getWorld(), pos);
             };
             if(e.getWorld().isClientSide())
@@ -145,7 +145,7 @@ public class ScarecrowTracker {
         ChunkAccess chunk = e.getChunk();
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
-            if(chunk.getBlockEntity(pos) instanceof ScarecrowTile)
+            if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
                 removeScarecrow(e.getWorld(), pos);
         }
     }
@@ -176,9 +176,9 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(Level world, Vec3 center, double range){
+    public static boolean isScarecrowInRange(Level level, Vec3 center, double range){
         double rangeSquared = range * range;
-        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet());
+        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
 
         for(BlockPos scarecrow : scarecrows){
             if(center.distanceToSqr(scarecrow.getX() + 0.5, scarecrow.getY() + 0.5, scarecrow.getZ() + 0.5) < rangeSquared)

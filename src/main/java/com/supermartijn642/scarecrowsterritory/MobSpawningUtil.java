@@ -92,9 +92,9 @@ public class MobSpawningUtil {
     /**
      * {@link NaturalSpawner#getMobForSpawn(ServerLevel, EntityType)}
      */
-    private static Mob getMobForSpawn(ServerLevel world, EntityType<?> entityType){
+    private static Mob getMobForSpawn(ServerLevel level, EntityType<?> entityType){
         try{
-            return (Mob)getMobForSpawn.invoke(null, world, entityType);
+            return (Mob)getMobForSpawn.invoke(null, level, entityType);
         }catch(IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
             return null;
@@ -104,9 +104,9 @@ public class MobSpawningUtil {
     /**
      * {@link NaturalSpawner#getRandomPosWithin(Level, LevelChunk)}
      */
-    private static BlockPos getRandomPosWithin(Level world, LevelChunk chunk){
+    private static BlockPos getRandomPosWithin(Level level, LevelChunk chunk){
         try{
-            return (BlockPos)getRandomPosWithin.invoke(null, world, chunk);
+            return (BlockPos)getRandomPosWithin.invoke(null, level, chunk);
         }catch(IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
             return null;
@@ -116,41 +116,41 @@ public class MobSpawningUtil {
     /**
      * {@link NaturalSpawner#spawnForChunk(ServerLevel, LevelChunk, NaturalSpawner.SpawnState, boolean, boolean, boolean)}
      */
-    public static void spawnEntitiesInChunk(ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnState densityManager, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
-        world.getProfiler().push("spawner");
+    public static void spawnEntitiesInChunk(ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnState densityManager, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
+        level.getProfiler().push("spawner");
 
         for(MobCategory classification : MobCategory.values()){
             if(classification != MobCategory.MISC &&
                 (spawnPassives || !classification.isFriendly()) &&
                 (spawnHostiles || classification.isFriendly()) &&
                 (spawnAnimals || !classification.isPersistent()) &&
-                canSpawnForCategory(densityManager, classification, world)){
+                canSpawnForCategory(densityManager, classification, level)){
 
-                spawnCategoryForChunk(classification, world, chunk,
+                spawnCategoryForChunk(classification, level, chunk,
                     (type, pos, c) -> canSpawn(densityManager, type, pos, c),
                     (entity, c) -> afterSpawn(densityManager, entity, c));
             }
         }
 
-        world.getProfiler().pop();
+        level.getProfiler().pop();
     }
 
     /**
      * {@link NaturalSpawner#spawnCategoryForChunk(MobCategory, ServerLevel, LevelChunk, NaturalSpawner.SpawnPredicate, NaturalSpawner.AfterSpawnCallback)}
      */
-    private static void spawnCategoryForChunk(MobCategory classification, ServerLevel world, LevelChunk chunk, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
-        BlockPos blockpos = getRandomPosWithin(world, chunk);
+    private static void spawnCategoryForChunk(MobCategory classification, ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
+        BlockPos blockpos = getRandomPosWithin(level, chunk);
         if(blockpos != null && blockpos.getY() >= 1){
-            spawnCategoryForPosition(classification, world, chunk, blockpos, densityCheck, densityAdder);
+            spawnCategoryForPosition(classification, level, chunk, blockpos, densityCheck, densityAdder);
         }
     }
 
     /**
      * {@link NaturalSpawner#spawnCategoryForPosition(MobCategory, ServerLevel, ChunkAccess, BlockPos, NaturalSpawner.SpawnPredicate, NaturalSpawner.AfterSpawnCallback)}
      */
-    private static void spawnCategoryForPosition(MobCategory classification, ServerLevel world, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
-        StructureFeatureManager structuremanager = world.structureFeatureManager();
-        ChunkGenerator chunkgenerator = world.getChunkSource().getGenerator();
+    private static void spawnCategoryForPosition(MobCategory classification, ServerLevel level, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
+        StructureFeatureManager structureManager = level.structureFeatureManager();
+        ChunkGenerator chunkgenerator = level.getChunkSource().getGenerator();
         int y = pos.getY();
         BlockState blockstate = chunk.getBlockState(pos);
         if(!blockstate.isRedstoneConductor(chunk, pos)){
@@ -163,40 +163,40 @@ public class MobSpawningUtil {
                 int spawnZ = pos.getZ();
                 MobSpawnSettings.SpawnerData spawner = null;
                 SpawnGroupData ilivingentitydata = null;
-                int groupSize = Mth.ceil(world.random.nextFloat() * 4.0F);
+                int groupSize = Mth.ceil(level.random.nextFloat() * 4.0F);
                 int entitiesInGroup = 0;
 
                 // try spawning entities in the group
                 for(int i2 = 0; i2 < groupSize; ++i2){
-                    spawnX += world.random.nextInt(6) - world.random.nextInt(6);
-                    spawnZ += world.random.nextInt(6) - world.random.nextInt(6);
+                    spawnX += level.random.nextInt(6) - level.random.nextInt(6);
+                    spawnZ += level.random.nextInt(6) - level.random.nextInt(6);
                     spawnPos.set(spawnX, y, spawnZ);
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
                     if(spawner == null){
-                        Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(world, structuremanager, chunkgenerator, classification, world.random, spawnPos);
+                        Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
                         if(!optional.isPresent()){
                             break;
                         }
 
                         spawner = optional.get();
-                        groupSize = spawner.minCount + world.random.nextInt(1 + spawner.maxCount - spawner.minCount);
+                        groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
                     }
 
-                    if(isValidSpawnPositionForType(world, classification, structuremanager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
-                        Mob mobentity = getMobForSpawn(world, spawner.type);
+                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
+                        Mob mobentity = getMobForSpawn(level, spawner.type);
                         if(mobentity == null){
                             return;
                         }
 
-                        mobentity.moveTo(spawnXCenter, y, spawnZCenter, world.random.nextFloat() * 360.0F, 0.0F);
-                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, world, spawnXCenter, y, spawnZCenter, null, MobSpawnType.NATURAL);
-                        if(canSpawn != -1 && (canSpawn == 1 || (mobentity.checkSpawnRules(world, MobSpawnType.NATURAL) && mobentity.checkSpawnObstruction(world)))){
-                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, world, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, MobSpawnType.NATURAL))
-                                ilivingentitydata = mobentity.finalizeSpawn(world, world.getCurrentDifficultyAt(mobentity.blockPosition()), MobSpawnType.NATURAL, ilivingentitydata, (CompoundTag)null);
+                        mobentity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, level, spawnXCenter, y, spawnZCenter, null, MobSpawnType.NATURAL);
+                        if(canSpawn != -1 && (canSpawn == 1 || (mobentity.checkSpawnRules(level, MobSpawnType.NATURAL) && mobentity.checkSpawnObstruction(level)))){
+                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, level, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, MobSpawnType.NATURAL))
+                                ilivingentitydata = mobentity.finalizeSpawn(level, level.getCurrentDifficultyAt(mobentity.blockPosition()), MobSpawnType.NATURAL, ilivingentitydata, (CompoundTag)null);
                             entitiesSpawned++;
                             entitiesInGroup++;
-                            world.addFreshEntityWithPassengers(mobentity);
+                            level.addFreshEntityWithPassengers(mobentity);
                             densityAdder.run(mobentity, chunk);
                             if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(mobentity)){
                                 return;
@@ -215,20 +215,20 @@ public class MobSpawningUtil {
     /**
      * {@link NaturalSpawner#isValidSpawnPostitionForType(ServerLevel, MobCategory, StructureFeatureManager, ChunkGenerator, MobSpawnSettings.SpawnerData, BlockPos.MutableBlockPos, double)}
      */
-    private static boolean isValidSpawnPositionForType(ServerLevel world, MobCategory classification, StructureFeatureManager structureManager, ChunkGenerator chunkGenerator, MobSpawnSettings.SpawnerData spawners, BlockPos.MutableBlockPos pos){
+    private static boolean isValidSpawnPositionForType(ServerLevel level, MobCategory classification, StructureFeatureManager structureManager, ChunkGenerator chunkGenerator, MobSpawnSettings.SpawnerData spawners, BlockPos.MutableBlockPos pos){
         EntityType<?> entityType = spawners.type;
         if(entityType.getCategory() == MobCategory.MISC)
             return false;
 
         // removed the player distance check here
 
-        if(entityType.canSummon() && canSpawnMobAt(world, structureManager, chunkGenerator, classification, spawners, pos)){
+        if(entityType.canSummon() && canSpawnMobAt(level, structureManager, chunkGenerator, classification, spawners, pos)){
             SpawnPlacements.Type placementType = SpawnPlacements.getPlacementType(entityType);
-            if(!NaturalSpawner.isSpawnPositionOk(placementType, world, pos, entityType) ||
-                !SpawnPlacements.checkSpawnRules(entityType, world, MobSpawnType.NATURAL, pos, world.random))
+            if(!NaturalSpawner.isSpawnPositionOk(placementType, level, pos, entityType) ||
+                !SpawnPlacements.checkSpawnRules(entityType, level, MobSpawnType.NATURAL, pos, level.random))
                 return false;
 
-            return world.noCollision(entityType.getAABB(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
+            return level.noCollision(entityType.getAABB(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
         }
 
         return false;

@@ -118,9 +118,9 @@ public class AbstractSpawnerUtil {
     /**
      * {@link BaseSpawner#isNearPlayer(Level, BlockPos)}
      */
-    private static boolean isNearPlayer(BaseSpawner spawner, Level world, BlockPos pos){
+    private static boolean isNearPlayer(BaseSpawner spawner, Level level, BlockPos pos){
         try{
-            return (boolean)isNearPlayer.invoke(spawner, world, pos);
+            return (boolean)isNearPlayer.invoke(spawner, level, pos);
         }catch(Exception e){
             e.printStackTrace();
             return false;
@@ -130,28 +130,28 @@ public class AbstractSpawnerUtil {
     /**
      * {@link BaseSpawner#delay(Level, BlockPos)}
      */
-    private static void delay(BaseSpawner spawner, Level world, BlockPos pos){
+    private static void delay(BaseSpawner spawner, Level level, BlockPos pos){
         try{
-            delay.invoke(spawner, world, pos);
+            delay.invoke(spawner, level, pos);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    public static void tickAbstractSpawner(BaseSpawner spawner, Level world, BlockPos pos){
-        if(world.isClientSide)
-            tickSpawnerClient(spawner, world, pos);
+    public static void tickAbstractSpawner(BaseSpawner spawner, Level level, BlockPos pos){
+        if(level.isClientSide)
+            tickSpawnerClient(spawner, level, pos);
         else
-            tickSpawnerServer(spawner, (ServerLevel)world, pos);
+            tickSpawnerServer(spawner, (ServerLevel)level, pos);
     }
 
-    private static void tickSpawnerClient(BaseSpawner spawner, Level world, BlockPos pos){
-        if(isNearPlayer(spawner, world, pos)){
-            double d3 = pos.getX() + world.random.nextDouble();
-            double d4 = pos.getY() + world.random.nextDouble();
-            double d5 = pos.getZ() + world.random.nextDouble();
-            world.addParticle(ParticleTypes.SMOKE, d3, d4, d5, 0.0D, 0.0D, 0.0D);
-            world.addParticle(ParticleTypes.FLAME, d3, d4, d5, 0.0D, 0.0D, 0.0D);
+    private static void tickSpawnerClient(BaseSpawner spawner, Level level, BlockPos pos){
+        if(isNearPlayer(spawner, level, pos)){
+            double d3 = pos.getX() + level.random.nextDouble();
+            double d4 = pos.getY() + level.random.nextDouble();
+            double d5 = pos.getZ() + level.random.nextDouble();
+            level.addParticle(ParticleTypes.SMOKE, d3, d4, d5, 0.0D, 0.0D, 0.0D);
+            level.addParticle(ParticleTypes.FLAME, d3, d4, d5, 0.0D, 0.0D, 0.0D);
             if(getSpawnDelay(spawner) > 0)
                 setSpawnDelay(spawner, getSpawnDelay(spawner) - 1);
 
@@ -160,10 +160,10 @@ public class AbstractSpawnerUtil {
         }
     }
 
-    private static void tickSpawnerServer(BaseSpawner spawner, ServerLevel world, BlockPos pos){
-        if(!isNearPlayer(spawner, world, pos)){
+    private static void tickSpawnerServer(BaseSpawner spawner, ServerLevel level, BlockPos pos){
+        if(!isNearPlayer(spawner, level, pos)){
             if(getSpawnDelay(spawner) == -1){
-                delay(spawner, world, pos);
+                delay(spawner, level, pos);
             }
 
             if(getSpawnDelay(spawner) > 0){
@@ -175,64 +175,64 @@ public class AbstractSpawnerUtil {
                     CompoundTag compoundTag = getNextSpawnData(spawner).getEntityToSpawn();
                     Optional<EntityType<?>> optional = EntityType.by(compoundTag);
                     if(!optional.isPresent()){
-                        delay(spawner, world, pos);
+                        delay(spawner, level, pos);
                         return;
                     }
 
                     ListTag listTag = compoundTag.getList("Pos", 6);
                     int j = listTag.size();
-                    double d0 = j >= 1 ? listTag.getDouble(0) : (double)pos.getX() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    double d1 = j >= 2 ? listTag.getDouble(1) : (double)(pos.getY() + world.random.nextInt(3) - 1);
-                    double d2 = j >= 3 ? listTag.getDouble(2) : (double)pos.getZ() + (world.random.nextDouble() - world.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    if(world.noCollision(optional.get().getAABB(d0, d1, d2))){
+                    double d0 = j >= 1 ? listTag.getDouble(0) : (double)pos.getX() + (level.random.nextDouble() - level.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    double d1 = j >= 2 ? listTag.getDouble(1) : (double)(pos.getY() + level.random.nextInt(3) - 1);
+                    double d2 = j >= 3 ? listTag.getDouble(2) : (double)pos.getZ() + (level.random.nextDouble() - level.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    if(level.noCollision(optional.get().getAABB(d0, d1, d2))){
                         BlockPos blockpos = new BlockPos(d0, d1, d2);
                         if(getNextSpawnData(spawner).getCustomSpawnRules().isPresent()){
-                            if(!optional.get().getCategory().isFriendly() && world.getDifficulty() == Difficulty.PEACEFUL){
+                            if(!optional.get().getCategory().isFriendly() && level.getDifficulty() == Difficulty.PEACEFUL){
                                 continue;
                             }
 
                             SpawnData.CustomSpawnRules spawndata$customspawnrules = getNextSpawnData(spawner).getCustomSpawnRules().get();
-                            if(!spawndata$customspawnrules.blockLightLimit().isValueInRange(world.getBrightness(LightLayer.BLOCK, blockpos)) || !spawndata$customspawnrules.skyLightLimit().isValueInRange(world.getBrightness(LightLayer.SKY, blockpos))){
+                            if(!spawndata$customspawnrules.blockLightLimit().isValueInRange(level.getBrightness(LightLayer.BLOCK, blockpos)) || !spawndata$customspawnrules.skyLightLimit().isValueInRange(level.getBrightness(LightLayer.SKY, blockpos))){
                                 continue;
                             }
-                        }else if(!SpawnPlacements.checkSpawnRules(optional.get(), world, MobSpawnType.SPAWNER, blockpos, world.getRandom())){
+                        }else if(!SpawnPlacements.checkSpawnRules(optional.get(), level, MobSpawnType.SPAWNER, blockpos, level.getRandom())){
                             continue;
                         }
 
-                        Entity entity = EntityType.loadEntityRecursive(compoundTag, world, (p_221408_6_) -> {
+                        Entity entity = EntityType.loadEntityRecursive(compoundTag, level, (p_221408_6_) -> {
                             p_221408_6_.moveTo(d0, d1, d2, p_221408_6_.getYRot(), p_221408_6_.getXRot());
                             return p_221408_6_;
                         });
                         if(entity == null){
-                            delay(spawner, world, pos);
+                            delay(spawner, level, pos);
                             return;
                         }
 
-                        int k = world.getEntitiesOfClass(entity.getClass(), (new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)).inflate(getSpawnRange(spawner))).size();
+                        int k = level.getEntitiesOfClass(entity.getClass(), (new AABB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)).inflate(getSpawnRange(spawner))).size();
                         if(k >= getMaxNearbyEntities(spawner)){
-                            delay(spawner, world, pos);
+                            delay(spawner, level, pos);
                             return;
                         }
 
-                        entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), world.random.nextFloat() * 360.0F, 0.0F);
+                        entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity instanceof Mob){
                             Mob mob = (Mob)entity;
-                            if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner)){
+                            if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner)){
                                 continue;
                             }
 
                             if(getNextSpawnData(spawner).getEntityToSpawn().size() == 1 && getNextSpawnData(spawner).getEntityToSpawn().contains("id", 8)){
-                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, world, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))
-                                    ((Mob)entity).finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
+                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))
+                                    ((Mob)entity).finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
                             }
                         }
 
-                        if(!world.tryAddFreshEntityWithPassengers(entity)){
-                            delay(spawner, world, pos);
+                        if(!level.tryAddFreshEntityWithPassengers(entity)){
+                            delay(spawner, level, pos);
                             return;
                         }
 
-                        world.levelEvent(2004, pos, 0);
+                        level.levelEvent(2004, pos, 0);
                         if(entity instanceof Mob){
                             ((Mob)entity).spawnAnim();
                         }
@@ -242,7 +242,7 @@ public class AbstractSpawnerUtil {
                 }
 
                 if(flag){
-                    delay(spawner, world, pos);
+                    delay(spawner, level, pos);
                 }
             }
         }

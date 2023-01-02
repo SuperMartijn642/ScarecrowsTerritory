@@ -2,66 +2,67 @@ package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
+import com.supermartijn642.core.block.EntityHoldingBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowBlock extends BaseBlock implements EntityBlock, SimpleWaterloggedBlock {
+public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private final ScarecrowType type;
 
     public ScarecrowBlock(ScarecrowType type, DyeColor color){
-        super(type.getRegistryName(color), false, type.getBlockProperties(color));
+        super(false, type.getBlockProperties(color));
         this.type = type;
 
-        this.registerDefaultState(this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, Direction.NORTH).setValue(BOTTOM, true).setValue(WATERLOGGED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(BOTTOM, true).setValue(WATERLOGGED, false));
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit){
-        BlockEntity tile = worldIn.getBlockEntity(pos);
-        if(tile instanceof ScarecrowTile)
-            return ((ScarecrowTile)tile).rightClick(player, handIn) ? InteractionResult.sidedSuccess(worldIn.isClientSide) : InteractionResult.PASS;
-        return InteractionResult.PASS;
+    protected InteractionFeedback interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, Direction hitSide, Vec3 hitLocation){
+        BlockEntity entity = level.getBlockEntity(pos);
+        if(entity instanceof ScarecrowBlockEntity)
+            return ((ScarecrowBlockEntity)entity).rightClick(player, hand) ? InteractionFeedback.SUCCESS : InteractionFeedback.PASS;
+        return super.interact(state, level, pos, player, hand, hitSide, hitLocation);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context){
-        return this.type.getBlockShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING), state.getValue(BOTTOM));
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context){
+        return this.type.getBlockShape(state.getValue(FACING), state.getValue(BOTTOM)).getUnderlying();
     }
 
     @Override
@@ -74,38 +75,37 @@ public class ScarecrowBlock extends BaseBlock implements EntityBlock, SimpleWate
         if(this.type.is2BlocksHigh() && !context.getLevel().isEmptyBlock(context.getClickedPos().above()) && context.getLevel().getBlockState(context.getClickedPos().above()).getBlock() != Blocks.WATER)
             return null;
         FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return this.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, context.getHorizontalDirection().getOpposite()).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }
 
     @Override
-    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
-        if(this.type.is2BlocksHigh() && !worldIn.isEmptyBlock(pos) && worldIn.getBlockState(pos).getBlock() != Blocks.WATER){
-            FluidState fluidState = worldIn.getFluidState(pos.above());
-            worldIn.setBlockAndUpdate(pos.above(), state.setValue(BOTTOM, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER));
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack){
+        if(this.type.is2BlocksHigh() && !level.isEmptyBlock(pos) && level.getBlockState(pos).getBlock() != Blocks.WATER){
+            FluidState fluidState = level.getFluidState(pos.above());
+            level.setBlockAndUpdate(pos.above(), state.setValue(BOTTOM, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER));
         }
     }
 
     @Override
-    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving){
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving){
         if(this.type.is2BlocksHigh() && state.getBlock() != newState.getBlock()){
             boolean bottom = state.getValue(BOTTOM);
-            BlockState state1 = worldIn.getBlockState(bottom ? pos.above() : pos.below());
+            BlockState state1 = level.getBlockState(bottom ? pos.above() : pos.below());
             if(state1.getBlock() == state.getBlock() && state1.getValue(BOTTOM) != bottom)
-                worldIn.setBlockAndUpdate(bottom ? pos.above() : pos.below(),
+                level.setBlockAndUpdate(bottom ? pos.above() : pos.below(),
                     state1.getValue(WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState());
         }
-        super.onRemove(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block,BlockState> builder){
-        builder.add(HorizontalDirectionalBlock.FACING, BOTTOM, WATERLOGGED);
+        builder.add(FACING, BOTTOM, WATERLOGGED);
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state){
-        return this.type.createTileEntity(pos, state);
+    public BlockEntity createNewBlockEntity(BlockPos pos, BlockState state){
+        return this.type.createBlockEntity(pos, state);
     }
 
     @Override
@@ -114,33 +114,27 @@ public class ScarecrowBlock extends BaseBlock implements EntityBlock, SimpleWate
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos){
-        if(stateIn.getValue(WATERLOGGED))
-            worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
-        return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos){
+        if(state.getValue(WATERLOGGED))
+            level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn){
-        boolean spawners = STConfig.loadSpawners.get();
-        boolean passive = STConfig.passiveMobSpawning.get();
+    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced){
+        boolean spawners = ScarecrowsTerritoryConfig.loadSpawners.get();
+        boolean passive = ScarecrowsTerritoryConfig.passiveMobSpawning.get();
 
         if(spawners && passive){
-            Component spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
-            Component passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
-            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.both", spawnerRange, passiveRange).color(ChatFormatting.GRAY).get());
+            Component spawnerRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
+            Component passiveRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
+            info.accept(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.both", spawnerRange, passiveRange).color(ChatFormatting.GRAY).get());
         }else if(spawners){
-            Component spawnerRange = TextComponents.number(Math.round(STConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
-            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", spawnerRange).color(ChatFormatting.GRAY).get());
+            Component spawnerRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();
+            info.accept(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", spawnerRange).color(ChatFormatting.GRAY).get());
         }else if(passive){
-            Component passiveRange = TextComponents.number(Math.round(STConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
-            tooltip.add(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.passive", passiveRange).color(ChatFormatting.GRAY).get());
+            Component passiveRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
+            info.accept(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.passive", passiveRange).color(ChatFormatting.GRAY).get());
         }
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> blockEntityType){
-        return blockEntityType == this.type.tileTileEntityType ? (world2, pos, state2, blockEntity) -> ((ScarecrowTile)blockEntity).tick() : null;
     }
 }

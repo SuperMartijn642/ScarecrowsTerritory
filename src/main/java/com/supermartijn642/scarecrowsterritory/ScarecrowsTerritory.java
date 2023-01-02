@@ -1,13 +1,12 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import net.minecraft.block.Block;
+import com.supermartijn642.core.item.CreativeItemGroup;
+import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
+import com.supermartijn642.core.registry.RegistrationHandler;
+import com.supermartijn642.scarecrowsterritory.generators.*;
 import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 
 /**
@@ -16,35 +15,30 @@ import net.minecraftforge.fml.common.Mod;
 @Mod("scarecrowsterritory")
 public class ScarecrowsTerritory {
 
-    public static final ItemGroup GROUP = new ItemGroup("scarecrowsterritory") {
-        @Override
-        public ItemStack makeIcon(){
-            return new ItemStack(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE));
-        }
-    };
+    public static final CreativeItemGroup GROUP = CreativeItemGroup.create("scarecrowsterritory", () -> ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE).asItem());
 
     public ScarecrowsTerritory(){
+        register();
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
+        registerGenerators();
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlockRegistry(final RegistryEvent.Register<Block> e){
-            for(ScarecrowType type : ScarecrowType.values())
-                type.registerBlock(e);
-        }
-
-        @SubscribeEvent
-        public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
-            for(ScarecrowType type : ScarecrowType.values())
-                type.registerTileType(e);
-        }
-
-        @SubscribeEvent
-        public static void onItemRegistry(final RegistryEvent.Register<Item> e){
-            for(ScarecrowType type : ScarecrowType.values())
-                type.registerItem(e);
+    private static void register(){
+        RegistrationHandler handler = RegistrationHandler.get("scarecrowsterritory");
+        for(ScarecrowType type : ScarecrowType.values()){
+            handler.registerBlockCallback(type::registerBlock);
+            handler.registerBlockEntityTypeCallback(type::registerBlockEntityType);
+            handler.registerItemCallback(type::registerItem);
         }
     }
 
+    private static void registerGenerators(){
+        GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("scarecrowsterritory");
+        handler.addGenerator(ScarecrowModelGenerator::new);
+        handler.addGenerator(ScarecrowBlockStateGenerator::new);
+        handler.addGenerator(ScarecrowLanguageGenerator::new);
+        handler.addGenerator(ScarecrowLootTableGenerator::new);
+        handler.addGenerator(ScarecrowRecipeGenerator::new);
+        handler.addGenerator(ScarecrowTagGenerator::new);
+    }
 }

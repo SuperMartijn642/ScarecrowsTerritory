@@ -3,7 +3,7 @@ package com.supermartijn642.scarecrowsterritory.generators;
 import com.supermartijn642.core.generator.RecipeGenerator;
 import com.supermartijn642.core.generator.ResourceCache;
 import com.supermartijn642.scarecrowsterritory.ScarecrowType;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -33,7 +33,7 @@ public class ScarecrowRecipeGenerator extends RecipeGenerator {
             .unlockedBy(Tags.Items.RODS_WOODEN);
 
         // Colored scarecrows
-        TagKey<Item> scarecrowTag = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation("scarecrowsterritory", "primitive_scarecrows"));
+        TagKey<Item> scarecrowTag = TagKey.create(Registries.ITEM, new ResourceLocation("scarecrowsterritory", "primitive_scarecrows"));
         for(DyeColor color : DyeColor.values()){
             this.shapeless(ScarecrowType.PRIMITIVE.items.get(color))
                 .input(scarecrowTag)

@@ -20,7 +20,7 @@ public class ScarecrowLanguageGenerator extends LanguageGenerator {
         // Creative tab
         this.itemGroup(ScarecrowsTerritory.GROUP, "Scarecrows' Territory");
         // Blocks
-        this.block(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.BLUE), "Black Scarecrow");
+        this.block(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.BLACK), "Black Scarecrow");
         this.block(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.BLUE), "Blue Scarecrow");
         this.block(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.BROWN), "Brown Scarecrow");
         this.block(ScarecrowType.PRIMITIVE.blocks.get(DyeColor.CYAN), "Cyan Scarecrow");

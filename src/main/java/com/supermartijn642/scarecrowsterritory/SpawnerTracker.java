@@ -8,9 +8,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -26,8 +26,8 @@ public class SpawnerTracker {
     private static final Map<LevelAccessor,Set<BlockPos>> SPAWNERS_PER_WORLD = new LinkedHashMap<>();
 
     @SubscribeEvent
-    public static void onLevelUnload(WorldEvent.Unload e){
-        SPAWNERS_PER_WORLD.remove(e.getWorld());
+    public static void onLevelUnload(LevelEvent.Unload e){
+        SPAWNERS_PER_WORLD.remove(e.getLevel());
     }
 
     @SubscribeEvent
@@ -37,17 +37,17 @@ public class SpawnerTracker {
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
                 if(chunk.getBlockEntity(pos) instanceof SpawnerBlockEntity){
-                    SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
-                    SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+                    SPAWNERS_PER_WORLD.putIfAbsent(e.getLevel(), new HashSet<>());
+                    SPAWNERS_PER_WORLD.computeIfPresent(e.getLevel(), (w, s) -> {
                         s.add(pos);
                         return s;
                     });
                 }
             };
-            if(e.getWorld().isClientSide())
+            if(e.getLevel().isClientSide())
                 ClientUtils.queueTask(task);
-            else if(e.getWorld() instanceof Level)
-                e.getWorld().getServer().tell(new TickTask(0, task));
+            else if(e.getLevel() instanceof Level)
+                e.getLevel().getServer().tell(new TickTask(0, task));
         }
     }
 
@@ -57,7 +57,7 @@ public class SpawnerTracker {
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             if(chunk.getBlockEntity(pos) instanceof SpawnerBlockEntity){
-                SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+                SPAWNERS_PER_WORLD.computeIfPresent(e.getLevel(), (w, s) -> {
                     s.remove(pos);
                     return s;
                 });
@@ -68,8 +68,8 @@ public class SpawnerTracker {
     @SubscribeEvent
     public static void onBlockAdded(BlockEvent.EntityPlaceEvent e){
         if(e.getPlacedBlock().getBlock() == Blocks.SPAWNER){
-            SPAWNERS_PER_WORLD.putIfAbsent(e.getWorld(), new HashSet<>());
-            SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+            SPAWNERS_PER_WORLD.putIfAbsent(e.getLevel(), new HashSet<>());
+            SPAWNERS_PER_WORLD.computeIfPresent(e.getLevel(), (w, s) -> {
                 s.add(e.getPos());
                 return s;
             });
@@ -79,7 +79,7 @@ public class SpawnerTracker {
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent e){
         if(e.getState().getBlock() == Blocks.SPAWNER){
-            SPAWNERS_PER_WORLD.computeIfPresent(e.getWorld(), (w, s) -> {
+            SPAWNERS_PER_WORLD.computeIfPresent(e.getLevel(), (w, s) -> {
                 s.remove(e.getPos());
                 return s;
             });

@@ -12,6 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.eventbus.api.Event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -217,9 +219,11 @@ public class AbstractSpawnerUtil {
                         entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity instanceof Mob){
                             Mob mob = (Mob)entity;
-                            if(!net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner)){
-                                continue;
-                            }
+                            Event.Result res = ForgeEventFactory.canEntitySpawn(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER);
+                            if(res == net.minecraftforge.eventbus.api.Event.Result.DENY) continue;
+                            if(res == net.minecraftforge.eventbus.api.Event.Result.DEFAULT)
+                                if(getNextSpawnData(spawner).getCustomSpawnRules().isEmpty() && !mob.checkSpawnRules(level, MobSpawnType.SPAWNER) || !mob.checkSpawnObstruction(level))
+                                    continue;
 
                             if(getNextSpawnData(spawner).getEntityToSpawn().size() == 1 && getNextSpawnData(spawner).getEntityToSpawn().contains("id", 8)){
                                 if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))

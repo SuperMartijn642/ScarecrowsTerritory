@@ -13,9 +13,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,14 +38,14 @@ public class ScarecrowTracker {
 
         Entity entity = e.getEntity();
         double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
-        if(isScarecrowInRange(e.getEntityLiving().level, entity.position(), range)){
+        if(isScarecrowInRange(e.getEntity().level, entity.position(), range)){
             e.setResult(Event.Result.DENY);
         }
     }
 
     @SubscribeEvent
-    public static void onWorldTick(TickEvent.WorldTickEvent e){
-        Level level = e.world;
+    public static void onWorldTick(TickEvent.LevelTickEvent e){
+        Level level = e.level;
         if(level.isClientSide || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
@@ -120,8 +120,8 @@ public class ScarecrowTracker {
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload e){
-        SCARECROWS_PER_WORLD.remove(e.getWorld());
+    public static void onWorldUnload(LevelEvent.Unload e){
+        SCARECROWS_PER_WORLD.remove(e.getLevel());
     }
 
     @SubscribeEvent
@@ -131,12 +131,12 @@ public class ScarecrowTracker {
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
                 if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
-                    addScarecrow(e.getWorld(), pos);
+                    addScarecrow(e.getLevel(), pos);
             };
-            if(e.getWorld().isClientSide())
+            if(e.getLevel().isClientSide())
                 ClientUtils.queueTask(task);
             else
-                e.getWorld().getServer().tell(new TickTask(0, task));
+                e.getLevel().getServer().tell(new TickTask(0, task));
         }
     }
 
@@ -146,33 +146,33 @@ public class ScarecrowTracker {
 
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
-                removeScarecrow(e.getWorld(), pos);
+                removeScarecrow(e.getLevel(), pos);
         }
     }
 
     @SubscribeEvent
     public static void onBlockAdded(BlockEvent.EntityPlaceEvent e){
         if(e.getPlacedBlock().getBlock() instanceof ScarecrowBlock){
-            addScarecrow(e.getWorld(), e.getPos());
+            addScarecrow(e.getLevel(), e.getPos());
 
             boolean bottom = e.getPlacedBlock().getValue(ScarecrowBlock.BOTTOM);
             BlockPos otherHalf = bottom ? e.getPos().above() : e.getPos().below();
-            BlockState state = e.getWorld().getBlockState(otherHalf);
+            BlockState state = e.getLevel().getBlockState(otherHalf);
             if(state.getBlock() instanceof ScarecrowBlock && state.getValue(ScarecrowBlock.BOTTOM) != bottom)
-                addScarecrow(e.getWorld(), otherHalf);
+                addScarecrow(e.getLevel(), otherHalf);
         }
     }
 
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent e){
         if(e.getState().getBlock() instanceof ScarecrowBlock){
-            removeScarecrow(e.getWorld(), e.getPos());
+            removeScarecrow(e.getLevel(), e.getPos());
 
             boolean bottom = e.getState().getValue(ScarecrowBlock.BOTTOM);
             BlockPos otherHalf = bottom ? e.getPos().above() : e.getPos().below();
-            BlockState state = e.getWorld().getBlockState(otherHalf);
+            BlockState state = e.getLevel().getBlockState(otherHalf);
             if(state.getBlock() instanceof ScarecrowBlock && state.getValue(ScarecrowBlock.BOTTOM) != bottom)
-                removeScarecrow(e.getWorld(), otherHalf);
+                removeScarecrow(e.getLevel(), otherHalf);
         }
     }
 

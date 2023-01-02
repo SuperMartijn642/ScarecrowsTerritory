@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -31,33 +33,33 @@ public class MobSpawningUtil {
     /**
      * {@link WorldEntitySpawner#getRandomChunkPosition(World, int, int)}
      */
-    private static BlockPos getRandomChunkPosition(World world, int x, int z){
+    private static BlockPos getRandomChunkPosition(World level, int x, int z){
         try{
-            return (BlockPos)getRandomChunkPosition.invoke(null, world, x, z);
+            return (BlockPos)getRandomChunkPosition.invoke(null, level, x, z);
         }catch(Exception e){
             e.printStackTrace();
             return null;
         }
     }
 
-    public static void spawnEntitiesInChunks(WorldServer world, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
+    public static void spawnEntitiesInChunks(WorldServer level, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
         if(spawnHostiles || spawnPassives || spawnAnimals){
-            chunks = chunks.stream().filter(pos -> world.isAreaLoaded(pos.getBlock(0, 0, 0), 0)).collect(Collectors.toSet());
+            chunks = chunks.stream().filter(pos -> level.isAreaLoaded(pos.getBlock(0, 0, 0), 0)).collect(Collectors.toSet());
             if(chunks.size() > 0)
-                trySpawnEntitiesInChunks(world, chunks, spawnPassives, spawnHostiles, spawnAnimals);
+                trySpawnEntitiesInChunks(level, chunks, spawnPassives, spawnHostiles, spawnAnimals);
         }
     }
 
-    private static void trySpawnEntitiesInChunks(WorldServer worldServerIn, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
-        int i = chunks.size() + Math.max(worldServerIn.getChunkProvider().getLoadedChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(worldServerIn));
+    private static void trySpawnEntitiesInChunks(WorldServer level, Set<ChunkPos> chunks, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
+        int i = chunks.size() + Math.max(level.getChunkProvider().getLoadedChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(level));
 
         int entitiesSpawned = 0;
-        BlockPos worldSpawnPoint = worldServerIn.getSpawnPoint();
+        BlockPos worldSpawnPoint = level.getSpawnPoint();
 
-        for(EnumCreatureType enumcreaturetype : EnumCreatureType.values()){
-            if((!enumcreaturetype.getPeacefulCreature() || spawnPassives) && (enumcreaturetype.getPeacefulCreature() || spawnHostiles) && (!enumcreaturetype.getAnimal() || spawnAnimals)){
-                int k4 = worldServerIn.countEntities(enumcreaturetype, true);
-                int l4 = enumcreaturetype.getMaxNumberOfCreature() * i / (17 * 17);
+        for(EnumCreatureType creatureType : EnumCreatureType.values()){
+            if((!creatureType.getPeacefulCreature() || spawnPassives) && (creatureType.getPeacefulCreature() || spawnHostiles) && (!creatureType.getAnimal() || spawnAnimals)){
+                int k4 = level.countEntities(creatureType, true);
+                int l4 = creatureType.getMaxNumberOfCreature() * i / (17 * 17);
 
                 if(k4 <= l4){
                     java.util.ArrayList<ChunkPos> shuffled = com.google.common.collect.Lists.newArrayList(chunks);
@@ -66,11 +68,11 @@ public class MobSpawningUtil {
                     label134:
 
                     for(ChunkPos chunkpos1 : shuffled){
-                        BlockPos randomChunkPos = getRandomChunkPosition(worldServerIn, chunkpos1.x, chunkpos1.z);
+                        BlockPos randomChunkPos = getRandomChunkPosition(level, chunkpos1.x, chunkpos1.z);
                         int randomChunkX = randomChunkPos.getX();
                         int randomChunkY = randomChunkPos.getY();
                         int randomChunkZ = randomChunkPos.getZ();
-                        IBlockState iblockstate = worldServerIn.getBlockState(randomChunkPos);
+                        IBlockState iblockstate = level.getBlockState(randomChunkPos);
 
                         if(!iblockstate.isNormalCube()){
                             int entitiesInGroup = 0;
@@ -81,52 +83,52 @@ public class MobSpawningUtil {
                                 int spawnY = randomChunkY;
                                 int spawnZ = randomChunkZ;
                                 Biome.SpawnListEntry spawnEntry = null;
-                                IEntityLivingData ientitylivingdata = null;
+                                IEntityLivingData entityData = null;
                                 int groupSize = MathHelper.ceil(Math.random() * 4.0D);
 
                                 // try spawning entities in the group
                                 for(int i4 = 0; i4 < groupSize; ++i4){
-                                    spawnX += worldServerIn.rand.nextInt(6) - worldServerIn.rand.nextInt(6);
-                                    spawnY += worldServerIn.rand.nextInt(1) - worldServerIn.rand.nextInt(1);
-                                    spawnZ += worldServerIn.rand.nextInt(6) - worldServerIn.rand.nextInt(6);
+                                    spawnX += level.rand.nextInt(6) - level.rand.nextInt(6);
+                                    spawnY += level.rand.nextInt(1) - level.rand.nextInt(1);
+                                    spawnZ += level.rand.nextInt(6) - level.rand.nextInt(6);
                                     spawnPos.setPos(spawnX, spawnY, spawnZ);
-                                    float spawnXCenter = (float)spawnX + 0.5F;
-                                    float spawnZCenter = (float)spawnZ + 0.5F;
+                                    float spawnXCenter = spawnX + 0.5F;
+                                    float spawnZCenter = spawnZ + 0.5F;
 
                                     if(worldSpawnPoint.distanceSq(spawnXCenter, spawnY, spawnZCenter) >= 576.0D){
                                         if(spawnEntry == null){
-                                            spawnEntry = worldServerIn.getSpawnListEntryForTypeAt(enumcreaturetype, spawnPos);
+                                            spawnEntry = level.getSpawnListEntryForTypeAt(creatureType, spawnPos);
 
                                             if(spawnEntry == null){
                                                 break;
                                             }
                                         }
 
-                                        if(worldServerIn.canCreatureTypeSpawnHere(enumcreaturetype, spawnEntry, spawnPos) && WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.getPlacementForEntity(spawnEntry.entityClass), worldServerIn, spawnPos)){
-                                            EntityLiving entityliving;
+                                        if(level.canCreatureTypeSpawnHere(creatureType, spawnEntry, spawnPos) && WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.getPlacementForEntity(spawnEntry.entityClass), level, spawnPos)){
+                                            EntityLiving entityLiving;
 
                                             try{
-                                                entityliving = spawnEntry.newInstance(worldServerIn);
+                                                entityLiving = spawnEntry.newInstance(level);
                                             }catch(Exception exception){
                                                 exception.printStackTrace();
                                                 return;
                                             }
 
-                                            entityliving.setLocationAndAngles(spawnXCenter, spawnY, spawnZCenter, worldServerIn.rand.nextFloat() * 360.0F, 0.0F);
+                                            entityLiving.setLocationAndAngles(spawnXCenter, spawnY, spawnZCenter, level.rand.nextFloat() * 360.0F, 0.0F);
 
-                                            net.minecraftforge.fml.common.eventhandler.Event.Result canSpawn = net.minecraftforge.event.ForgeEventFactory.canEntitySpawn(entityliving, worldServerIn, spawnXCenter, spawnY, spawnZCenter, false);
-                                            if(canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.ALLOW || (canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.DEFAULT && (entityliving.getCanSpawnHere() && entityliving.isNotColliding()))){
-                                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityliving, worldServerIn, spawnXCenter, spawnY, spawnZCenter))
-                                                    ientitylivingdata = entityliving.onInitialSpawn(worldServerIn.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
+                                            Event.Result canSpawn = ForgeEventFactory.canEntitySpawn(entityLiving, level, spawnXCenter, spawnY, spawnZCenter, false);
+                                            if(canSpawn == Event.Result.ALLOW || (canSpawn == Event.Result.DEFAULT && (entityLiving.getCanSpawnHere() && entityLiving.isNotColliding()))){
+                                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityLiving, level, spawnXCenter, spawnY, spawnZCenter))
+                                                    entityData = entityLiving.onInitialSpawn(level.getDifficultyForLocation(new BlockPos(entityLiving)), entityData);
 
-                                                if(entityliving.isNotColliding()){
+                                                if(entityLiving.isNotColliding()){
                                                     ++entitiesInGroup;
-                                                    worldServerIn.spawnEntity(entityliving);
+                                                    level.spawnEntity(entityLiving);
                                                 }else{
-                                                    entityliving.setDead();
+                                                    entityLiving.setDead();
                                                 }
 
-                                                if(entitiesInGroup >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entityliving)){
+                                                if(entitiesInGroup >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entityLiving)){
                                                     continue label134;
                                                 }
                                             }
@@ -142,5 +144,4 @@ public class MobSpawningUtil {
             }
         }
     }
-
 }

@@ -30,46 +30,46 @@ public class ScarecrowTracker {
     private static final Map<World,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<World,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
-    public static boolean canDespawn(World world, Vec3d pos){
-        if(!STConfig.passiveMobSpawning.get())
+    public static boolean canDespawn(World level, Vec3d pos){
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get())
             return true;
 
-        double range = STConfig.passiveMobRange.get();
-        return !isScarecrowInRange(world, pos, range);
+        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
+        return !isScarecrowInRange(level, pos, range);
     }
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
-        World world = e.world;
-        if(world.isRemote || !(world instanceof WorldServer) || world.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
+        World level = e.world;
+        if(level.isRemote || !(level instanceof WorldServer) || level.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
             return;
 
-        if(!CHUNKS_TO_SPAWN_MOBS.containsKey(world) || !world.getGameRules().getBoolean("doMobSpawning"))
+        if(!CHUNKS_TO_SPAWN_MOBS.containsKey(level) || !level.getGameRules().getBoolean("doMobSpawning"))
             return;
 
-        spawnEntitiesInChunks((WorldServer)world);
+        spawnEntitiesInChunks((WorldServer)level);
     }
 
-    private static void spawnEntitiesInChunks(WorldServer world){
-        boolean spawnAnimals = world.getWorldInfo().getWorldTime() % 400L == 0L;
-        boolean spawnHostiles = world.getDifficulty() != EnumDifficulty.PEACEFUL;
-        Set<Map.Entry<ChunkPos,Integer>> entries = CHUNKS_TO_SPAWN_MOBS.getOrDefault(world, Collections.emptyMap()).entrySet();
+    private static void spawnEntitiesInChunks(WorldServer level){
+        boolean spawnAnimals = level.getWorldInfo().getWorldTime() % 400L == 0L;
+        boolean spawnHostiles = level.getDifficulty() != EnumDifficulty.PEACEFUL;
+        Set<Map.Entry<ChunkPos,Integer>> entries = CHUNKS_TO_SPAWN_MOBS.getOrDefault(level, Collections.emptyMap()).entrySet();
         Set<ChunkPos> chunks = entries.stream().filter(entry -> entry.getValue() > 0).map(Map.Entry::getKey).collect(Collectors.toSet());
-        MobSpawningUtil.spawnEntitiesInChunks(world, chunks, true, spawnHostiles, spawnAnimals);
+        MobSpawningUtil.spawnEntitiesInChunks(level, chunks, true, spawnHostiles, spawnAnimals);
     }
 
-    private static void addScarecrow(World world, BlockPos pos){
-        SCARECROWS_PER_WORLD.putIfAbsent(world, new HashSet<>());
-        SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
+    private static void addScarecrow(World level, BlockPos pos){
+        SCARECROWS_PER_WORLD.putIfAbsent(level, new HashSet<>());
+        SCARECROWS_PER_WORLD.computeIfPresent(level, (w, s) -> {
             s.add(pos);
             return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
+        int range = (int)Math.ceil(ScarecrowsTerritoryConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
-        CHUNKS_TO_SPAWN_MOBS.putIfAbsent(world, new LinkedHashMap<>());
-        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
+        CHUNKS_TO_SPAWN_MOBS.putIfAbsent(level, new LinkedHashMap<>());
+        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(level, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
                 for(int z = minZ; z <= maxZ; z++){
                     ChunkPos chunk = new ChunkPos(x, z);
@@ -81,16 +81,16 @@ public class ScarecrowTracker {
         });
     }
 
-    private static void removeScarecrow(World world, BlockPos pos){
-        SCARECROWS_PER_WORLD.computeIfPresent(world, (w, s) -> {
+    private static void removeScarecrow(World level, BlockPos pos){
+        SCARECROWS_PER_WORLD.computeIfPresent(level, (w, s) -> {
             s.remove(pos);
             return s;
         });
 
-        int range = (int)Math.ceil(STConfig.passiveMobRange.get());
+        int range = (int)Math.ceil(ScarecrowsTerritoryConfig.passiveMobRange.get());
         int minX = (pos.getX() - range) >> 4, maxX = (pos.getX() + range) >> 4;
         int minZ = (pos.getZ() - range) >> 4, maxZ = (pos.getZ() + range) >> 4;
-        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(world, (w, s) -> {
+        CHUNKS_TO_SPAWN_MOBS.computeIfPresent(level, (w, s) -> {
             for(int x = minX; x <= maxX; x++){
                 for(int z = minZ; z <= maxZ; z++){
                     ChunkPos chunk = new ChunkPos(x, z);
@@ -115,7 +115,7 @@ public class ScarecrowTracker {
 
         for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
             Runnable task = () -> {
-                if(entry.getValue() instanceof ScarecrowTile)
+                if(entry.getValue() instanceof ScarecrowBlockEntity)
                     addScarecrow(e.getWorld(), entry.getKey());
             };
             if(e.getWorld().isRemote)
@@ -130,7 +130,7 @@ public class ScarecrowTracker {
         Chunk chunk = e.getChunk();
 
         for(Map.Entry<BlockPos,TileEntity> entry : chunk.getTileEntityMap().entrySet()){
-            if(entry.getValue() instanceof ScarecrowTile)
+            if(entry.getValue() instanceof ScarecrowBlockEntity)
                 removeScarecrow(e.getWorld(), entry.getKey());
         }
     }
@@ -161,9 +161,9 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(World world, Vec3d center, double range){
+    public static boolean isScarecrowInRange(World level, Vec3d center, double range){
         double rangeSquared = range * range;
-        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(world, Collections.emptySet());
+        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
 
         for(BlockPos scarecrow : scarecrows){
             if(center.squareDistanceTo(scarecrow.getX() + 0.5, scarecrow.getY() + 0.5, scarecrow.getZ() + 0.5) < rangeSquared)

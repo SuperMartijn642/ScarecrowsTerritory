@@ -25,7 +25,7 @@ public class SpawnerTracker {
     private static final Map<World,Set<BlockPos>> SPAWNERS_PER_WORLD = new LinkedHashMap<>();
 
     @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload e){
+    public static void onLevelUnload(WorldEvent.Unload e){
         SPAWNERS_PER_WORLD.remove(e.getWorld());
     }
 
@@ -85,10 +85,9 @@ public class SpawnerTracker {
         }
     }
 
-    public static Set<BlockPos> getSpawnersInRange(World world, BlockPos center, double range){
+    public static Set<BlockPos> getSpawnersInRange(World level, BlockPos center, double range){
         double rangeSquared = range * range;
-        return SPAWNERS_PER_WORLD.getOrDefault(world, Collections.emptySet())
+        return SPAWNERS_PER_WORLD.getOrDefault(level, Collections.emptySet())
             .stream().filter(pos -> center.distanceSq(pos) <= rangeSquared).collect(Collectors.toSet());
     }
-
 }

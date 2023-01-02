@@ -1,4 +1,0 @@
-tile.scarecrowsterritory.primitive_scarecrow.name=Espantalho
-scarecrowsterritory.primitive_scarecrow.info.spawners=Mantém os Geradores no raio de %1$d blocos ativados
-scarecrowsterritory.primitive_scarecrow.info.passive=Permite a Geração de mobs passivos no raio de %1$d blocos
-scarecrowsterritory.primitive_scarecrow.info.both=Mantém os Geradores no raio de %1$d blocos ativados e permite a Geração de mobs passivos no raio de %2$d blocos

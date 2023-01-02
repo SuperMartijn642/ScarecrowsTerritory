@@ -1,23 +1,23 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import com.supermartijn642.core.ToolType;
-import com.supermartijn642.core.block.BaseBlock;
+import com.supermartijn642.core.block.BaseBlockEntityType;
+import com.supermartijn642.core.block.BlockProperties;
+import com.supermartijn642.core.block.BlockShape;
+import com.supermartijn642.core.item.BaseBlockItem;
+import com.supermartijn642.core.item.ItemProperties;
+import com.supermartijn642.core.registry.RegistrationHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
@@ -26,64 +26,46 @@ public enum ScarecrowType {
 
     PRIMITIVE;
 
-    private static final AxisAlignedBB[] PRIMITIVE_SHAPE = new AxisAlignedBB[]{
-        new AxisAlignedBB(7.5 / 16d, 0, 7.5 / 16d, 8.5 / 16d, 26 / 16d, 8.5 / 16d),
-        new AxisAlignedBB(4 / 16d, 9 / 16d, 6 / 16d, 12 / 16d, 22 / 16d, 10 / 16d),
-        new AxisAlignedBB(4 / 16d, 21 / 16d, 4 / 16d, 12 / 16d, 29 / 16d, 12 / 16d)};
+    private static final BlockShape PRIMITIVE_SHAPE = BlockShape.or(
+        BlockShape.createBlockShape(7.5, 0, 7.5, 8.5, 26, 8.5),
+        BlockShape.createBlockShape(4, 9, 6, 12, 22, 10),
+        BlockShape.createBlockShape(4, 21, 4, 12, 29, 12)
+    );
 
-    private static final AxisAlignedBB[][] PRIMITIVE_SHAPES_BOTTOM = new AxisAlignedBB[4][];
-    private static final AxisAlignedBB[][] PRIMITIVE_SHAPES_TOP = new AxisAlignedBB[4][];
+    private static final BlockShape[] PRIMITIVE_SHAPES_BOTTOM = new BlockShape[4];
+    private static final BlockShape[] PRIMITIVE_SHAPES_TOP = new BlockShape[4];
 
     static{
         PRIMITIVE_SHAPES_BOTTOM[EnumFacing.NORTH.getHorizontalIndex()] = PRIMITIVE_SHAPE;
-        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.EAST.getHorizontalIndex()] = rotateShape(EnumFacing.NORTH, EnumFacing.EAST, PRIMITIVE_SHAPE);
-        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.SOUTH.getHorizontalIndex()] = rotateShape(EnumFacing.NORTH, EnumFacing.SOUTH, PRIMITIVE_SHAPE);
-        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.WEST.getHorizontalIndex()] = rotateShape(EnumFacing.NORTH, EnumFacing.WEST, PRIMITIVE_SHAPE);
-        for(int i = 0; i < 4; i++){
-            PRIMITIVE_SHAPES_TOP[i] = new AxisAlignedBB[PRIMITIVE_SHAPES_BOTTOM[i].length];
-            for(int j = 0; j < PRIMITIVE_SHAPES_BOTTOM[i].length; j++)
-                PRIMITIVE_SHAPES_TOP[i][j] = PRIMITIVE_SHAPES_BOTTOM[i][j].offset(0, -1, 0);
-        }
-    }
-
-    public static AxisAlignedBB[] rotateShape(EnumFacing from, EnumFacing to, AxisAlignedBB[] shape){
-        AxisAlignedBB[] result = new AxisAlignedBB[shape.length];
-        System.arraycopy(shape, 0, result, 0, shape.length);
-
-        int times = (to.getHorizontalIndex() - from.getHorizontalIndex() + 4) % 4;
-        for(int i = 0; i < times; i++){
-            for(int j = 0; j < result.length; j++){
-                AxisAlignedBB box = result[j];
-                result[j] = new AxisAlignedBB(1 - box.maxZ, box.minY, box.minX, 1 - box.minZ, box.maxY, box.maxX);
-            }
-        }
-
-        return result;
+        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.EAST.getHorizontalIndex()] = PRIMITIVE_SHAPE.rotate(EnumFacing.Axis.Y);
+        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.SOUTH.getHorizontalIndex()] = PRIMITIVE_SHAPE.rotate(EnumFacing.Axis.Y).rotate(EnumFacing.Axis.Y);
+        PRIMITIVE_SHAPES_BOTTOM[EnumFacing.WEST.getHorizontalIndex()] = PRIMITIVE_SHAPE.rotate(EnumFacing.Axis.Y).rotate(EnumFacing.Axis.Y).rotate(EnumFacing.Axis.Y);
+        for(int i = 0; i < 4; i++)
+            PRIMITIVE_SHAPES_TOP[i] = PRIMITIVE_SHAPES_BOTTOM[i].offset(0, -1, 0);
     }
 
     public final EnumMap<EnumDyeColor,ScarecrowBlock> blocks = new EnumMap<>(EnumDyeColor.class);
-    private final EnumMap<EnumDyeColor,ItemBlock> items = new EnumMap<>(EnumDyeColor.class);
+    public BaseBlockEntityType<? extends ScarecrowBlockEntity> blockEntityType;
+    public final EnumMap<EnumDyeColor,BaseBlockItem> items = new EnumMap<>(EnumDyeColor.class);
 
-    public void registerBlock(RegistryEvent.Register<Block> e){
+    public void registerBlock(RegistrationHandler.Helper<Block> helper){
         switch(this){
             case PRIMITIVE:
                 Arrays.stream(EnumDyeColor.values()).forEach(color -> this.blocks.put(color, new ScarecrowBlock(this, color)));
         }
-        this.blocks.values().forEach(e.getRegistry()::register);
+        for(Map.Entry<EnumDyeColor,ScarecrowBlock> entry : this.blocks.entrySet())
+            helper.register(this.getRegistryName(entry.getKey()), entry.getValue());
     }
 
-    public void registerTileEntity(RegistryEvent.Register<Block> e){
-        GameRegistry.registerTileEntity(ScarecrowTile.PrimitiveScarecrowTile.class, new ResourceLocation("scarecrowsterritory", this.name().toLowerCase(Locale.ROOT) + "_tile"));
+    public void registerBlockEntityType(RegistrationHandler.Helper<BaseBlockEntityType<?>> helper){
+        this.blockEntityType = BaseBlockEntityType.create(this::createBlockEntity, this.blocks.values().toArray(new Block[0]));
+        helper.register(this.name().toLowerCase(Locale.ROOT) + "_scarecrow_tile", this.blockEntityType);
     }
 
-    public void registerItem(RegistryEvent.Register<Item> e){
-        this.blocks.forEach((color, block) -> {
-            ItemBlock item = new ItemBlock(block);
-            item.setRegistryName(this.getRegistryName(color));
-            item.setCreativeTab(ScarecrowsTerritory.GROUP);
-            this.items.put(color, item);
-        });
-        this.items.values().forEach(e.getRegistry()::register);
+    public void registerItem(RegistrationHandler.Helper<Item> helper){
+        this.blocks.forEach((color, block) -> this.items.put(color, new BaseBlockItem(block, ItemProperties.create().group(ScarecrowsTerritory.GROUP))));
+        for(Map.Entry<EnumDyeColor,BaseBlockItem> entry : this.items.entrySet())
+            helper.register(this.getRegistryName(entry.getKey()), entry.getValue());
     }
 
     public String getRegistryName(EnumDyeColor color){
@@ -91,28 +73,28 @@ public enum ScarecrowType {
             color == EnumDyeColor.SILVER ? "light_gray" : color.getName()) + "_scarecrow";
     }
 
-    public BaseBlock.Properties getBlockProperties(EnumDyeColor color){
+    public BlockProperties getBlockProperties(EnumDyeColor color){
         switch(this){
             case PRIMITIVE:
-                return BaseBlock.Properties.create(Material.CLOTH, color).sound(SoundType.CLOTH).harvestTool(ToolType.AXE).hardnessAndResistance(0.5f);
+                return BlockProperties.create(Material.CLOTH, color).sound(SoundType.CLOTH).destroyTime(0.5f).explosionResistance(0.5f);
         }
-        return BaseBlock.Properties.create(Material.AIR);
+        return BlockProperties.create(Material.AIR);
     }
 
-    public AxisAlignedBB[] getBlockShape(EnumFacing facing, boolean bottom){
+    public BlockShape getBlockShape(EnumFacing facing, boolean bottom){
         switch(this){
             case PRIMITIVE:
                 return bottom ? PRIMITIVE_SHAPES_BOTTOM[facing.getHorizontalIndex()] : PRIMITIVE_SHAPES_TOP[facing.getHorizontalIndex()];
         }
-        return new AxisAlignedBB[]{};
+        return BlockShape.empty();
     }
 
-    public ScarecrowTile createTileEntity(){
+    public ScarecrowBlockEntity createBlockEntity(){
         switch(this){
             case PRIMITIVE:
                 break;
         }
-        return new ScarecrowTile.PrimitiveScarecrowTile();
+        return new ScarecrowBlockEntity(this);
     }
 
     public BlockRenderLayer getRenderLayer(){
@@ -126,5 +108,4 @@ public enum ScarecrowType {
     public boolean is2BlocksHigh(){
         return this == PRIMITIVE;
     }
-
 }

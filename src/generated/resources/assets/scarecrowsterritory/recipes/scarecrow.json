@@ -1,0 +1,29 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " A ",
+    "BCB",
+    " B "
+  ],
+  "key": {
+    "A": [
+      {
+        "type": "minecraft:item",
+        "item": "minecraft:pumpkin"
+      }
+    ],
+    "B": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+    "C": [
+      {
+        "type": "minecraft:item",
+        "item": "minecraft:hay_block"
+      }
+    ]
+  },
+  "result": {
+    "item": "scarecrowsterritory:primitive_scarecrow"
+  }
+}

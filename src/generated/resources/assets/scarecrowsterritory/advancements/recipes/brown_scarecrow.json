@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:recipes/root",
+  "display": {
+    "icon": {
+      "item": "scarecrowsterritory:brown_scarecrow"
+    },
+    "title": {
+      "translate": "scarecrowsterritory.advancement.recipes/brown_scarecrow.title"
+    },
+    "description": {
+      "translate": "scarecrowsterritory.advancement.recipes/brown_scarecrow.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "scarecrowsterritory:brown_scarecrow"
+      }
+    },
+    "recipe_condition": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          null
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "recipe_condition"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "scarecrowsterritory:brown_scarecrow"
+    ]
+  }
+}

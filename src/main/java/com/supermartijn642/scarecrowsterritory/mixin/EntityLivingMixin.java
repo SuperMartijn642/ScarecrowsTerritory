@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityLiving.class)
 public abstract class EntityLivingMixin extends Entity {
 
-    public EntityLivingMixin(World worldIn){
-        super(worldIn);
+    public EntityLivingMixin(World level){
+        super(level);
     }
 
     @Inject(at = @At("HEAD"), method = "despawnEntity()V", cancellable = true)

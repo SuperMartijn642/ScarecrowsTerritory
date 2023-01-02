@@ -139,14 +139,14 @@ public class AbstractSpawnerUtil {
 
     public static void tickAbstractSpawner(MobSpawnerBaseLogic spawner){
         if(!isActivated(spawner)){
-            World world = spawner.getSpawnerWorld();
-            BlockPos blockpos = spawner.getSpawnerPosition();
-            if(!(world instanceof WorldServer)){
-                double d3 = (double)blockpos.getX() + world.rand.nextDouble();
-                double d4 = (double)blockpos.getY() + world.rand.nextDouble();
-                double d5 = (double)blockpos.getZ() + world.rand.nextDouble();
-                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d3, d4, d5, 0.0D, 0.0D, 0.0D);
-                world.spawnParticle(EnumParticleTypes.FLAME, d3, d4, d5, 0.0D, 0.0D, 0.0D);
+            World level = spawner.getSpawnerWorld();
+            BlockPos pos = spawner.getSpawnerPosition();
+            if(!(level instanceof WorldServer)){
+                double d3 = pos.getX() + level.rand.nextDouble();
+                double d4 = pos.getY() + level.rand.nextDouble();
+                double d5 = pos.getZ() + level.rand.nextDouble();
+                level.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d3, d4, d5, 0.0D, 0.0D, 0.0D);
+                level.spawnParticle(EnumParticleTypes.FLAME, d3, d4, d5, 0.0D, 0.0D, 0.0D);
                 if(getSpawnDelay(spawner) > 0)
                     setSpawnDelay(spawner, getSpawnDelay(spawner) - 1);
 
@@ -165,38 +165,38 @@ public class AbstractSpawnerUtil {
                 boolean flag = false;
 
                 for(int i = 0; i < getSpawnCount(spawner); ++i){
-                    NBTTagCompound compound = getSpawnData(spawner).getNbt();
+                    NBTTagCompound tag = getSpawnData(spawner).getNbt();
 
-                    NBTTagList nbttaglist = compound.getTagList("Pos", 6);
-                    int j = nbttaglist.tagCount();
-                    double d0 = j >= 1 ? nbttaglist.getDoubleAt(0) : (double)blockpos.getX() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    double d1 = j >= 2 ? nbttaglist.getDoubleAt(1) : (double)(blockpos.getY() + world.rand.nextInt(3) - 1);
-                    double d2 = j >= 3 ? nbttaglist.getDoubleAt(2) : (double)blockpos.getZ() + (world.rand.nextDouble() - world.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
-                    Entity entity = AnvilChunkLoader.readWorldEntityPos(compound, world, d0, d1, d2, false);
+                    NBTTagList list = tag.getTagList("Pos", 6);
+                    int j = list.tagCount();
+                    double d0 = j >= 1 ? list.getDoubleAt(0) : (double)pos.getX() + (level.rand.nextDouble() - level.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    double d1 = j >= 2 ? list.getDoubleAt(1) : (double)(pos.getY() + level.rand.nextInt(3) - 1);
+                    double d2 = j >= 3 ? list.getDoubleAt(2) : (double)pos.getZ() + (level.rand.nextDouble() - level.rand.nextDouble()) * getSpawnRange(spawner) + 0.5D;
+                    Entity entity = AnvilChunkLoader.readWorldEntityPos(tag, level, d0, d1, d2, false);
 
                     if(entity == null){
                         return;
                     }
 
-                    int k = world.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB(blockpos.getX(), blockpos.getY(), blockpos.getZ(), (blockpos.getX() + 1), (blockpos.getY() + 1), (blockpos.getZ() + 1))).grow(getSpawnRange(spawner))).size();
+                    int k = level.getEntitiesWithinAABB(entity.getClass(), (new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), (pos.getX() + 1), (pos.getY() + 1), (pos.getZ() + 1))).grow(getSpawnRange(spawner))).size();
                     if(k >= getMaxNearbyEntities(spawner)){
                         resetTimer(spawner);
                         return;
                     }
 
-                    EntityLiving entityliving = entity instanceof EntityLiving ? (EntityLiving)entity : null;
-                    entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, world.rand.nextFloat() * 360.0F, 0.0F);
-                    if(entityliving == null || net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(entityliving, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner)){
+                    EntityLiving entityLiving = entity instanceof EntityLiving ? (EntityLiving)entity : null;
+                    entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, level.rand.nextFloat() * 360.0F, 0.0F);
+                    if(entityLiving == null || net.minecraftforge.event.ForgeEventFactory.canEntitySpawnSpawner(entityLiving, level, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner)){
                         if(getSpawnData(spawner).getNbt().getSize() == 1 && getSpawnData(spawner).getNbt().hasKey("id", 8) && entity instanceof EntityLiving){
-                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityliving, world, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner))
-                                ((EntityLiving)entity).onInitialSpawn(world.getDifficultyForLocation(new BlockPos(entity)), null);
+                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityLiving, level, (float)entity.posX, (float)entity.posY, (float)entity.posZ, spawner))
+                                ((EntityLiving)entity).onInitialSpawn(level.getDifficultyForLocation(new BlockPos(entity)), null);
                         }
 
-                        AnvilChunkLoader.spawnEntity(entity, world);
-                        world.playEvent(2004, blockpos, 0);
+                        AnvilChunkLoader.spawnEntity(entity, level);
+                        level.playEvent(2004, pos, 0);
 
-                        if(entityliving != null){
-                            entityliving.spawnExplosionParticle();
+                        if(entityLiving != null){
+                            entityLiving.spawnExplosionParticle();
                         }
 
                         flag = true;
@@ -209,5 +209,4 @@ public class AbstractSpawnerUtil {
             }
         }
     }
-
 }

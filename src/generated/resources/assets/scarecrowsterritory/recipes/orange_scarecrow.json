@@ -1,0 +1,16 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "primitive_scarecrows"
+    },
+    {
+      "type": "forge:ore_dict",
+      "ore": "dyeOrange"
+    }
+  ],
+  "result": {
+    "item": "scarecrowsterritory:orange_scarecrow"
+  }
+}

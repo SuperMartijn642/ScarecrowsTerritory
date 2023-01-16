@@ -19,7 +19,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * Created 1/14/2021 by SuperMartijn642
@@ -36,8 +35,8 @@ public class MobSpawningUtil {
     static{
         canSpawn = ReflectionUtil.findMethod(NaturalSpawner.SpawnState.class, "m_47127_", EntityType.class, BlockPos.class, ChunkAccess.class);
         afterSpawn = ReflectionUtil.findMethod(NaturalSpawner.SpawnState.class, "m_47131_", Mob.class, ChunkAccess.class);
-        getRandomSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_151598_", ServerLevel.class, StructureManager.class, ChunkGenerator.class, MobCategory.class, Random.class, BlockPos.class);
-        canSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47003_", ServerLevel.class, StructureManager.class, ChunkGenerator.class, MobCategory.class, MobSpawnSettings.SpawnerData.class, BlockPos.class);
+        getRandomSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_220429_", ServerLevel.class, StructureManager.class, ChunkGenerator.class, MobCategory.class, RandomSource.class, BlockPos.class);
+        canSpawnMobAt = ReflectionUtil.findMethod(NaturalSpawner.class, "m_220436_", ServerLevel.class, StructureManager.class, ChunkGenerator.class, MobCategory.class, MobSpawnSettings.SpawnerData.class, BlockPos.class);
         getMobForSpawn = ReflectionUtil.findMethod(NaturalSpawner.class, "m_46988_", ServerLevel.class, EntityType.class);
         getRandomPosWithin = ReflectionUtil.findMethod(NaturalSpawner.class, "m_47062_", Level.class, LevelChunk.class);
     }

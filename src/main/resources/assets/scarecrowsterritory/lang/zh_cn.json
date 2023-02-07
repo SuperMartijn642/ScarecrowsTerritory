@@ -1,0 +1,23 @@
+{
+  "scarecrowsterritory.block.brown_scarecrow": "棕色稻草人",
+  "scarecrowsterritory.primitive_scarecrow.info.both": "使 %1$d 格方块范围内的刷怪笼保持激活状态，并允许 %2$d 格方块范围的生物生成",
+  "scarecrowsterritory.primitive_scarecrow.info.passive": "允许 %1$d 格方块范围内的村民繁殖",
+  "scarecrowsterritory.item_group": "稻草人领域",
+  "scarecrowsterritory.block.green_scarecrow": "绿色稻草人",
+  "scarecrowsterritory.block.cyan_scarecrow": "青色稻草人",
+  "scarecrowsterritory.block.magenta_scarecrow": "品红色稻草人",
+  "scarecrowsterritory": "稻草人领域",
+  "scarecrowsterritory.block.light_gray_scarecrow": "淡灰色稻草人",
+  "scarecrowsterritory.block.red_scarecrow": "红色稻草人",
+  "scarecrowsterritory.block.yellow_scarecrow": "黄色稻草人",
+  "scarecrowsterritory.block.pink_scarecrow": "粉红色稻草人",
+  "scarecrowsterritory.block.primitive_scarecrow": "紫色稻草人",
+  "scarecrowsterritory.block.lime_scarecrow": "黄绿色稻草人",
+  "scarecrowsterritory.block.white_scarecrow": "白色稻草人",
+  "scarecrowsterritory.block.black_scarecrow": "黑色稻草人",
+  "scarecrowsterritory.block.blue_scarecrow": "蓝色稻草人",
+  "scarecrowsterritory.block.gray_scarecrow": "灰色稻草人",
+  "scarecrowsterritory.block.orange_scarecrow": "橙色稻草人",
+  "scarecrowsterritory.primitive_scarecrow.info.spawners": "使 %1$d 格方块范围内的刷怪笼保持激活状态",
+  "scarecrowsterritory.block.light_blue_scarecrow": "淡蓝色稻草人"
+}

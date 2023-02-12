@@ -1,0 +1,132 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:black_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:brown_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:yellow_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:blue_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:black_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:yellow_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:orange_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:gray_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:lime_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:brown_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:white_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:pink_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:cyan_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:magenta_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:light_blue_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:purple_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:cyan_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:red_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:blue_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:lime_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:light_blue_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:gray_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:white_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:magenta_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:green_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:green_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:orange_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:light_gray_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:pink_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:red_scarecrow"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:purple_scarecrow_hat"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "scarecrowsterritory:light_gray_scarecrow"
+    }
+  ]
+}

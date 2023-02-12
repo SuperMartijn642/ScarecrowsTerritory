@@ -2,13 +2,13 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "scarecrowsterritory:primitive_scarecrow"
+      "item": "scarecrowsterritory:brown_scarecrow"
     },
     "title": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/scarecrow.title"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/brown_scarecrow.title"
     },
     "description": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/scarecrow.description"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/brown_scarecrow.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "scarecrowsterritory:scarecrow"
+        "recipe": "scarecrowsterritory:brown_scarecrow"
       }
     },
     "recipe_condition": {
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:rods/wooden"
+            "tag": "scarecrowsterritory:primitive_scarecrows"
           }
         ]
       }
@@ -41,7 +41,7 @@
   ],
   "rewards": {
     "recipes": [
-      "scarecrowsterritory:scarecrow"
+      "scarecrowsterritory:brown_scarecrow"
     ]
   }
 }

@@ -2,13 +2,13 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "scarecrowsterritory:yellow_scarecrow"
+      "item": "scarecrowsterritory:lime_scarecrow"
     },
     "title": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/yellow_scarecrow.title"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/lime_scarecrow.title"
     },
     "description": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/yellow_scarecrow.description"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/lime_scarecrow.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "scarecrowsterritory:yellow_scarecrow"
+        "recipe": "scarecrowsterritory:lime_scarecrow"
       }
     },
     "recipe_condition": {
@@ -41,7 +41,7 @@
   ],
   "rewards": {
     "recipes": [
-      "scarecrowsterritory:yellow_scarecrow"
+      "scarecrowsterritory:lime_scarecrow"
     ]
   }
 }

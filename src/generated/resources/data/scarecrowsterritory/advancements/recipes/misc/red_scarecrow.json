@@ -5,10 +5,10 @@
       "item": "scarecrowsterritory:red_scarecrow"
     },
     "title": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/red_scarecrow.title"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/red_scarecrow.title"
     },
     "description": {
-      "translate": "scarecrowsterritory.advancement.recipes/scarecrowsterritory/red_scarecrow.description"
+      "translate": "scarecrowsterritory.advancement.recipes/misc/red_scarecrow.description"
     },
     "frame": "task",
     "show_toast": false,

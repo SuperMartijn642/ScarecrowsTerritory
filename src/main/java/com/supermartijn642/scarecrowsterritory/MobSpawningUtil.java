@@ -249,8 +249,7 @@ public class MobSpawningUtil {
      * {@link WorldEntitySpawner.EntityDensityManager#canSpawnForCategory(EntityClassification)}
      */
     private static boolean canSpawnForCategory(WorldEntitySpawner.EntityDensityManager densityManager, EntityClassification classification, IWorld world){
-        int i = classification.getMaxInstancesPerChunk() * Math.max(getSpawnableChunkCount(densityManager), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / (17 * 17);
-        i *= 3;
-        return densityManager.getMobCategoryCounts().getInt(classification) < i;
+        int spawnableChunks = Math.max(1, getSpawnableChunkCount(densityManager) / (17 * 17));
+        return densityManager.getMobCategoryCounts().getInt(classification) < classification.getMaxInstancesPerChunk() * spawnableChunks;
     }
 }

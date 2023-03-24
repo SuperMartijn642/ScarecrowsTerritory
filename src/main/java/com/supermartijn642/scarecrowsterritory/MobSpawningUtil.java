@@ -238,9 +238,8 @@ public class MobSpawningUtil {
      * {@link NaturalSpawner.SpawnState#canSpawnForCategory(MobCategory)}
      */
     private static boolean canSpawnForCategory(NaturalSpawner.SpawnState densityManager, MobCategory classification, LevelAccessor world){
-        int i = classification.getMaxInstancesPerChunk() * Math.max(densityManager.getSpawnableChunkCount(), ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(world)) / (17 * 17);
-        i *= 3;
-        return densityManager.getMobCategoryCounts().getInt(classification) < i;
+        int spawnableChunks = Math.max(1, densityManager.getSpawnableChunkCount() / (17 * 17));
+        return densityManager.getMobCategoryCounts().getInt(classification) < classification.getMaxInstancesPerChunk() * spawnableChunks;
     }
 
 }

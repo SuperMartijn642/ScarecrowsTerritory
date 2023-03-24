@@ -1,6 +1,5 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.nbt.CompoundNBT;
@@ -27,11 +26,6 @@ import java.util.Random;
  * Created 1/14/2021 by SuperMartijn642
  */
 public class MobSpawningUtil {
-
-    /**
-     * Copied from {@link net.minecraft.world.server.ServerChunkProvider#MAGIC_NUMBER}
-     */
-    private static final int MAGIC_NUMBER = (int)Math.pow(17.0D, 2.0D);
 
     private static final Field distanceManager;
 
@@ -105,13 +99,10 @@ public class MobSpawningUtil {
             if(classification != EntityClassification.MISC &&
                 (spawnPassives || !classification.isFriendly()) &&
                 (spawnHostiles || classification.isFriendly()) &&
-                (spawnAnimals || !classification.isPersistent())){
+                (spawnAnimals || !classification.isPersistent()) &&
+                canSpawnForCategory(classification, level)){
 
-                Object2IntMap<EntityClassification> categoryCounts = level.getMobCategoryCounts();
-                int spawnChunkCount = getDistanceManager(level.getChunkSource()).getNaturalSpawnChunkCount();
-                int categoryMobCap = classification.getMaxInstancesPerChunk() * Math.max(spawnChunkCount, ScarecrowTracker.getNumberOfChunksToSpawnMobsIn(level)) / MAGIC_NUMBER;
-                if(categoryCounts.getInt(classification) <= categoryMobCap)
-                    spawnCategoryForChunk(classification, level, chunk);
+                spawnCategoryForChunk(classification, level, chunk);
             }
         }
 
@@ -219,5 +210,10 @@ public class MobSpawningUtil {
                 groupsSpawned++;
             }
         }
+    }
+
+    private static boolean canSpawnForCategory(EntityClassification classification, ServerWorld level){
+        int spawnableChunks = Math.max(1, getDistanceManager(level.getChunkSource()).getNaturalSpawnChunkCount() / (17 * 17));
+        return level.getMobCategoryCounts().getInt(classification) < classification.getMaxInstancesPerChunk() * spawnableChunks;
     }
 }

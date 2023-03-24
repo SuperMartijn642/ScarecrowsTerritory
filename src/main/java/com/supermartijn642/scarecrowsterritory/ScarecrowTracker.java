@@ -41,7 +41,7 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
         World level = e.world;
-        if(level.isRemote || !(level instanceof WorldServer) || level.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isRemote || !(level instanceof WorldServer) || level.getWorldType() == WorldType.DEBUG_ALL_BLOCK_STATES)
             return;
 
         if(!CHUNKS_TO_SPAWN_MOBS.containsKey(level) || !level.getGameRules().getBoolean("doMobSpawning"))

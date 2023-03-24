@@ -50,7 +50,7 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent e){
         World level = e.world;
-        if(level.isClientSide || !(level instanceof ServerWorld) || level.isDebug())
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide || !(level instanceof ServerWorld) || level.isDebug())
             return;
 
         if(!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))

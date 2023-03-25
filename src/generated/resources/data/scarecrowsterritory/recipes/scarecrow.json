@@ -10,7 +10,7 @@
       "item": "minecraft:carved_pumpkin"
     },
     "B": {
-      "tag": "forge:rods/wooden"
+      "item": "minecraft:stick"
     },
     "C": {
       "item": "minecraft:hay_block"

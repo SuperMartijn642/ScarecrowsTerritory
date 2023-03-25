@@ -1,9 +1,2 @@
 ### Scarecrows' Territory 1.1.8
-- Fixed 'passiveMobSpawning' config option not working properly
-- Fixed mob cap for passive spawning being too high
-
-### Scarecrows' Territory 1.1.7
-- Added Simplified Chinese translations (thanks to mango_buff!)
-
-### Scarecrows' Territory 1.1.6
-- Updated to core library 1.1
+- Initial release of Scarecrows' Territory for Fabric

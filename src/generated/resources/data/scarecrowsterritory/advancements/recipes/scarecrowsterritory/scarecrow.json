@@ -27,7 +27,9 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:rods/wooden"
+            "items": [
+              "minecraft:stick"
+            ]
           }
         ]
       }

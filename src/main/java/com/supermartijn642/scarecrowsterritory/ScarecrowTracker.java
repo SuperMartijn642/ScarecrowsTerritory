@@ -1,53 +1,52 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.ClientUtils;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.*;
 
 /**
  * Created 1/13/2021 by SuperMartijn642
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ScarecrowTracker {
 
     private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
-    @SubscribeEvent
-    public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
-            return;
-
-        Entity entity = e.getEntity();
-        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
-        if(isScarecrowInRange(e.getEntityLiving().level, entity.position(), range)){
-            e.setResult(Event.Result.DENY);
-        }
+    public static void registerListeners(){
+        ServerTickEvents.END_WORLD_TICK.register(ScarecrowTracker::onWorldTick);
+        ServerWorldEvents.UNLOAD.register((server, level) -> onWorldUnload(level));
+        ServerChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
+        ServerChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
+        ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
+        ClientChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
+        PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> onBlockBreak(level, pos, state));
     }
 
-    @SubscribeEvent
-    public static void onWorldTick(TickEvent.WorldTickEvent e){
-        Level level = e.world;
+    public static boolean shouldEntityDespawn(Mob mob){
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || mob.level.isClientSide)
+            return true;
+
+        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
+        return !isScarecrowInRange(mob.level, mob.position(), range);
+    }
+
+    private static void onWorldTick(Level level){
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide
-                || !(level instanceof ServerLevel) || level.isDebug())
+            || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
         if(!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
@@ -120,60 +119,49 @@ public class ScarecrowTracker {
         });
     }
 
-    @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload e){
-        SCARECROWS_PER_WORLD.remove(e.getWorld());
+    private static void onWorldUnload(Level level){
+        SCARECROWS_PER_WORLD.remove(level);
     }
 
-    @SubscribeEvent
-    public static void onChunkLoad(ChunkEvent.Load e){
-        ChunkAccess chunk = e.getChunk();
-
+    private static void onChunkLoad(Level level, LevelChunk chunk){
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             Runnable task = () -> {
                 if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
-                    addScarecrow(e.getWorld(), pos);
+                    addScarecrow(level, pos);
             };
-            if(e.getWorld().isClientSide())
+            if(level.isClientSide())
                 ClientUtils.queueTask(task);
             else
-                e.getWorld().getServer().tell(new TickTask(0, task));
+                level.getServer().tell(new TickTask(0, task));
         }
     }
 
-    @SubscribeEvent
-    public static void onChunkUnload(ChunkEvent.Unload e){
-        ChunkAccess chunk = e.getChunk();
-
+    private static void onChunkUnload(Level level, LevelChunk chunk){
         for(BlockPos pos : chunk.getBlockEntitiesPos()){
             if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
-                removeScarecrow(e.getWorld(), pos);
+                removeScarecrow(level, pos);
         }
     }
 
-    @SubscribeEvent
-    public static void onBlockAdded(BlockEvent.EntityPlaceEvent e){
-        if(e.getPlacedBlock().getBlock() instanceof ScarecrowBlock){
-            addScarecrow(e.getWorld(), e.getPos());
+    public static void onBlockAdded(Level level, BlockPos pos, BlockState placedState){
+        if(placedState.getBlock() instanceof ScarecrowBlock){
+            addScarecrow(level, pos);
 
-            boolean bottom = e.getPlacedBlock().getValue(ScarecrowBlock.BOTTOM);
-            BlockPos otherHalf = bottom ? e.getPos().above() : e.getPos().below();
-            BlockState state = e.getWorld().getBlockState(otherHalf);
+            boolean bottom = placedState.getValue(ScarecrowBlock.BOTTOM);
+            BlockPos otherHalf = bottom ? pos.above() : pos.below();
+            BlockState state = level.getBlockState(otherHalf);
             if(state.getBlock() instanceof ScarecrowBlock && state.getValue(ScarecrowBlock.BOTTOM) != bottom)
-                addScarecrow(e.getWorld(), otherHalf);
+                addScarecrow(level, otherHalf);
         }
     }
 
-    @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent e){
-        if(e.getState().getBlock() instanceof ScarecrowBlock){
-            removeScarecrow(e.getWorld(), e.getPos());
+    private static void onBlockBreak(Level level, BlockPos pos, BlockState removedState){
+        if(removedState.getBlock() instanceof ScarecrowBlock){
+            removeScarecrow(level, pos);
 
-            boolean bottom = e.getState().getValue(ScarecrowBlock.BOTTOM);
-            BlockPos otherHalf = bottom ? e.getPos().above() : e.getPos().below();
-            BlockState state = e.getWorld().getBlockState(otherHalf);
-            if(state.getBlock() instanceof ScarecrowBlock && state.getValue(ScarecrowBlock.BOTTOM) != bottom)
-                removeScarecrow(e.getWorld(), otherHalf);
+            boolean bottom = removedState.getValue(ScarecrowBlock.BOTTOM);
+            BlockPos otherHalf = bottom ? pos.above() : pos.below();
+            removeScarecrow(level, otherHalf);
         }
     }
 

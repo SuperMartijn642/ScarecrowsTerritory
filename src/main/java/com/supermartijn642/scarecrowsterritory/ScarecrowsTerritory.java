@@ -4,22 +4,22 @@ import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.scarecrowsterritory.generators.*;
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.world.item.DyeColor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
 
 /**
  * Created 7/7/2020 by SuperMartijn642
  */
-@Mod("scarecrowsterritory")
-public class ScarecrowsTerritory {
+public class ScarecrowsTerritory implements ModInitializer {
 
     public static final CreativeItemGroup GROUP = CreativeItemGroup.create("scarecrowsterritory", () -> ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE).asItem());
 
-    public ScarecrowsTerritory(){
+    @Override
+    public void onInitialize(){
+        ScarecrowTracker.registerListeners();
+        SpawnerTracker.registerListeners();
+
         register();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
         registerGenerators();
     }
 

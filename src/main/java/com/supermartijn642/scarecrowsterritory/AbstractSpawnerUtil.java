@@ -67,7 +67,7 @@ public class AbstractSpawnerUtil {
                     double d1 = j >= 2 ? listTag.getDouble(1) : (double)(pos.getY() + level.random.nextInt(3) - 1);
                     double d2 = j >= 3 ? listTag.getDouble(2) : (double)pos.getZ() + (level.random.nextDouble() - level.random.nextDouble()) * spawner.spawnRange + 0.5D;
                     if(level.noCollision(optional.get().getAABB(d0, d1, d2))){
-                        BlockPos blockpos = new BlockPos(d0, d1, d2);
+                        BlockPos blockpos = new BlockPos((int)d0, (int)d1, (int)d2);
                         if(spawner.nextSpawnData.getCustomSpawnRules().isPresent()){
                             if(!optional.get().getCategory().isFriendly() && level.getDifficulty() == Difficulty.PEACEFUL){
                                 continue;

@@ -1,6 +1,7 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.CommonUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -31,8 +32,10 @@ public class ScarecrowTracker {
         ServerWorldEvents.UNLOAD.register((server, level) -> onWorldUnload(level));
         ServerChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
         ServerChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
-        ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
-        ClientChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
+        if(CommonUtils.getEnvironmentSide().isClient()){
+            ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
+            ClientChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
+        }
         PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> onBlockBreak(level, pos, state));
     }
 

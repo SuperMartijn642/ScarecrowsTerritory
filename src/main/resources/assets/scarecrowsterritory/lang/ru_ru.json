@@ -1,0 +1,22 @@
+{
+  "scarecrowsterritory.block.brown_scarecrow": "Коричневый пугало",
+  "scarecrowsterritory.primitive_scarecrow.info.both": "Сохраняет рассадники в пределах %1$d блоков активированными и позволяет пассивным существам появляться в пределах %2$d.",
+  "scarecrowsterritory.primitive_scarecrow.info.passive": "Позволяет пассивным существам появляться в пределах %1$d блоков.",
+  "scarecrowsterritory.item_group": "Scarecrows' Territory",
+  "scarecrowsterritory.block.green_scarecrow": "Зелёное пугало",
+  "scarecrowsterritory.block.cyan_scarecrow": "Бирюзовое пугало",
+  "scarecrowsterritory.block.magenta_scarecrow": "Пурпурное пугало",
+  "scarecrowsterritory.block.light_gray_scarecrow": "Светло-серое пугало",
+  "scarecrowsterritory.block.red_scarecrow": "Красное пугало",
+  "scarecrowsterritory.block.yellow_scarecrow": "Жёлтое пугало",
+  "scarecrowsterritory.block.pink_scarecrow": "Розовое пугало",
+  "scarecrowsterritory.block.primitive_scarecrow": "Фиолетовое пугало",
+  "scarecrowsterritory.block.lime_scarecrow": "Лаймовое пугало",
+  "scarecrowsterritory.block.white_scarecrow": "Белое пугало",
+  "scarecrowsterritory.block.black_scarecrow": "Чёрное пугало",
+  "scarecrowsterritory.block.blue_scarecrow": "Синее пугало",
+  "scarecrowsterritory.block.gray_scarecrow": "Серое пугало",
+  "scarecrowsterritory.block.orange_scarecrow": "Оранжевое пугало",
+  "scarecrowsterritory.block.light_blue_scarecrow": "Голубое пугало",
+  "scarecrowsterritory.primitive_scarecrow.info.spawners": "Сохраняет рассадники в пределах %1$d блоков активированными."
+}

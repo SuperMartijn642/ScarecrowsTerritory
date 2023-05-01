@@ -1,6 +1,7 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.CommonUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
@@ -28,8 +29,10 @@ public class SpawnerTracker {
         ServerWorldEvents.UNLOAD.register((server, level) -> onLevelUnload(level));
         ServerChunkEvents.CHUNK_LOAD.register(SpawnerTracker::onChunkLoad);
         ServerChunkEvents.CHUNK_UNLOAD.register(SpawnerTracker::onChunkUnload);
-        ClientChunkEvents.CHUNK_LOAD.register(SpawnerTracker::onChunkLoad);
-        ClientChunkEvents.CHUNK_UNLOAD.register(SpawnerTracker::onChunkUnload);
+        if(CommonUtils.getEnvironmentSide().isClient()){
+            ClientChunkEvents.CHUNK_LOAD.register(SpawnerTracker::onChunkLoad);
+            ClientChunkEvents.CHUNK_UNLOAD.register(SpawnerTracker::onChunkUnload);
+        }
         PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> onBlockBreak(level, pos, state));
     }
 

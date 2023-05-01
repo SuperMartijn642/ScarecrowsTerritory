@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.9
+- Added Russian translations (thanks to Heimdallr-1!)
+
 ### Scarecrows' Territory 1.1.8
 - Fixed 'passiveMobSpawning' config option not working properly
 - Fixed mob cap for passive spawning being too high

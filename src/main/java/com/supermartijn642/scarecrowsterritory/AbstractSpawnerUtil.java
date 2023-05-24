@@ -13,7 +13,7 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -187,7 +187,7 @@ public class AbstractSpawnerUtil {
                     double d1 = j >= 2 ? listTag.getDouble(1) : (double)(pos.getY() + level.random.nextInt(3) - 1);
                     double d2 = j >= 3 ? listTag.getDouble(2) : (double)pos.getZ() + (level.random.nextDouble() - level.random.nextDouble()) * getSpawnRange(spawner) + 0.5D;
                     if(level.noCollision(optional.get().getAABB(d0, d1, d2))){
-                        BlockPos blockpos = new BlockPos(d0, d1, d2);
+                        BlockPos blockpos = new BlockPos((int)d0, (int)d1, (int)d2);
                         if(getNextSpawnData(spawner).getCustomSpawnRules().isPresent()){
                             if(!optional.get().getCategory().isFriendly() && level.getDifficulty() == Difficulty.PEACEFUL){
                                 continue;
@@ -219,16 +219,12 @@ public class AbstractSpawnerUtil {
                         entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity instanceof Mob){
                             Mob mob = (Mob)entity;
-                            Event.Result res = ForgeEventFactory.canEntitySpawn(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER);
-                            if(res == net.minecraftforge.eventbus.api.Event.Result.DENY) continue;
-                            if(res == net.minecraftforge.eventbus.api.Event.Result.DEFAULT)
-                                if(getNextSpawnData(spawner).getCustomSpawnRules().isEmpty() && !mob.checkSpawnRules(level, MobSpawnType.SPAWNER) || !mob.checkSpawnObstruction(level))
-                                    continue;
+                            if(getNextSpawnData(spawner).getCustomSpawnRules().isEmpty() && !mob.checkSpawnRules(level, MobSpawnType.SPAWNER) || !mob.checkSpawnObstruction(level))
+                                continue;
 
-                            if(getNextSpawnData(spawner).getEntityToSpawn().size() == 1 && getNextSpawnData(spawner).getEntityToSpawn().contains("id", 8)){
-                                if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mob, level, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), spawner, MobSpawnType.SPAWNER))
-                                    ((Mob)entity).finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
-                            }
+                            MobSpawnEvent.FinalizeSpawn event = ForgeEventFactory.onFinalizeSpawnSpawner(mob, level, level.getCurrentDifficultyAt(entity.blockPosition()), null, compoundTag, spawner);
+                            if(event != null && getNextSpawnData(spawner).getEntityToSpawn().size() == 1 && getNextSpawnData(spawner).getEntityToSpawn().contains("id", 8))
+                                ((Mob)entity).finalizeSpawn(level, event.getDifficulty(), event.getSpawnType(), event.getSpawnData(), event.getSpawnTag());
                         }
 
                         if(!level.tryAddFreshEntityWithPassengers(entity)){

@@ -12,7 +12,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
@@ -32,7 +32,7 @@ public class ScarecrowTracker {
     private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
     @SubscribeEvent
-    public static void onEntityDespawn(LivingSpawnEvent.AllowDespawn e){
+    public static void onEntityDespawn(MobSpawnEvent.AllowDespawn e){
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
             return;
 

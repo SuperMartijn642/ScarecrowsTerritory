@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -190,10 +189,8 @@ public class MobSpawningUtil {
                         }
 
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
-                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(entity, level, spawnXCenter, y, spawnZCenter, null, MobSpawnType.NATURAL);
-                        if(canSpawn != -1 && (canSpawn == 1 || (entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)))){
-                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, level, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, MobSpawnType.NATURAL))
-                                entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, (CompoundTag)null);
+                        if(entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)){
+                            entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
                             entitiesSpawned++;
                             entitiesInGroup++;
                             level.addFreshEntityWithPassengers(entity);

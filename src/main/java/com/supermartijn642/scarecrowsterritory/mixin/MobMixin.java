@@ -22,7 +22,7 @@ public class MobMixin {
     private void checkDespawn(CallbackInfo ci){
         //noinspection DataFlowIssue
         Mob mob = (Mob)(Object)this;
-        if((mob.level.getDifficulty() != Difficulty.PEACEFUL || !mob.shouldDespawnInPeaceful())
+        if((mob.level().getDifficulty() != Difficulty.PEACEFUL || !mob.shouldDespawnInPeaceful())
             && !mob.isPersistenceRequired() && !mob.requiresCustomPersistence()){
             if(!ScarecrowTracker.shouldEntityDespawn(mob)){
                 mob.setNoActionTime(0);

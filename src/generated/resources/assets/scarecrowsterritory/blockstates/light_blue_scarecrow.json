@@ -1,14 +1,18 @@
 {
   "variants": {
+    "facing=north,bottom=true": {
+      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom"
+    },
     "facing=south,bottom=true": {
       "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom",
       "y": 180
     },
-    "facing=north,bottom=true": {
-      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom"
+    "facing=west,bottom=true": {
+      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom",
+      "y": 270
     },
-    "facing=east,bottom=false": {
-      "model": "scarecrowsterritory:block/light_blue_scarecrow_top",
+    "facing=east,bottom=true": {
+      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom",
       "y": 90
     },
     "facing=north,bottom=false": {
@@ -18,17 +22,13 @@
       "model": "scarecrowsterritory:block/light_blue_scarecrow_top",
       "y": 180
     },
-    "facing=east,bottom=true": {
-      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom",
-      "y": 90
-    },
     "facing=west,bottom=false": {
       "model": "scarecrowsterritory:block/light_blue_scarecrow_top",
       "y": 270
     },
-    "facing=west,bottom=true": {
-      "model": "scarecrowsterritory:block/light_blue_scarecrow_bottom",
-      "y": 270
+    "facing=east,bottom=false": {
+      "model": "scarecrowsterritory:block/light_blue_scarecrow_top",
+      "y": 90
     }
   }
 }

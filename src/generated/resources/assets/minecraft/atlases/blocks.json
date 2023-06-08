@@ -46,6 +46,10 @@
     },
     {
       "type": "minecraft:single",
+      "resource": "minecraft:block/oak_log"
+    },
+    {
+      "type": "minecraft:single",
       "resource": "scarecrowsterritory:pink_scarecrow"
     },
     {

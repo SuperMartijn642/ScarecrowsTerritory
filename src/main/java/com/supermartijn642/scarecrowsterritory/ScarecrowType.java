@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -78,9 +77,9 @@ public enum ScarecrowType {
     public BlockProperties getBlockProperties(DyeColor color){
         switch(this){
             case PRIMITIVE:
-                return BlockProperties.create(Material.WOOL, color).sound(SoundType.WOOL).destroyTime(0.5f).explosionResistance(0.5f);
+                return BlockProperties.create().mapColor(color.getMapColor()).sound(SoundType.WOOL).destroyTime(0.5f).explosionResistance(0.5f);
         }
-        return BlockProperties.create(Material.AIR);
+        return BlockProperties.create().air();
     }
 
     public BlockShape getBlockShape(Direction facing, boolean bottom){

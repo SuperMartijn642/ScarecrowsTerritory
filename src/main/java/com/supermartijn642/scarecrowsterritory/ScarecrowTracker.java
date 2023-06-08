@@ -33,12 +33,12 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onEntityDespawn(MobSpawnEvent.AllowDespawn e){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level().isClientSide)
             return;
 
         Entity entity = e.getEntity();
         double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
-        if(isScarecrowInRange(e.getEntity().level, entity.position(), range)){
+        if(isScarecrowInRange(e.getEntity().level(), entity.position(), range)){
             e.setResult(Event.Result.DENY);
         }
     }

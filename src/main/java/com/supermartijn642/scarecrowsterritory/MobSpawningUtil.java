@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.scarecrowsterritory.extensions.ScarecrowMobExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -70,7 +71,7 @@ public class MobSpawningUtil {
                 int spawnX = pos.getX();
                 int spawnZ = pos.getZ();
                 MobSpawnSettings.SpawnerData spawner = null;
-                SpawnGroupData ilivingentitydata = null;
+                SpawnGroupData entityData = null;
                 int groupSize = Mth.ceil(level.random.nextFloat() * 4.0F);
                 int entitiesInGroup = 0;
 
@@ -95,21 +96,22 @@ public class MobSpawningUtil {
                     }
 
                     if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
-                        Mob mobentity = NaturalSpawner.getMobForSpawn(level, spawner.type);
-                        if(mobentity == null)
+                        Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type);
+                        if(entity == null)
                             return;
 
-                        mobentity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
-                        if(mobentity.checkSpawnRules(level, MobSpawnType.NATURAL) && mobentity.checkSpawnObstruction(level)){
-                            ilivingentitydata = mobentity.finalizeSpawn(level, level.getCurrentDifficultyAt(mobentity.blockPosition()), MobSpawnType.NATURAL, ilivingentitydata, (CompoundTag)null);
+                        ((ScarecrowMobExtension)entity).scarecrowsterritory$setSpawnedByScarecrow();
+                        entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        if(entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)){
+                            entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, (CompoundTag)null);
                             entitiesSpawned++;
                             entitiesInGroup++;
-                            level.addFreshEntityWithPassengers(mobentity);
-                            densityAdder.run(mobentity, chunk);
-                            if(entitiesSpawned >= mobentity.getMaxSpawnClusterSize())
+                            level.addFreshEntityWithPassengers(entity);
+                            densityAdder.run(entity, chunk);
+                            if(entitiesSpawned >= entity.getMaxSpawnClusterSize())
                                 return;
 
-                            if(mobentity.isMaxGroupSizeReached(entitiesInGroup))
+                            if(entity.isMaxGroupSizeReached(entitiesInGroup))
                                 break;
                         }
                     }

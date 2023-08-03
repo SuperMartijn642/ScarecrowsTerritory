@@ -151,6 +151,9 @@ public class MobSpawningUtil {
                     if(level.getSharedSpawnPos().closerThan(new Vec3d(spawnXCenter, y, spawnZCenter), 24.0D))
                         continue;
 
+                    if(!ScarecrowTracker.isScarecrowInRange(level, new Vec3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                        continue;
+
                     ChunkPos chunkpos = new ChunkPos(spawnPos);
                     if(!Objects.equals(chunkpos, chunk.getPos()) && !level.getChunkSource().isEntityTickingChunk(chunkpos))
                         continue;

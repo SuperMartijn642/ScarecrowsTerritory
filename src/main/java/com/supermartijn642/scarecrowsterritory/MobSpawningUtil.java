@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
@@ -180,36 +179,33 @@ public class MobSpawningUtil {
 
                     if(spawner == null){
                         Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
-                        if(!optional.isPresent()){
+                        if(!optional.isPresent())
                             break;
-                        }
 
                         spawner = optional.get();
                         groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
                     }
 
                     if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
-                        Mob mobentity = getMobForSpawn(level, spawner.type);
-                        if(mobentity == null){
+                        Mob entity = getMobForSpawn(level, spawner.type);
+                        if(entity == null)
                             return;
-                        }
 
-                        mobentity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
-                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobentity, level, spawnXCenter, y, spawnZCenter, null, MobSpawnType.NATURAL);
-                        if(canSpawn != -1 && (canSpawn == 1 || (mobentity.checkSpawnRules(level, MobSpawnType.NATURAL) && mobentity.checkSpawnObstruction(level)))){
-                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobentity, level, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, MobSpawnType.NATURAL))
-                                entityData = mobentity.finalizeSpawn(level, level.getCurrentDifficultyAt(mobentity.blockPosition()), MobSpawnType.NATURAL, entityData, (CompoundTag)null);
+                        entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
+                        entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(entity, level, spawnXCenter, y, spawnZCenter, null, MobSpawnType.NATURAL);
+                        if(canSpawn != -1 && (canSpawn == 1 || (entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)))){
+                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, level, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, MobSpawnType.NATURAL))
+                                entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
                             entitiesSpawned++;
                             entitiesInGroup++;
-                            level.addFreshEntityWithPassengers(mobentity);
-                            densityAdder.run(mobentity, chunk);
-                            if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(mobentity)){
+                            level.addFreshEntityWithPassengers(entity);
+                            densityAdder.run(entity, chunk);
+                            if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entity))
                                 return;
-                            }
 
-                            if(mobentity.isMaxGroupSizeReached(entitiesInGroup)){
+                            if(entity.isMaxGroupSizeReached(entitiesInGroup))
                                 break;
-                            }
                         }
                     }
                 }

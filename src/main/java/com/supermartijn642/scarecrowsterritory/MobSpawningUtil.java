@@ -139,7 +139,7 @@ public class MobSpawningUtil {
      */
     private static void spawnCategoryForChunk(MobCategory classification, ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
         BlockPos blockpos = getRandomPosWithin(level, chunk);
-        if(blockpos != null && blockpos.getY() >= 1){
+        if(blockpos.getY() >= level.getMinBuildHeight()){
             spawnCategoryForPosition(classification, level, chunk, blockpos, densityCheck, densityAdder);
         }
     }

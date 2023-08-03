@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.MobSpawnInfo;
@@ -185,6 +186,10 @@ public class MobSpawningUtil {
                     spawnPos.set(spawnX, y, spawnZ);
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
+
+                    if(!ScarecrowTracker.isScarecrowInRange(level, new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                        continue;
+
                     if(spawner == null){
                         spawner = getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
                         if(spawner == null){

@@ -9,6 +9,7 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
@@ -96,6 +97,9 @@ public class MobSpawningUtil {
                                 float spawnZCenter = spawnZ + 0.5F;
 
                                 if(worldSpawnPoint.distanceSq(spawnXCenter, spawnY, spawnZCenter) >= 576.0D){
+                                    if(!ScarecrowTracker.isScarecrowInRange(level, new Vec3d(spawnPos.getX() + 0.5, spawnPos.getY() + 0.5, spawnPos.getZ() + 0.5), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                                        continue;
+
                                     if(spawnEntry == null){
                                         spawnEntry = level.getSpawnListEntryForTypeAt(classification, spawnPos);
 

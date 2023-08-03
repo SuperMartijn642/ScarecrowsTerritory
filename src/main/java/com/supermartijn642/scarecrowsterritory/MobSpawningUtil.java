@@ -2,7 +2,6 @@ package com.supermartijn642.scarecrowsterritory;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.*;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -124,29 +123,28 @@ public class MobSpawningUtil {
      */
     private static void spawnCategoryForPosition(EntityClassification classification, ServerWorld level, Chunk chunk, BlockPos pos){
         ChunkGenerator<?> chunkgenerator = level.getChunkSource().getGenerator();
-        int entitiesSpawned = 0;
         int y = pos.getY();
         BlockState blockstate = chunk.getBlockState(pos);
         if(!blockstate.isRedstoneConductor(chunk, pos)){
             BlockPos.Mutable spawnPos = new BlockPos.Mutable();
-            int groupsSpawned = 0;
+            int entitiesSpawned = 0;
 
             // try spawning a group 3 times
-            while(groupsSpawned < 3){
+            for(int k = 0; k < 3; ++k){
                 int spawnX = pos.getX();
                 int spawnZ = pos.getZ();
-                Biome.SpawnListEntry spawnListEntry = null;
-                ILivingEntityData ilivingentitydata = null;
+                Biome.SpawnListEntry spawner = null;
+                ILivingEntityData entityData = null;
                 int groupSize = MathHelper.ceil(Math.random() * 4.0D);
                 int entitiesInGroup = 0;
 
                 // try spawning entities in the group
-                for(int i2 = 0; i2 < groupSize; i2++){
+                for(int i2 = 0; i2 < groupSize; ++i2){
                     spawnX += level.random.nextInt(6) - level.random.nextInt(6);
                     spawnZ += level.random.nextInt(6) - level.random.nextInt(6);
                     spawnPos.set(spawnX, y, spawnZ);
-                    float spawnXCenter = spawnX + 0.5F;
-                    float spawnZCenter = spawnZ + 0.5F;
+                    double spawnXCenter = (double)spawnX + 0.5D;
+                    double spawnZCenter = (double)spawnZ + 0.5D;
 
                     if(level.getSharedSpawnPos().closerThan(new Vec3d(spawnXCenter, y, spawnZCenter), 24.0D))
                         continue;
@@ -158,59 +156,55 @@ public class MobSpawningUtil {
                     if(!Objects.equals(chunkpos, chunk.getPos()) && !level.getChunkSource().isEntityTickingChunk(chunkpos))
                         continue;
 
-                    if(spawnListEntry == null){
-                        spawnListEntry = getSpawnList(chunkgenerator, classification, level.random, spawnPos, level);
-                        if(spawnListEntry == null){
+                    if(spawner == null){
+                        spawner = getSpawnList(chunkgenerator, classification, level.random, spawnPos, level);
+                        if(spawner == null)
                             break;
-                        }
 
-                        groupSize = spawnListEntry.minCount + level.random.nextInt(1 + spawnListEntry.maxCount - spawnListEntry.minCount);
+                        groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
                     }
 
-                    if(spawnListEntry.type.getCategory() == EntityClassification.MISC)
+                    if(spawner.type.getCategory() == EntityClassification.MISC)
                         continue;
 
-                    EntityType<?> entityType = spawnListEntry.type;
-                    if(!entityType.canSummon() || !getSpawnList(chunkgenerator, classification, spawnListEntry, spawnPos, level))
+                    EntityType<?> entityType = spawner.type;
+                    if(!entityType.canSummon() || !getSpawnList(chunkgenerator, classification, spawner, spawnPos, level))
                         continue;
 
                     EntitySpawnPlacementRegistry.PlacementType placementType = EntitySpawnPlacementRegistry.getPlacementType(entityType);
-                    if(!WorldEntitySpawner.isSpawnPositionOk(placementType, level, spawnPos, entityType) || !EntitySpawnPlacementRegistry.checkSpawnRules(entityType, level, SpawnReason.NATURAL, spawnPos, level.random) || !level.noCollision(entityType.getAABB((double)spawnXCenter, (double)y, (double)spawnZCenter))){
-                        continue;
-                    }
+                    if(WorldEntitySpawner.isSpawnPositionOk(placementType, level, spawnPos, entityType) && EntitySpawnPlacementRegistry.checkSpawnRules(entityType, level, SpawnReason.NATURAL, spawnPos, level.random) && level.noCollision(entityType.getAABB(spawnXCenter, y, spawnZCenter))){
 
-                    MobEntity mobEntity;
-                    try{
-                        Entity entity = entityType.create(level);
-                        if(!(entity instanceof MobEntity)){
-                            throw new IllegalStateException("Trying to spawn a non-mob: " + Registry.ENTITY_TYPE.getKey(entityType));
-                        }
+                        MobEntity entity;
+                        try{
+                            Entity e = entityType.create(level);
+                            if(!(e instanceof MobEntity)){
+                                throw new IllegalStateException("Trying to spawn a non-mob: " + Registry.ENTITY_TYPE.getKey(entityType));
+                            }
 
-                        mobEntity = (MobEntity)entity;
-                    }catch(Exception exception){
-                        System.err.println("Failed to create mob");
-                        exception.printStackTrace();
-                        return;
-                    }
-
-                    mobEntity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360, 0);
-                    int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(mobEntity, level, spawnXCenter, y, spawnZCenter, null, SpawnReason.NATURAL);
-                    if(canSpawn != -1 && (canSpawn == 0 || (!mobEntity.checkSpawnRules(level, SpawnReason.NATURAL) && mobEntity.checkSpawnObstruction(level)))){
-                        if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(mobEntity, level, spawnXCenter, y, spawnZCenter, null, SpawnReason.NATURAL))
-                            ilivingentitydata = mobEntity.finalizeSpawn(level, level.getCurrentDifficultyAt(mobEntity.getCommandSenderBlockPosition()), SpawnReason.NATURAL, ilivingentitydata, (CompoundNBT)null);
-                        entitiesSpawned++;
-                        entitiesInGroup++;
-                        level.addFreshEntity(mobEntity);
-                        if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(mobEntity)){
+                            entity = (MobEntity)e;
+                        }catch(Exception exception){
+                            System.err.println("Failed to create mob");
+                            exception.printStackTrace();
                             return;
                         }
 
-                        if(mobEntity.isMaxGroupSizeReached(entitiesInGroup)){
-                            break;
+                        entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
+                        entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(entity, level, spawnXCenter, y, spawnZCenter, null, SpawnReason.NATURAL);
+                        if(canSpawn != -1 && (canSpawn == 1 || (entity.checkSpawnRules(level, SpawnReason.NATURAL) && entity.checkSpawnObstruction(level)))){
+                            if(!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, level, (float)spawnXCenter, (float)y, (float)spawnZCenter, null, SpawnReason.NATURAL))
+                                entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.getCommandSenderBlockPosition()), SpawnReason.NATURAL, entityData, null);
+                            entitiesSpawned++;
+                            entitiesInGroup++;
+                            level.addFreshEntity(entity);
+                            if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entity))
+                                return;
+
+                            if(entity.isMaxGroupSizeReached(entitiesInGroup))
+                                break;
                         }
                     }
                 }
-                groupsSpawned++;
             }
         }
     }

@@ -3,6 +3,8 @@ package com.supermartijn642.scarecrowsterritory;
 import com.supermartijn642.core.ClientUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.concurrent.TickDelayedTask;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -36,10 +38,18 @@ public class ScarecrowTracker {
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level.isClientSide)
             return;
 
-        Entity entity = e.getEntity();
+        LivingEntity mob = e.getEntityLiving();
         double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
-        if(isScarecrowInRange(e.getEntityLiving().level, entity.position(), range)){
+        if(isScarecrowInRange(mob.level, mob.position(), range))
             e.setResult(Event.Result.DENY);
+        else if(mob.getPersistentData().getBoolean("spawnedByScarecrow") && mob instanceof MobEntity){
+            Entity entity = mob.level.getNearestPlayer(mob, -1);
+            if(entity == null){
+                if(((MobEntity)mob).removeWhenFarAway(range * range))
+                    e.setResult(Event.Result.ALLOW);
+                else
+                    mob.setNoActionTime(0);
+            }
         }
     }
 

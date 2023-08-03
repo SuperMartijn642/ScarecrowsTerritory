@@ -1,5 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.scarecrowsterritory.extensions.ScarecrowMobExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -97,6 +98,7 @@ public class MobSpawningUtil {
                         if(entity == null)
                             return;
 
+                        ((ScarecrowMobExtension)entity).scarecrowsterritory$setSpawnedByScarecrow();
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)){
                             entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);

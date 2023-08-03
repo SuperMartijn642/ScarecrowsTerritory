@@ -192,19 +192,18 @@ public class MobSpawningUtil {
 
                     if(spawner == null){
                         spawner = getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
-                        if(spawner == null){
+                        if(spawner == null)
                             break;
-                        }
 
                         groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
                     }
 
                     if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
                         MobEntity entity = getMobForSpawn(level, spawner.type);
-                        if(entity == null){
+                        if(entity == null)
                             return;
-                        }
 
+                        entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         int canSpawn = net.minecraftforge.common.ForgeHooks.canEntitySpawn(entity, level, spawnXCenter, y, spawnZCenter, null, SpawnReason.NATURAL);
                         if(canSpawn != -1 && (canSpawn == 1 || (entity.checkSpawnRules(level, SpawnReason.NATURAL) && entity.checkSpawnObstruction(level)))){
@@ -214,13 +213,11 @@ public class MobSpawningUtil {
                             entitiesInGroup++;
                             level.addFreshEntityWithPassengers(entity);
                             densityAdder.run(entity, chunk);
-                            if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entity)){
+                            if(entitiesSpawned >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entity))
                                 return;
-                            }
 
-                            if(entity.isMaxGroupSizeReached(entitiesInGroup)){
+                            if(entity.isMaxGroupSizeReached(entitiesInGroup))
                                 break;
-                            }
                         }
                     }
                 }

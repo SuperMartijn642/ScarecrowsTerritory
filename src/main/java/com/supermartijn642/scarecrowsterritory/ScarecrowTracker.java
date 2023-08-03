@@ -6,6 +6,7 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -36,10 +37,18 @@ public class ScarecrowTracker {
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level().isClientSide)
             return;
 
-        Entity entity = e.getEntity();
+        Mob mob = e.getEntity();
         double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
-        if(isScarecrowInRange(e.getEntity().level(), entity.position(), range)){
+        if(isScarecrowInRange(mob.level(), mob.position(), range))
             e.setResult(Event.Result.DENY);
+        else if(mob.getPersistentData().getBoolean("spawnedByScarecrow")){
+            Entity entity = mob.level().getNearestPlayer(mob, -1);
+            if(entity == null){
+                if(mob.removeWhenFarAway(range * range))
+                    e.setResult(Event.Result.ALLOW);
+                else
+                    mob.setNoActionTime(0);
+            }
         }
     }
 

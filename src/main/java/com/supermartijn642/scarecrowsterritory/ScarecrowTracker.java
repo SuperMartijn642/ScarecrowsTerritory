@@ -34,7 +34,7 @@ public class ScarecrowTracker {
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get())
             return true;
 
-        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
+        double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         return !isScarecrowInRange(level, pos, range);
     }
 
@@ -161,12 +161,11 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(World level, Vec3d center, double range){
-        double rangeSquared = range * range;
+    public static boolean isScarecrowInRange(World level, Vec3d pos, double range){
         Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
-
         for(BlockPos scarecrow : scarecrows){
-            if(center.squareDistanceTo(scarecrow.getX() + 0.5, scarecrow.getY() + 0.5, scarecrow.getZ() + 0.5) < rangeSquared)
+            Vec3d center = new Vec3d(scarecrow).addVector(0.5, 0.5, 0.5);
+            if(Math.abs(center.x - pos.x) <= range && Math.abs(center.y - pos.y) <= range && Math.abs(center.z - pos.z) <= range)
                 return true;
         }
 

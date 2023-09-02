@@ -39,7 +39,7 @@ public class ScarecrowTracker {
             return;
 
         LivingEntity mob = e.getEntityLiving();
-        double range = ScarecrowsTerritoryConfig.passiveMobRange.get();
+        double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         if(isScarecrowInRange(mob.level, mob.position(), range))
             e.setResult(Event.Result.DENY);
         else if(mob.getPersistentData().getBoolean("spawnedByScarecrow") && mob instanceof Mob){
@@ -187,12 +187,11 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(Level level, Vec3 center, double range){
-        double rangeSquared = range * range;
+    public static boolean isScarecrowInRange(Level level, Vec3 pos, double range){
         Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
-
         for(BlockPos scarecrow : scarecrows){
-            if(center.distanceToSqr(scarecrow.getX() + 0.5, scarecrow.getY() + 0.5, scarecrow.getZ() + 0.5) < rangeSquared)
+            Vec3 center = Vec3.atCenterOf(scarecrow);
+            if(Math.abs(center.x - pos.x) <= range && Math.abs(center.y - pos.y) <= range && Math.abs(center.z - pos.z) <= range)
                 return true;
         }
 

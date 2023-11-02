@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.event.ForgeEventFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -118,9 +119,8 @@ public class MobSpawningUtil {
     public static void spawnEntitiesInChunk(ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnState densityManager, boolean spawnPassives, boolean spawnHostiles, boolean spawnAnimals){
         level.getProfiler().push("spawner");
 
-        for(MobCategory classification : MobCategory.values()){
-            if(classification != MobCategory.MISC &&
-                (spawnPassives || !classification.isFriendly()) &&
+        for(MobCategory classification : NaturalSpawner.SPAWNING_CATEGORIES){
+            if((spawnPassives || !classification.isFriendly()) &&
                 (spawnHostiles || classification.isFriendly()) &&
                 (spawnAnimals || !classification.isPersistent()) &&
                 canSpawnForCategory(densityManager, classification, level)){
@@ -139,7 +139,7 @@ public class MobSpawningUtil {
      */
     private static void spawnCategoryForChunk(MobCategory classification, ServerLevel level, LevelChunk chunk, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
         BlockPos blockpos = getRandomPosWithin(level, chunk);
-        if(blockpos.getY() >= level.getMinBuildHeight()){
+        if(blockpos.getY() >= level.getMinBuildHeight() + 1){
             spawnCategoryForPosition(classification, level, chunk, blockpos, densityCheck, densityAdder);
         }
     }
@@ -178,7 +178,7 @@ public class MobSpawningUtil {
 
                     if(spawner == null){
                         Optional<MobSpawnSettings.SpawnerData> optional = getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
-                        if(!optional.isPresent())
+                        if(optional.isEmpty())
                             break;
 
                         spawner = optional.get();
@@ -192,7 +192,7 @@ public class MobSpawningUtil {
 
                         entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
-                        if(entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)){
+                        if(ForgeEventFactory.checkSpawnPosition(entity, level, MobSpawnType.NATURAL)){
                             entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
                             entitiesSpawned++;
                             entitiesInGroup++;

@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.11a
+- Fix missing Forge event check when spawning mobs around scarecrows
+
 ### Scarecrows' Territory 1.1.11
 - Passive mob spawning range is now square instead of spherical
 - Decreased default spawner activation range from 8 to 5 blocks

@@ -1,3 +1,7 @@
+### Scarecrows' Territory 1.1.11b
+- Added the option to require trophies from OpenBlocks Trophies
+- Added compatibility for In Control's spawning
+
 ### Scarecrows' Territory 1.1.11a
 - Fix missing Forge event check when spawning mobs around scarecrows
 

@@ -39,5 +39,11 @@ public class ScarecrowLanguageGenerator extends LanguageGenerator {
         this.translation("scarecrowsterritory.primitive_scarecrow.info.spawners", "Keeps spawners in a %1$d block range activated");
         this.translation("scarecrowsterritory.primitive_scarecrow.info.passive", "Allows passive mob spawning in a %1$d block range");
         this.translation("scarecrowsterritory.primitive_scarecrow.info.both", "Keeps spawners in a %1$d block range activated and allows passive mob spawning in a %2$d block range");
+        // Trophies integration
+        this.translation("scarecrowsterritory.primitive_scarecrow.info.trophies", "Allows mob from nearby trophies to spawn in a %d block range");
+        this.translation("scarecrowsterritory.primitive_scarecrow.trophy.success.single", "Allowing %s to spawn");
+        this.translation("scarecrowsterritory.primitive_scarecrow.trophy.success.multiple", "Allowing mobs from %s trophies to spawn");
+        this.translation("scarecrowsterritory.primitive_scarecrow.trophy.missing", "Place a trophy to allow mobs to spawn");
+        this.translation("scarecrowsterritory.primitive_scarecrow.trophy.too_many", "Too many trophies!");
     }
 }

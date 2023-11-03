@@ -173,6 +173,10 @@ public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlo
         return this.trophyToEntity.keySet();
     }
 
+    public boolean canTrophiesSpawn(EntityType<?> entityType){
+        return this.entityToTrophies.containsKey(entityType);
+    }
+
     @Override
     protected CompoundTag writeData(){
         return null;

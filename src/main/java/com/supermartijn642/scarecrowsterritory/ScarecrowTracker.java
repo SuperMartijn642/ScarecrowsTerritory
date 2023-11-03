@@ -209,4 +209,8 @@ public class ScarecrowTracker {
         }
         return closestPos;
     }
+
+    public static Set<BlockPos> getScarecrows(Level level){
+        return SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
+    }
 }

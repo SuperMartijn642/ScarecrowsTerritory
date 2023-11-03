@@ -36,6 +36,8 @@ repositories {
 dependencies {
     // Forge
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    // SpongePowered Mixin
+    annotationProcessor "org.spongepowered:mixin:0.8.4:processor"
 
     // Core library
     implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:${project.core_library_file}")
@@ -44,6 +46,8 @@ dependencies {
 
     // OpenBlocks Trophies
     implementation fg.deobf("curse.maven:openblocks-trophies-683319:${project.openblocks_trophies_file}")
+    // In Control
+    implementation fg.deobf("curse.maven:in-control-257356:${project.in_control_file}")
 
     // Just Enough Items
     runtimeOnly fg.deobf("curse.maven:jei-238222:${project.just_enough_items_file}")
@@ -124,6 +128,12 @@ task prepareDataResources(type: Sync) {
 tasks.whenTaskAdded {
     if (it.name == "prepareRunData")
         it.dependsOn "prepareDataResources"
+}
+
+// MixinGradle Settings
+mixin {
+    add sourceSets.main, "${project.mod_id}.mixins.refmap.json"
+    config "${project.mod_id}.mixins.json"
 }
 
 // CurseGradle settings for uploading to CurseForge

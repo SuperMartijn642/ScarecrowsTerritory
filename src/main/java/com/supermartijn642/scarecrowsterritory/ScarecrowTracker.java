@@ -185,7 +185,7 @@ public class ScarecrowTracker {
         }
     }
 
-    public static boolean isScarecrowInRange(Level level, Vec3 pos, double range){
+    public static boolean isScarecrowInRange(LevelAccessor level, Vec3 pos, double range){
         Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
         for(BlockPos scarecrow : scarecrows){
             Vec3 center = Vec3.atCenterOf(scarecrow);

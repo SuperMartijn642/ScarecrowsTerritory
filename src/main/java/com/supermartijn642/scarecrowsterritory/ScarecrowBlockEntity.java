@@ -174,7 +174,7 @@ public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlo
     }
 
     public boolean canTrophiesSpawn(EntityType<?> entityType){
-        return this.entityToTrophies.containsKey(entityType);
+        return this.satisfiesTrophyConditions() && this.entityToTrophies.containsKey(entityType);
     }
 
     @Override

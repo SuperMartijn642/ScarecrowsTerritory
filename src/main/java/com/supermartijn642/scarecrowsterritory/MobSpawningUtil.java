@@ -216,7 +216,7 @@ public class MobSpawningUtil {
                         entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         if(ForgeEventFactory.checkSpawnPosition(entity, level, MobSpawnType.NATURAL)){
-                            entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
+                            entityData = ForgeEventFactory.onFinalizeSpawn(entity, level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
                             entitiesSpawned++;
                             entitiesInGroup++;
                             level.addFreshEntityWithPassengers(entity);

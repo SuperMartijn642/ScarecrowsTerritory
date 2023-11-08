@@ -26,9 +26,6 @@ public class ScarecrowsTerritory {
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
         registerGenerators();
-
-        if(ENABLE_TROPHIES_INTEGRATION.get())
-            ScarecrowTrophyHighlighter.registerListeners();
     }
 
     private static void register(){

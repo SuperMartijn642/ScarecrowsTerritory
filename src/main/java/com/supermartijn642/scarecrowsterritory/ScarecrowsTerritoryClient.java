@@ -17,7 +17,9 @@ public class ScarecrowsTerritoryClient {
             }
         }
 
-        if(ScarecrowsTerritory.ENABLE_TROPHIES_INTEGRATION.get())
+        if(ScarecrowsTerritory.ENABLE_TROPHIES_INTEGRATION.get()){
             handler.registerAtlasSprite(TextureAtlases.getBlocks(), ScarecrowTrophyHighlighter.CONFIRMATION_SPRITE.getPath());
+            ScarecrowTrophyHighlighter.registerListeners();
+        }
     }
 }

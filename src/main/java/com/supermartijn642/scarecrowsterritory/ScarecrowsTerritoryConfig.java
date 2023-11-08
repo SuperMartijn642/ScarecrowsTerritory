@@ -19,6 +19,7 @@ public class ScarecrowsTerritoryConfig {
     public static final Supplier<Boolean> enableTrophyIntegration;
     public static final Supplier<Integer> trophyCheckRange;
     public static final Supplier<Integer> maxTrophies;
+    public static final Supplier<Double> forcedSpawnChance;
 
     public static final Supplier<Boolean> byPassGameStageCheck;
 
@@ -40,6 +41,7 @@ public class ScarecrowsTerritoryConfig {
         enableTrophyIntegration = builder.comment("Should the integration with OpenBlocks Trophies be enabled? If true, scarecrows will only spawn mobs for which their trophy is placed nearby.").gameRestart().define("enableTrophyIntegration", false);
         trophyCheckRange = builder.comment("What should be the range in blocks in which the scarecrow checks for trophies? A value of 2 would mean the scarecrow checks a 5x5x5 area around itself.").define("trophyCheckRange", 1, 1, 3);
         maxTrophies = builder.comment("What should be the maximum number of trophies for which the scarecrow will spawn mobs?").define("maxTrophies", 8, 1, 1000);
+        forcedSpawnChance = builder.comment("What should be the chance that the scarecrows spawn an entity from a surrounding trophy every tick?").define("forcedSpawnChance", 0, 0, 1d);
 
         builder.pop();
 

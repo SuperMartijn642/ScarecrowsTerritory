@@ -8,6 +8,7 @@ import mcjty.incontrol.spawner.SpawnerConditions;
 import mcjty.incontrol.spawner.SpawnerSystem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
@@ -114,5 +115,16 @@ public class SpawnerSystemMixin {
                     ci.setReturnValue(null);
             }
         }
+    }
+
+    @ModifyVariable(
+        method = "executeRule(ILmcjty/incontrol/spawner/SpawnerRule;Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/MobCategory;F)V",
+        at = @At("STORE"),
+        ordinal = 0
+    )
+    private static Entity markSpawnedEntity(Entity entity){
+        if(entity != null && replacedWithScarecrow.get())
+            entity.getPersistentData().putBoolean("scarecrowsterritory", true);
+        return entity;
     }
 }

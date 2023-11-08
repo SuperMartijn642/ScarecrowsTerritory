@@ -1,3 +1,14 @@
+### Scarecrows' Territory 1.1.11d
+- Added a config option whether to bypass In Control's game stage check
+- Added a config option to do additional spawns for mobs from surrounding trophies
+- Reworked In Control's game stage check bypass
+- Fixed spawn check for the number of surrounding trophies
+- Fixed missing finalize spawn event for vanilla mob spawning around scarecrows
+- Fixed crash on startup on dedicated server
+
+### Scarecrows' Territory 1.1.11c
+- Scarecrows will now always bypass In Control's game stage checks
+
 ### Scarecrows' Territory 1.1.11b
 - Added the option to require trophies from OpenBlocks Trophies
 - Added compatibility for In Control's spawning

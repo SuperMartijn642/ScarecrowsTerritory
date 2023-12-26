@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.*;
 
@@ -201,10 +201,10 @@ public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlo
 
                             entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
                             entity.moveTo(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, this.level.random.nextFloat() * 360.0F, 0.0F);
-                            if(!ForgeEventFactory.checkSpawnPosition((Mob)entity, (ServerLevelAccessor)this.level, MobSpawnType.NATURAL))
+                            if(!EventHooks.checkSpawnPosition((Mob)entity, (ServerLevelAccessor)this.level, MobSpawnType.NATURAL))
                                 continue;
 
-                            ForgeEventFactory.onFinalizeSpawn((Mob)entity, ((ServerLevelAccessor)this.level), this.level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, null, null);
+                            EventHooks.onFinalizeSpawn((Mob)entity, ((ServerLevelAccessor)this.level), this.level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, null, null);
                             if(((Mob)entity).isSpawnCancelled())
                                 continue;
 

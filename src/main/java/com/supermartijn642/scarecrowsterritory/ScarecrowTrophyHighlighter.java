@@ -18,7 +18,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import org.joml.Quaternionf;
 
 import java.util.Collection;
@@ -32,7 +32,7 @@ public class ScarecrowTrophyHighlighter {
     private static final BlockShape HIGHLIGHT_SHAPE = BlockShape.fullCube().shrink(0.2f);
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(ScarecrowTrophyHighlighter::renderWorld);
+        NeoForge.EVENT_BUS.addListener(ScarecrowTrophyHighlighter::renderWorld);
     }
 
     private static void renderWorld(RenderWorldEvent e){
@@ -91,7 +91,7 @@ public class ScarecrowTrophyHighlighter {
         float width = sprite.getU1() - sprite.getU0(), height = sprite.getV1() - sprite.getV0();
         poseStack.translate(scarecrowPos.getX() + 0.5, scarecrowPos.getY() + 3, scarecrowPos.getZ() + 0.5);
         poseStack.mulPose(new Quaternionf().rotateY((float)(Math.PI / 2 - Math.atan2(camera.z - scarecrowPos.getZ() - 0.5, camera.x - scarecrowPos.getX() - 0.5))));
-        poseStack.translate(- 0.5, 0, 0);
+        poseStack.translate(-0.5, 0, 0);
         poseStack.scale(1, -1, 1);
         ScreenUtils.drawTexture(poseStack, 0, 0, 1, 1, valid ? sprite.getU0() : sprite.getU0() + width / 2, sprite.getV0(), width / 2, height);
 

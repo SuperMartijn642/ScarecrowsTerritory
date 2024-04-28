@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.11e
+- Fixed spawners not visually being active when in range of a scarecrow
+
 ### Scarecrows' Territory 1.1.11d
 - Added a config option whether to bypass In Control's game stage check
 - Added a config option to do additional spawns for mobs from surrounding trophies

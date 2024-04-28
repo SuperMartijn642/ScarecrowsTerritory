@@ -6,6 +6,7 @@
   "refmap": "${mod_id}.mixins.refmap.json",
   "plugin": "${mod_package}.${mixin_package}.${mixin_plugin}",
   "mixins": [
+    "BaseSpawnerMixin",
     "in_control.SpawnerSystemMixin",
     "in_control.CommonRuleEvaluatorMixin"
   ],

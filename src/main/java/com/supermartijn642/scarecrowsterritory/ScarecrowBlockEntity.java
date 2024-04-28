@@ -21,7 +21,6 @@ import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
@@ -96,15 +95,6 @@ public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlo
 
     @Override
     public void update(){
-        if(ScarecrowsTerritoryConfig.loadSpawners.get()){
-            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.level, this.worldPosition, ScarecrowsTerritoryConfig.loadSpawnerRange.get());
-            for(BlockPos spawnerPos : spawners){
-                BlockEntity entity = this.level.getBlockEntity(spawnerPos);
-                if(entity instanceof SpawnerBlockEntity)
-                    AbstractSpawnerUtil.tickAbstractSpawner(((SpawnerBlockEntity)entity).getSpawner(), this.level, spawnerPos);
-            }
-        }
-
         if(ScarecrowsTerritory.ENABLE_TROPHIES_INTEGRATION.get()){
             // Increase the scan index
             int range = ScarecrowsTerritoryConfig.trophyCheckRange.get();

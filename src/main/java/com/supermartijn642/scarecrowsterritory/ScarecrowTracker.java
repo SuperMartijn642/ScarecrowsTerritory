@@ -127,16 +127,16 @@ public class ScarecrowTracker {
     }
 
     private static void onChunkLoad(Level level, LevelChunk chunk){
-        for(BlockPos pos : chunk.getBlockEntitiesPos()){
-            Runnable task = () -> {
+        Runnable task = () -> {
+            for(BlockPos pos : chunk.getBlockEntitiesPos()){
                 if(chunk.getBlockEntity(pos) instanceof ScarecrowBlockEntity)
                     addScarecrow(level, pos);
-            };
-            if(level.isClientSide())
-                ClientUtils.queueTask(task);
-            else
-                level.getServer().tell(new TickTask(0, task));
-        }
+            }
+        };
+        if(level.isClientSide())
+            ClientUtils.queueTask(task);
+        else
+            level.getServer().tell(new TickTask(0, task));
     }
 
     private static void onChunkUnload(Level level, LevelChunk chunk){

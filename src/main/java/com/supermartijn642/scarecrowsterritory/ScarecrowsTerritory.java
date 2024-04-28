@@ -17,7 +17,6 @@ public class ScarecrowsTerritory implements ModInitializer {
     @Override
     public void onInitialize(){
         ScarecrowTracker.registerListeners();
-        SpawnerTracker.registerListeners();
 
         register();
         registerGenerators();

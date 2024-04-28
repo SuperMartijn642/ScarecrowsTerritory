@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.11a
+- Fixed spawners not visually being active when in range of a scarecrow
+
 ### Scarecrows' Territory 1.1.11
 - Passive mob spawning range is now square instead of spherical
 - Decreased default spawner activation range from 8 to 5 blocks

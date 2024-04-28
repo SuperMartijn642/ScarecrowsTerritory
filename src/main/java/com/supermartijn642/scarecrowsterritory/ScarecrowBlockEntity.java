@@ -1,7 +1,6 @@
 package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.block.BaseBlockEntity;
-import com.supermartijn642.core.block.TickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -10,17 +9,13 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-
-import java.util.Set;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
  */
-public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlockEntity {
+public class ScarecrowBlockEntity extends BaseBlockEntity {
 
     private final ScarecrowType type;
 
@@ -56,18 +51,6 @@ public class ScarecrowBlockEntity extends BaseBlockEntity implements TickableBlo
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void update(){
-        if(ScarecrowsTerritoryConfig.loadSpawners.get()){
-            Set<BlockPos> spawners = SpawnerTracker.getSpawnersInRange(this.level, this.worldPosition, ScarecrowsTerritoryConfig.loadSpawnerRange.get());
-            for(BlockPos spawnerPos : spawners){
-                BlockEntity entity = this.level.getBlockEntity(spawnerPos);
-                if(entity instanceof SpawnerBlockEntity)
-                    AbstractSpawnerUtil.tickAbstractSpawner(((SpawnerBlockEntity)entity).getSpawner(), this.level, spawnerPos);
-            }
-        }
     }
 
     @Override

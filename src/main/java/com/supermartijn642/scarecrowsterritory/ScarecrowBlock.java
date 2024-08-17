@@ -30,7 +30,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -122,7 +121,7 @@ public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, Sim
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced){
+    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         boolean spawners = ScarecrowsTerritoryConfig.loadSpawners.get();
         boolean passive = ScarecrowsTerritoryConfig.passiveMobSpawning.get();
 

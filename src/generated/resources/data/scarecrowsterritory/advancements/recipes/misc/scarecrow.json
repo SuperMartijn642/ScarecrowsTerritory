@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "scarecrowsterritory:primitive_scarecrow"
+      "id": "scarecrowsterritory:primitive_scarecrow"
     },
     "title": {
       "translate": "scarecrowsterritory.advancement.recipes/misc/scarecrow.title"
@@ -27,9 +27,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:stick"
-            ]
+            "items": "minecraft:stick"
           }
         ]
       }

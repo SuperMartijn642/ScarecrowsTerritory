@@ -101,7 +101,7 @@ public class MobSpawningUtil {
                         ((ScarecrowMobExtension)entity).scarecrowsterritory$setSpawnedByScarecrow();
                         entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity.checkSpawnRules(level, MobSpawnType.NATURAL) && entity.checkSpawnObstruction(level)){
-                            entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData, null);
+                            entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.NATURAL, entityData);
                             entitiesSpawned++;
                             entitiesInGroup++;
                             level.addFreshEntityWithPassengers(entity);
@@ -128,13 +128,11 @@ public class MobSpawningUtil {
 
         // removed the player distance check here
 
-        if(entityType.canSummon() && NaturalSpawner.canSpawnMobAt(level, structureManager, chunkGenerator, classification, spawners, pos)){
-            SpawnPlacements.Type placementType = SpawnPlacements.getPlacementType(entityType);
-            if(!NaturalSpawner.isSpawnPositionOk(placementType, level, pos, entityType) ||
-                !SpawnPlacements.checkSpawnRules(entityType, level, MobSpawnType.NATURAL, pos, level.random))
-                return false;
-
-            return level.noCollision(entityType.getAABB(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
+        if(entityType.canSummon()
+            && NaturalSpawner.canSpawnMobAt(level, structureManager, chunkGenerator, classification, spawners, pos)
+            && SpawnPlacements.isSpawnPositionOk(entityType, level, pos)
+            && SpawnPlacements.checkSpawnRules(entityType, level, MobSpawnType.NATURAL, pos, level.random)){
+            return level.noCollision(entityType.getSpawnAABB(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
         }
 
         return false;

@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "scarecrowsterritory:primitive_scarecrow"
+      "id": "scarecrowsterritory:primitive_scarecrow"
     },
     "title": {
       "translate": "scarecrowsterritory.advancement.recipes/misc/scarecrow.title"
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:rods/wooden"
+            "items": "#forge:rods/wooden"
           }
         ]
       }

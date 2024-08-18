@@ -1,7 +1,5 @@
 package com.supermartijn642.scarecrowsterritory;
 
-import com.google.common.base.Suppliers;
-import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
@@ -11,8 +9,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.function.Supplier;
-
 /**
  * Created 7/7/2020 by SuperMartijn642
  */
@@ -20,7 +16,6 @@ import java.util.function.Supplier;
 public class ScarecrowsTerritory {
 
     public static final CreativeItemGroup GROUP = CreativeItemGroup.create("scarecrowsterritory", () -> ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE).asItem());
-    public static final Supplier<Boolean> ENABLE_TROPHIES_INTEGRATION = Suppliers.memoize(() -> ScarecrowsTerritoryConfig.enableTrophyIntegration.get() && CommonUtils.isModLoaded("obtrophies"));
 
     public ScarecrowsTerritory(){
         register();

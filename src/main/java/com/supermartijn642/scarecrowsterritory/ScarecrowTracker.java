@@ -195,22 +195,4 @@ public class ScarecrowTracker {
 
         return false;
     }
-
-    public static BlockPos getClosestScarecrow(Level level, BlockPos pos){
-        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
-        BlockPos closestPos = null;
-        double closest = Double.MAX_VALUE;
-        for(BlockPos scarecrow : scarecrows){
-            double distance = scarecrow.distSqr(pos);
-            if(distance < closest || closestPos == null){
-                closestPos = scarecrow;
-                closest = distance;
-            }
-        }
-        return closestPos;
-    }
-
-    public static Set<BlockPos> getScarecrows(Level level){
-        return SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
-    }
 }

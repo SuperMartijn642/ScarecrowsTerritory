@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "scarecrowsterritory:yellow_scarecrow"
+      "id": "scarecrowsterritory:yellow_scarecrow"
     },
     "title": {
       "translate": "scarecrowsterritory.advancement.recipes/misc/yellow_scarecrow.title"
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "scarecrowsterritory:primitive_scarecrows"
+            "items": "#scarecrowsterritory:primitive_scarecrows"
           }
         ]
       }

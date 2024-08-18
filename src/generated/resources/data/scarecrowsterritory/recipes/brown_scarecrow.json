@@ -5,10 +5,10 @@
       "tag": "scarecrowsterritory:primitive_scarecrows"
     },
     {
-      "tag": "forge:dyes/brown"
+      "tag": "c:dyes/brown"
     }
   ],
   "result": {
-    "item": "scarecrowsterritory:brown_scarecrow"
+    "id": "scarecrowsterritory:brown_scarecrow"
   }
 }

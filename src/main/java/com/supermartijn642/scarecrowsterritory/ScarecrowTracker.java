@@ -12,40 +12,39 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.event.TickEvent;
-import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.MobDespawnEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.util.*;
 
 /**
  * Created 1/13/2021 by SuperMartijn642
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
 public class ScarecrowTracker {
 
     private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
     private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
     @SubscribeEvent
-    public static void onEntityDespawn(MobSpawnEvent.AllowDespawn e){
+    public static void onEntityDespawn(MobDespawnEvent e){
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level().isClientSide)
             return;
 
         Mob mob = e.getEntity();
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         if(isScarecrowInRange(mob.level(), mob.position(), range))
-            e.setResult(Event.Result.DENY);
+            e.setResult(MobDespawnEvent.Result.DENY);
         else if(mob.getPersistentData().getBoolean("spawnedByScarecrow")){
             Entity entity = mob.level().getNearestPlayer(mob, -1);
             if(entity == null){
                 if(mob.removeWhenFarAway(range * range))
-                    e.setResult(Event.Result.ALLOW);
+                    e.setResult(MobDespawnEvent.Result.ALLOW);
                 else
                     mob.setNoActionTime(0);
             }
@@ -53,8 +52,8 @@ public class ScarecrowTracker {
     }
 
     @SubscribeEvent
-    public static void onWorldTick(TickEvent.LevelTickEvent e){
-        Level level = e.level;
+    public static void onWorldTick(LevelTickEvent.Pre e){
+        Level level = e.getLevel();
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
@@ -194,23 +193,5 @@ public class ScarecrowTracker {
         }
 
         return false;
-    }
-
-    public static BlockPos getClosestScarecrow(Level level, BlockPos pos){
-        Set<BlockPos> scarecrows = SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
-        BlockPos closestPos = null;
-        double closest = Double.MAX_VALUE;
-        for(BlockPos scarecrow : scarecrows){
-            double distance = scarecrow.distSqr(pos);
-            if(distance < closest || closestPos == null){
-                closestPos = scarecrow;
-                closest = distance;
-            }
-        }
-        return closestPos;
-    }
-
-    public static Set<BlockPos> getScarecrows(Level level){
-        return SCARECROWS_PER_WORLD.getOrDefault(level, Collections.emptySet());
     }
 }

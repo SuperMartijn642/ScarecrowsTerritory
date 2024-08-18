@@ -10,13 +10,13 @@
       "item": "minecraft:carved_pumpkin"
     },
     "B": {
-      "tag": "forge:rods/wooden"
+      "tag": "c:rods/wooden"
     },
     "C": {
       "item": "minecraft:hay_block"
     }
   },
   "result": {
-    "item": "scarecrowsterritory:primitive_scarecrow"
+    "id": "scarecrowsterritory:primitive_scarecrow"
   }
 }

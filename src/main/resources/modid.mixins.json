@@ -3,11 +3,8 @@
   "minVersion": "${mixin_minimum_version}",
   "package": "${mod_package}.${mixin_package}",
   "compatibilityLevel": "${mixin_compatibility_level}",
-  "plugin": "${mod_package}.${mixin_package}.${mixin_plugin}",
   "mixins": [
-    "BaseSpawnerMixin",
-    "in_control.SpawnerSystemMixin",
-    "in_control.CommonRuleEvaluatorMixin"
+    "BaseSpawnerMixin"
   ],
   "client": [],
   "server": [],

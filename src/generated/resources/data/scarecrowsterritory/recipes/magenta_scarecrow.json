@@ -5,10 +5,10 @@
       "tag": "scarecrowsterritory:primitive_scarecrows"
     },
     {
-      "tag": "forge:dyes/magenta"
+      "tag": "c:dyes/magenta"
     }
   ],
   "result": {
-    "item": "scarecrowsterritory:magenta_scarecrow"
+    "id": "scarecrowsterritory:magenta_scarecrow"
   }
 }

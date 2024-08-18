@@ -31,7 +31,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
@@ -121,15 +120,9 @@ public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, Sim
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, @Nullable BlockGetter level, Consumer<Component> info, boolean advanced){
+    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         boolean spawners = ScarecrowsTerritoryConfig.loadSpawners.get();
         boolean passive = ScarecrowsTerritoryConfig.passiveMobSpawning.get();
-
-        if(ScarecrowsTerritory.ENABLE_TROPHIES_INTEGRATION.get()){
-            Component passiveRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.passiveMobRange.get())).color(ChatFormatting.GOLD).get();
-            info.accept(TextComponents.translation("scarecrowsterritory.primitive_scarecrow.info.trophies", passiveRange).color(ChatFormatting.GRAY).get());
-            return;
-        }
 
         if(spawners && passive){
             Component spawnerRange = TextComponents.number(Math.round(ScarecrowsTerritoryConfig.loadSpawnerRange.get())).color(ChatFormatting.GOLD).get();

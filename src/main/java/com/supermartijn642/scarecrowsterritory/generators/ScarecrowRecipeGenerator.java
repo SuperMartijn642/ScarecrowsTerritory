@@ -33,7 +33,7 @@ public class ScarecrowRecipeGenerator extends RecipeGenerator {
             .unlockedBy(Tags.Items.RODS_WOODEN);
 
         // Colored scarecrows
-        TagKey<Item> scarecrowTag = TagKey.create(Registries.ITEM, new ResourceLocation("scarecrowsterritory", "primitive_scarecrows"));
+        TagKey<Item> scarecrowTag = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("scarecrowsterritory", "primitive_scarecrows"));
         for(DyeColor color : DyeColor.values()){
             this.shapeless(ScarecrowType.PRIMITIVE.items.get(color))
                 .input(scarecrowTag)

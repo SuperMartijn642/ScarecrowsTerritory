@@ -21,6 +21,7 @@ public class ScarecrowsTerritory {
         register();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
         registerGenerators();
+        ScarecrowsTerritoryConfig.init();
     }
 
     private static void register(){

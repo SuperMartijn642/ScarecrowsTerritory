@@ -21,6 +21,7 @@ public class ScarecrowsTerritory {
         if(CommonUtils.getEnvironmentSide().isClient())
             ScarecrowsTerritoryClient.register();
         registerGenerators();
+        ScarecrowsTerritoryConfig.init();
     }
 
     private static void register(){

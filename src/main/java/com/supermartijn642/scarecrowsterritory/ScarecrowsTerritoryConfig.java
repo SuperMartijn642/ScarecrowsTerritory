@@ -32,4 +32,7 @@ public class ScarecrowsTerritoryConfig {
         builder.build();
     }
 
+    public static void init(){
+        // Force this class to be loaded
+    }
 }

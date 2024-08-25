@@ -20,6 +20,7 @@ public class ScarecrowsTerritory implements ModInitializer {
 
         register();
         registerGenerators();
+        ScarecrowsTerritoryConfig.init();
     }
 
     private static void register(){

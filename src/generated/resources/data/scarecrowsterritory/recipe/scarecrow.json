@@ -6,15 +6,9 @@
     " B "
   ],
   "key": {
-    "A": {
-      "item": "minecraft:carved_pumpkin"
-    },
-    "B": {
-      "item": "minecraft:stick"
-    },
-    "C": {
-      "item": "minecraft:hay_block"
-    }
+    "A": "minecraft:carved_pumpkin",
+    "B": "minecraft:stick",
+    "C": "minecraft:hay_block"
   },
   "result": {
     "id": "scarecrowsterritory:primitive_scarecrow"

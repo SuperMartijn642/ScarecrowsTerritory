@@ -1,12 +1,8 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "tag": "scarecrowsterritory:primitive_scarecrows"
-    },
-    {
-      "tag": "c:dyes/light_blue"
-    }
+    "#scarecrowsterritory:primitive_scarecrows",
+    "#c:dyes/light_blue"
   ],
   "result": {
     "id": "scarecrowsterritory:light_blue_scarecrow"

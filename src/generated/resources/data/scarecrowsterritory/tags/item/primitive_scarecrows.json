@@ -1,21 +1,21 @@
 {
   "replace": false,
   "values": [
-    "scarecrowsterritory:red_scarecrow",
-    "scarecrowsterritory:pink_scarecrow",
-    "scarecrowsterritory:orange_scarecrow",
-    "scarecrowsterritory:lime_scarecrow",
-    "scarecrowsterritory:gray_scarecrow",
-    "scarecrowsterritory:brown_scarecrow",
     "scarecrowsterritory:light_blue_scarecrow",
+    "scarecrowsterritory:lime_scarecrow",
+    "scarecrowsterritory:orange_scarecrow",
+    "scarecrowsterritory:white_scarecrow",
+    "scarecrowsterritory:yellow_scarecrow",
+    "scarecrowsterritory:gray_scarecrow",
+    "scarecrowsterritory:magenta_scarecrow",
+    "scarecrowsterritory:cyan_scarecrow",
+    "scarecrowsterritory:black_scarecrow",
+    "scarecrowsterritory:pink_scarecrow",
+    "scarecrowsterritory:brown_scarecrow",
+    "scarecrowsterritory:light_gray_scarecrow",
     "scarecrowsterritory:green_scarecrow",
     "scarecrowsterritory:primitive_scarecrow",
-    "scarecrowsterritory:cyan_scarecrow",
-    "scarecrowsterritory:white_scarecrow",
     "scarecrowsterritory:blue_scarecrow",
-    "scarecrowsterritory:magenta_scarecrow",
-    "scarecrowsterritory:black_scarecrow",
-    "scarecrowsterritory:light_gray_scarecrow",
-    "scarecrowsterritory:yellow_scarecrow"
+    "scarecrowsterritory:red_scarecrow"
   ]
 }

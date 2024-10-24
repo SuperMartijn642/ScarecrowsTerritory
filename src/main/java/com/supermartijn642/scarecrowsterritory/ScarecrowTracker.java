@@ -4,9 +4,9 @@ import com.supermartijn642.core.ClientUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -57,7 +57,7 @@ public class ScarecrowTracker {
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
-        if(!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
+        if(!((ServerLevel)level).getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
             return;
 
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
@@ -76,8 +76,9 @@ public class ScarecrowTracker {
         NaturalSpawner.SpawnState entityDensityManager = level.getChunkSource().getLastSpawnState();
         if(entityDensityManager != null){
             boolean spawnAnimals = level.getLevelData().getGameTime() % 400L == 0L;
-            boolean spawnHostiles = level.getDifficulty() != Difficulty.PEACEFUL;
-            MobSpawningUtil.spawnEntitiesInChunk(level, chunk, entityDensityManager, true, spawnHostiles, spawnAnimals);
+            boolean spawnHostiles = level.getServer().isSpawningMonsters();
+            List<MobCategory> categories = MobSpawningUtil.getFilteredSpawningCategories(entityDensityManager, true, spawnHostiles, spawnAnimals);
+            MobSpawningUtil.spawnEntitiesInChunk(level, chunk, entityDensityManager, categories);
         }
     }
 
@@ -145,7 +146,7 @@ public class ScarecrowTracker {
         if(e.getLevel().isClientSide())
             ClientUtils.queueTask(task);
         else
-            e.getLevel().getServer().tell(new TickTask(0, task));
+            e.getLevel().getServer().schedule(new TickTask(0, task));
     }
 
     @SubscribeEvent

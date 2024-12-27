@@ -37,6 +37,7 @@ public class ScarecrowsTerritory {
         GeneratorRegistrationHandler handler = GeneratorRegistrationHandler.get("scarecrowsterritory");
         handler.addGenerator(ScarecrowModelGenerator::new);
         handler.addGenerator(ScarecrowBlockStateGenerator::new);
+        handler.addGenerator(ScarecrowItemInfoGenerator::new);
         handler.addGenerator(ScarecrowLanguageGenerator::new);
         handler.addGenerator(ScarecrowLootTableGenerator::new);
         handler.addGenerator(ScarecrowRecipeGenerator::new);

@@ -28,12 +28,12 @@ public class MobSpawningUtil {
     /**
      * {@link NaturalSpawner#getFilteredSpawningCategories(NaturalSpawner.SpawnState, boolean, boolean, boolean)}
      */
-    public static List<MobCategory> getFilteredSpawningCategories(NaturalSpawner.SpawnState spawnState, boolean spawnFriendlies, boolean spawnEnemies, boolean spawnAnimals) {
+    public static List<MobCategory> getFilteredSpawningCategories(NaturalSpawner.SpawnState spawnState, boolean spawnFriendlies, boolean spawnEnemies, boolean spawnAnimals){
         List<MobCategory> list = new ArrayList<>(NaturalSpawner.SPAWNING_CATEGORIES.length);
-        for (MobCategory category : NaturalSpawner.SPAWNING_CATEGORIES) {
-            if ((spawnFriendlies || !category.isFriendly())
+        for(MobCategory category : NaturalSpawner.SPAWNING_CATEGORIES){
+            if((spawnFriendlies || !category.isFriendly())
                 && (spawnEnemies || category.isFriendly())
-                && (spawnAnimals || !category.isPersistent())) {
+                && (spawnAnimals || !category.isPersistent())){
                 list.add(category);
             }
         }
@@ -105,16 +105,16 @@ public class MobSpawningUtil {
                             break;
 
                         spawner = optional.get();
-                        groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
+                        groupSize = spawner.minCount() + level.random.nextInt(1 + spawner.maxCount() - spawner.minCount());
                     }
 
-                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
-                        Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type);
+                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type(), spawnPos, chunk)){
+                        Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type());
                         if(entity == null)
                             return;
 
                         ((ScarecrowMobExtension)entity).scarecrowsterritory$setSpawnedByScarecrow();
-                        entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        entity.snapTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         if(entity.checkSpawnRules(level, EntitySpawnReason.NATURAL) && entity.checkSpawnObstruction(level)){
                             entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.NATURAL, entityData);
                             entitiesSpawned++;
@@ -137,7 +137,7 @@ public class MobSpawningUtil {
      * {@link NaturalSpawner#isValidSpawnPostitionForType(ServerLevel, MobCategory, StructureManager, ChunkGenerator, MobSpawnSettings.SpawnerData, BlockPos.MutableBlockPos, double)}
      */
     private static boolean isValidSpawnPositionForType(ServerLevel level, MobCategory classification, StructureManager structureManager, ChunkGenerator chunkGenerator, MobSpawnSettings.SpawnerData spawners, BlockPos.MutableBlockPos pos){
-        EntityType<?> entityType = spawners.type;
+        EntityType<?> entityType = spawners.type();
         if(entityType.getCategory() == MobCategory.MISC)
             return false;
 

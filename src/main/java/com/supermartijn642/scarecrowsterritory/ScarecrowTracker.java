@@ -41,7 +41,7 @@ public class ScarecrowTracker {
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         if(isScarecrowInRange(mob.level(), mob.position(), range))
             e.setResult(Event.Result.DENY);
-        else if(mob.getPersistentData().getBoolean("spawnedByScarecrow")){
+        else if(mob.getPersistentData().getBooleanOr("spawnedByScarecrow", false)){
             Entity entity = mob.level().getNearestPlayer(mob, -1);
             if(entity == null){
                 if(mob.removeWhenFarAway(range * range))

@@ -106,16 +106,16 @@ public class MobSpawningUtil {
                             break;
 
                         spawner = optional.get();
-                        groupSize = spawner.minCount + level.random.nextInt(1 + spawner.maxCount - spawner.minCount);
+                        groupSize = spawner.minCount() + level.random.nextInt(1 + spawner.maxCount() - spawner.minCount());
                     }
 
-                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type, spawnPos, chunk)){
-                        Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type);
+                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type(), spawnPos, chunk)){
+                        Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type());
                         if(entity == null)
                             return;
 
                         entity.getPersistentData().putBoolean("spawnedByScarecrow", true);
-                        entity.moveTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        entity.snapTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
                         if(ForgeEventFactory.checkSpawnPosition(entity, level, EntitySpawnReason.NATURAL)){
                             entityData = ForgeEventFactory.onFinalizeSpawn(entity, level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.NATURAL, entityData);
                             entitiesSpawned++;
@@ -138,7 +138,7 @@ public class MobSpawningUtil {
      * {@link NaturalSpawner#isValidSpawnPostitionForType(ServerLevel, MobCategory, StructureManager, ChunkGenerator, MobSpawnSettings.SpawnerData, BlockPos.MutableBlockPos, double)}
      */
     private static boolean isValidSpawnPositionForType(ServerLevel level, MobCategory classification, StructureManager structureManager, ChunkGenerator chunkGenerator, MobSpawnSettings.SpawnerData spawners, BlockPos.MutableBlockPos pos){
-        EntityType<?> entityType = spawners.type;
+        EntityType<?> entityType = spawners.type();
         if(entityType.getCategory() == MobCategory.MISC)
             return false;
 

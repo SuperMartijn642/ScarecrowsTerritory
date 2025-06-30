@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -88,15 +89,15 @@ public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, Sim
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving){
-        if(this.type.is2BlocksHigh() && state.getBlock() != newState.getBlock()){
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving){
+        if(this.type.is2BlocksHigh()){
             boolean bottom = state.getValue(BOTTOM);
             BlockState state1 = level.getBlockState(bottom ? pos.above() : pos.below());
             if(state1.getBlock() == state.getBlock() && state1.getValue(BOTTOM) != bottom)
                 level.setBlockAndUpdate(bottom ? pos.above() : pos.below(),
                     state1.getValue(WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState());
         }
-        super.onRemove(state, level, pos, newState, isMoving);
+        super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
     }
 
     @Override
@@ -122,7 +123,7 @@ public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, Sim
     }
 
     @Override
-    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
+    public void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         boolean spawners = ScarecrowsTerritoryConfig.loadSpawners.get();
         boolean passive = ScarecrowsTerritoryConfig.passiveMobSpawning.get();
 

@@ -12,13 +12,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.*;
@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * Created 1/13/2021 by SuperMartijn642
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber
 public class ScarecrowTracker {
 
     private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
@@ -40,12 +40,12 @@ public class ScarecrowTracker {
         Mob mob = e.getEntity();
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         if(isScarecrowInRange(mob.level(), mob.position(), range))
-            e.setResult(Event.Result.DENY);
+            e.setResult(Result.DENY);
         else if(mob.getPersistentData().getBooleanOr("spawnedByScarecrow", false)){
             Entity entity = mob.level().getNearestPlayer(mob, -1);
             if(entity == null){
                 if(mob.removeWhenFarAway(range * range))
-                    e.setResult(Event.Result.ALLOW);
+                    e.setResult(Result.ALLOW);
                 else
                     mob.setNoActionTime(0);
             }

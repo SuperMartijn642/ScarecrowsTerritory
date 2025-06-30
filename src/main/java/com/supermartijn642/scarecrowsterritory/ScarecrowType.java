@@ -6,7 +6,7 @@ import com.supermartijn642.core.block.BlockShape;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.ItemProperties;
 import com.supermartijn642.core.registry.RegistrationHandler;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.DyeColor;
@@ -98,12 +98,12 @@ public enum ScarecrowType {
         return new ScarecrowBlockEntity(this, pos, state);
     }
 
-    public RenderType getRenderLayer(){
+    public ChunkSectionLayer getRenderLayer(){
         switch(this){
             case PRIMITIVE:
-                return RenderType.translucent();
+                return ChunkSectionLayer.TRANSLUCENT;
         }
-        return RenderType.solid();
+        return ChunkSectionLayer.SOLID;
     }
 
     public boolean is2BlocksHigh(){

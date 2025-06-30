@@ -1,12 +1,11 @@
 package com.supermartijn642.scarecrowsterritory;
 
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.scarecrowsterritory.generators.*;
 import net.minecraft.world.item.DyeColor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 
 /**
@@ -19,7 +18,8 @@ public class ScarecrowsTerritory {
 
     public ScarecrowsTerritory(){
         register();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
+        if(CommonUtils.getEnvironmentSide().isClient())
+            ScarecrowsTerritoryClient.register();
         registerGenerators();
         ScarecrowsTerritoryConfig.init();
     }

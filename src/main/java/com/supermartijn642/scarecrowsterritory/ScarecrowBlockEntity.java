@@ -2,7 +2,6 @@ package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.block.BaseBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -11,6 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * Created 11/30/2020 by SuperMartijn642
@@ -54,11 +55,10 @@ public class ScarecrowBlockEntity extends BaseBlockEntity {
     }
 
     @Override
-    protected CompoundTag writeData(){
-        return null;
+    protected void writeData(ValueOutput output){
     }
 
     @Override
-    protected void readData(CompoundTag compound){
+    protected void readData(ValueInput input){
     }
 }

@@ -1,4 +1,4 @@
-// 1.21.4	2024-12-27T17:17:05.1193308	Core Lib Generators
+// 1.21.5	2025-06-30T14:31:33.0584313	Core Lib Generators
 1e97a1ddd67633119639a6dfb3f98df293bc6713 assets/minecraft/atlases/blocks.json
 18b98d07b33807a5715a428c6505531f3d70b4a3 assets/scarecrowsterritory/blockstates/black_scarecrow.json
 552b750eade44aaf67dde39680bf532afef22e01 assets/scarecrowsterritory/blockstates/blue_scarecrow.json
@@ -81,8 +81,8 @@ f1bf16bc2d5165cd6eae795daa649d933b694e08 assets/scarecrowsterritory/models/item/
 b7057d7a9aefdad4bf0a1187e696c16151621ba1 assets/scarecrowsterritory/models/item/red_scarecrow.json
 3049a0a074b2e9aac758304c53d7aecabf28f73c assets/scarecrowsterritory/models/item/white_scarecrow.json
 8423822f19ecfd5602625066deb1dc49c1e49edf assets/scarecrowsterritory/models/item/yellow_scarecrow.json
-f3b1fa1f96f87444ce0d249a7d4d1be35f3e3d94 data/alexsmobs/tags/block/crow_fears.json
-7ddde0cb917a8770fbb1236972826d48c4b97c6d data/minecraft/tags/block/mineable/axe.json
+2ff4e108e523480cfdf64ffccd2ca9d14f767c41 data/alexsmobs/tags/block/crow_fears.json
+6a580f59a27d9860e191945b5f17445d9cf2235e data/minecraft/tags/block/mineable/axe.json
 99cf175e8bb2631aa9c649ad5f7f32c2c43fa48b data/scarecrowsterritory/advancement/recipes/misc/black_scarecrow.json
 bd5d3456dcdec28186e17a55adc7d4f1fd4a9b9d data/scarecrowsterritory/advancement/recipes/misc/blue_scarecrow.json
 5334f2b8ab0cda2f993d68375a728607ce8c5b47 data/scarecrowsterritory/advancement/recipes/misc/brown_scarecrow.json
@@ -133,4 +133,4 @@ b73356ae42770d6715891541dbb9da68d8f24617 data/scarecrowsterritory/recipe/primiti
 d0592bd0940f0936c45aca12d1f2cc0f1cacbae1 data/scarecrowsterritory/recipe/scarecrow.json
 8f244abb0021e67013217f36ac29c938a65f09bc data/scarecrowsterritory/recipe/white_scarecrow.json
 54c9a85acf3e4871167e3030940d5aee5c183951 data/scarecrowsterritory/recipe/yellow_scarecrow.json
-b4c03d873ee2559a229a83310636847132bd477b data/scarecrowsterritory/tags/item/primitive_scarecrows.json
+569ff8c1e0de6f8ff35670d92dcdee345623fd7f data/scarecrowsterritory/tags/item/primitive_scarecrows.json

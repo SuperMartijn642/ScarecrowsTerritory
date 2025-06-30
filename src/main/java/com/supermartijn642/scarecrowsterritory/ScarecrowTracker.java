@@ -25,7 +25,7 @@ import java.util.*;
 /**
  * Created 1/13/2021 by SuperMartijn642
  */
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber
 public class ScarecrowTracker {
 
     private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
@@ -40,7 +40,7 @@ public class ScarecrowTracker {
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
         if(isScarecrowInRange(mob.level(), mob.position(), range))
             e.setResult(MobDespawnEvent.Result.DENY);
-        else if(mob.getPersistentData().getBoolean("spawnedByScarecrow")){
+        else if(mob.getPersistentData().getBooleanOr("spawnedByScarecrow", false)){
             Entity entity = mob.level().getNearestPlayer(mob, -1);
             if(entity == null){
                 if(mob.removeWhenFarAway(range * range))

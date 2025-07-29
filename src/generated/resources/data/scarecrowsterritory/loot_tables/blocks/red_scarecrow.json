@@ -10,8 +10,8 @@
       ],
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "scarecrowsterritory:red_scarecrow"
+          "name": "scarecrowsterritory:red_scarecrow",
+          "type": "minecraft:item"
         }
       ]
     }

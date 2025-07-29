@@ -1,3 +1,7 @@
+### Scarecrows' Territory 1.1.11d
+- Removed OpenBlocks Trophies and In Control integration
+- Fixed crash when In Control 9.3 or newer is installed
+
 ### Scarecrows' Territory 1.1.11e
 - Fixed spawners not visually being active when in range of a scarecrow
 

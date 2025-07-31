@@ -1,0 +1,22 @@
+{
+    "scarecrowsterritory.item_group": "カカシ",
+    "scarecrowsterritory.block.black_scarecrow": "黒色のカカシ",
+    "scarecrowsterritory.block.blue_scarecrow": "青色のカカシ",
+    "scarecrowsterritory.block.brown_scarecrow": "茶色のカカシ",
+    "scarecrowsterritory.block.cyan_scarecrow": "青緑色のカカシ",
+    "scarecrowsterritory.block.gray_scarecrow": "灰色のカカシ",
+    "scarecrowsterritory.block.green_scarecrow": "緑色のカカシ",
+    "scarecrowsterritory.block.light_blue_scarecrow": "空色のカカシ",
+    "scarecrowsterritory.block.light_gray_scarecrow": "薄灰色のカカシ",
+    "scarecrowsterritory.block.lime_scarecrow": "黄緑色のカカシ",
+    "scarecrowsterritory.block.magenta_scarecrow": "赤紫色のカカシ",
+    "scarecrowsterritory.block.orange_scarecrow": "橙色のカカシ",
+    "scarecrowsterritory.block.pink_scarecrow": "桃色のカカシ",
+    "scarecrowsterritory.block.primitive_scarecrow": "紫色のカカシ",
+    "scarecrowsterritory.block.red_scarecrow": "赤色のカカシ",
+    "scarecrowsterritory.block.white_scarecrow": "白色のカカシ",
+    "scarecrowsterritory.block.yellow_scarecrow": "黄色のカカシ",
+    "scarecrowsterritory.primitive_scarecrow.info.spawners": "%1$dブロック以内のスポナーを稼働させます。",
+    "scarecrowsterritory.primitive_scarecrow.info.passive": "%1$dブロック以内に動物がスポーンするようになります。",
+    "scarecrowsterritory.primitive_scarecrow.info.both": "%1$dブロック以内のスポナーを稼働させ、%2$dブロック以内に動物がスポーンするようになります。"
+}

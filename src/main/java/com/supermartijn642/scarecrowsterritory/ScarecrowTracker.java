@@ -40,7 +40,7 @@ public class ScarecrowTracker {
     }
 
     public static boolean shouldEntityDespawn(Mob mob){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || mob.level().isClientSide)
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || mob.level().isClientSide())
             return true;
 
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
@@ -48,7 +48,7 @@ public class ScarecrowTracker {
     }
 
     private static void onWorldTick(Level level){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide()
             || !(level instanceof ServerLevel) || level.isDebug())
             return;
 

@@ -29,7 +29,7 @@ public class MobMixin implements ScarecrowMobExtension {
     private void checkDespawnHead(CallbackInfo ci){
         //noinspection DataFlowIssue
         Mob mob = (Mob)(Object)this;
-        if((mob.level().getDifficulty() != Difficulty.PEACEFUL || !mob.shouldDespawnInPeaceful())
+        if((mob.level().getDifficulty() != Difficulty.PEACEFUL || !mob.getType().isAllowedInPeaceful())
             && !mob.isPersistenceRequired() && !mob.requiresCustomPersistence()){
             if(!ScarecrowTracker.shouldEntityDespawn(mob)){
                 mob.setNoActionTime(0);

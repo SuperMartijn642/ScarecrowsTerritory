@@ -33,7 +33,7 @@ public class ScarecrowTracker {
 
     @SubscribeEvent
     public static void onEntityDespawn(MobDespawnEvent e){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level().isClientSide)
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || e.getEntity().level().isClientSide())
             return;
 
         Mob mob = e.getEntity();
@@ -54,7 +54,7 @@ public class ScarecrowTracker {
     @SubscribeEvent
     public static void onWorldTick(LevelTickEvent.Pre e){
         Level level = e.getLevel();
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide || !(level instanceof ServerLevel) || level.isDebug())
+        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide() || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
         if(!((ServerLevel)level).getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))

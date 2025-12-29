@@ -19,5 +19,3 @@ accessible method net/minecraft/world/level/NaturalSpawner getRandomSpawnMobAt (
 # NaturalSpawner$SpawnState
 accessible method net/minecraft/world/level/NaturalSpawner$SpawnState afterSpawn (Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/chunk/ChunkAccess;)V
 accessible method net/minecraft/world/level/NaturalSpawner$SpawnState canSpawn (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
-# Mob
-accessible method net/minecraft/world/entity/Mob shouldDespawnInPeaceful ()Z

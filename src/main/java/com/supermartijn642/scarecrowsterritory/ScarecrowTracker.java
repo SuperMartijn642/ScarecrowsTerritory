@@ -12,9 +12,13 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
@@ -52,7 +56,7 @@ public class ScarecrowTracker {
             || !(level instanceof ServerLevel) || level.isDebug())
             return;
 
-        if(!((ServerLevel)level).getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
+        if(!((ServerLevel)level).getGameRules().get(GameRules.SPAWN_MOBS))
             return;
 
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
@@ -71,7 +75,7 @@ public class ScarecrowTracker {
         NaturalSpawner.SpawnState entityDensityManager = level.getChunkSource().getLastSpawnState();
         if(entityDensityManager != null){
             boolean spawnAnimals = level.getLevelData().getGameTime() % 400L == 0L;
-            boolean spawnHostiles = level.getServer().isSpawningMonsters();
+            boolean spawnHostiles = level.isSpawningMonsters();
             List<MobCategory> categories = MobSpawningUtil.getFilteredSpawningCategories(entityDensityManager, true, spawnHostiles, spawnAnimals);
             MobSpawningUtil.spawnEntitiesInChunk(level, chunk, entityDensityManager, categories);
         }

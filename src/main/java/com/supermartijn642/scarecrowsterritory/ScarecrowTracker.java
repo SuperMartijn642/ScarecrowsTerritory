@@ -4,8 +4,8 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.CommonUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.TickTask;
@@ -32,9 +32,9 @@ public class ScarecrowTracker {
     private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
     public static void registerListeners(){
-        ServerTickEvents.END_WORLD_TICK.register(ScarecrowTracker::onWorldTick);
-        ServerWorldEvents.UNLOAD.register((server, level) -> onWorldUnload(level));
-        ServerChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
+        ServerTickEvents.END_LEVEL_TICK.register(ScarecrowTracker::onWorldTick);
+        ServerLevelEvents.UNLOAD.register((server, level) -> onWorldUnload(level));
+        ServerChunkEvents.CHUNK_LOAD.register((level, chunk, _) -> onChunkLoad(level, chunk));
         ServerChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
         if(CommonUtils.getEnvironmentSide().isClient()){
             ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
@@ -62,8 +62,8 @@ public class ScarecrowTracker {
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
         if(chunks != null){
             for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().toLong())){
-                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().pack())){
+                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x(), entry.getKey().z(), false);
                     if(chunk != null && !chunk.isEmpty() && level.getWorldBorder().isWithinBounds(entry.getKey()))
                         spawnEntitiesInChunk((ServerLevel)level, chunk);
                 }

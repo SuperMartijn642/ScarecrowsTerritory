@@ -85,13 +85,13 @@ public class MobSpawningUtil {
                 int spawnZ = pos.getZ();
                 MobSpawnSettings.SpawnerData spawner = null;
                 SpawnGroupData entityData = null;
-                int groupSize = Mth.ceil(level.random.nextFloat() * 4.0F);
+                int groupSize = Mth.ceil(level.getRandom().nextFloat() * 4.0F);
                 int entitiesInGroup = 0;
 
                 // try spawning entities in the group
                 for(int i2 = 0; i2 < groupSize; ++i2){
-                    spawnX += level.random.nextInt(6) - level.random.nextInt(6);
-                    spawnZ += level.random.nextInt(6) - level.random.nextInt(6);
+                    spawnX += level.getRandom().nextInt(6) - level.getRandom().nextInt(6);
+                    spawnZ += level.getRandom().nextInt(6) - level.getRandom().nextInt(6);
                     spawnPos.set(spawnX, y, spawnZ);
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
@@ -100,12 +100,12 @@ public class MobSpawningUtil {
                         continue;
 
                     if(spawner == null){
-                        Optional<MobSpawnSettings.SpawnerData> optional = NaturalSpawner.getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.random, spawnPos);
+                        Optional<MobSpawnSettings.SpawnerData> optional = NaturalSpawner.getRandomSpawnMobAt(level, structureManager, chunkgenerator, classification, level.getRandom(), spawnPos);
                         if(optional.isEmpty())
                             break;
 
                         spawner = optional.get();
-                        groupSize = spawner.minCount() + level.random.nextInt(1 + spawner.maxCount() - spawner.minCount());
+                        groupSize = spawner.minCount() + level.getRandom().nextInt(1 + spawner.maxCount() - spawner.minCount());
                     }
 
                     if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type(), spawnPos, chunk)){
@@ -114,7 +114,7 @@ public class MobSpawningUtil {
                             return;
 
                         ((ScarecrowMobExtension)entity).scarecrowsterritory$setSpawnedByScarecrow();
-                        entity.snapTo(spawnXCenter, y, spawnZCenter, level.random.nextFloat() * 360.0F, 0.0F);
+                        entity.snapTo(spawnXCenter, y, spawnZCenter, level.getRandom().nextFloat() * 360.0F, 0.0F);
                         if(entity.checkSpawnRules(level, EntitySpawnReason.NATURAL) && entity.checkSpawnObstruction(level)){
                             entityData = entity.finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.NATURAL, entityData);
                             entitiesSpawned++;
@@ -146,7 +146,7 @@ public class MobSpawningUtil {
         if(entityType.canSummon()
             && NaturalSpawner.canSpawnMobAt(level, structureManager, chunkGenerator, classification, spawners, pos)
             && SpawnPlacements.isSpawnPositionOk(entityType, level, pos)
-            && SpawnPlacements.checkSpawnRules(entityType, level, EntitySpawnReason.NATURAL, pos, level.random)){
+            && SpawnPlacements.checkSpawnRules(entityType, level, EntitySpawnReason.NATURAL, pos, level.getRandom())){
             return level.noCollision(entityType.getSpawnAABB(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D));
         }
 

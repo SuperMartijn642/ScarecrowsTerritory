@@ -56,6 +56,7 @@ public class ScarecrowTracker {
         }
     }
 
+    @SubscribeEvent
     public static void onWorldTick(TickEvent.LevelTickEvent.Post e){
         Level level = e.level();
         if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || level.isClientSide() || !(level instanceof ServerLevel) || level.isDebug())
@@ -67,8 +68,8 @@ public class ScarecrowTracker {
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
         if(chunks != null){
             for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().toLong())){
-                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().pack())){
+                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x(), entry.getKey().z(), false);
                     if(chunk != null && !chunk.isEmpty() && level.getWorldBorder().isWithinBounds(entry.getKey()))
                         spawnEntitiesInChunk((ServerLevel)level, chunk);
                 }

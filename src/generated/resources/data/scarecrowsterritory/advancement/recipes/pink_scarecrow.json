@@ -2,13 +2,13 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "id": "scarecrowsterritory:primitive_scarecrow"
+      "id": "scarecrowsterritory:pink_scarecrow"
     },
     "title": {
-      "translate": "scarecrowsterritory.advancement.recipes/misc/primitive_scarecrow.title"
+      "translate": "scarecrowsterritory.advancement.recipes/pink_scarecrow.title"
     },
     "description": {
-      "translate": "scarecrowsterritory.advancement.recipes/misc/primitive_scarecrow.description"
+      "translate": "scarecrowsterritory.advancement.recipes/pink_scarecrow.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "scarecrowsterritory:primitive_scarecrow"
+        "recipe": "scarecrowsterritory:pink_scarecrow"
       }
     },
     "recipe_condition": {
@@ -41,7 +41,7 @@
   ],
   "rewards": {
     "recipes": [
-      "scarecrowsterritory:primitive_scarecrow"
+      "scarecrowsterritory:pink_scarecrow"
     ]
   }
 }

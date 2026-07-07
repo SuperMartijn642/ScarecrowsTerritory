@@ -22,6 +22,7 @@ import net.neoforged.neoforge.event.entity.living.MobDespawnEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.util.*;
@@ -67,8 +68,8 @@ public class ScarecrowTracker {
         Map<ChunkPos,Integer> chunks = CHUNKS_TO_SPAWN_MOBS.get(level);
         if(chunks != null){
             for(Map.Entry<ChunkPos,Integer> entry : chunks.entrySet()){
-                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().toLong())){
-                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x, entry.getKey().z, false);
+                if(entry.getValue() > 0 && ((ServerLevel)level).getChunkSource().isPositionTicking(entry.getKey().pack())){
+                    LevelChunk chunk = level.getChunkSource().getChunk(entry.getKey().x(), entry.getKey().z(), false);
                     if(chunk != null && !chunk.isEmpty() && level.getWorldBorder().isWithinBounds(entry.getKey()))
                         spawnEntitiesInChunk((ServerLevel)level, chunk);
                 }
@@ -177,7 +178,7 @@ public class ScarecrowTracker {
     }
 
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent e){
+    public static void onBlockBreak(BreakBlockEvent e){
         if(e.getState().getBlock() instanceof ScarecrowBlock){
             removeScarecrow(e.getLevel(), e.getPos());
 

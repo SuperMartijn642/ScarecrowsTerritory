@@ -1,3 +1,5 @@
+## Update to Minecraft 26.2
+
 ## Update to Minecraft 26.1
 
 ### Scarecrows' Territory 1.1.11

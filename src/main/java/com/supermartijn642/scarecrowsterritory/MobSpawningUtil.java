@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class MobSpawningUtil {
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
 
-                    if(!ScarecrowTracker.isScarecrowInRange(level, pos.getCenter(), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                    if(!ScarecrowTracker.isScarecrowInRange(level, Vec3.atCenterOf(pos), ScarecrowsTerritoryConfig.passiveMobRange.get()))
                         continue;
 
                     if(spawner == null){

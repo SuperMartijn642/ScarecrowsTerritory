@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "scarecrowsterritory:magenta_scarecrow"
+        "recipes": "scarecrowsterritory:magenta_scarecrow"
       }
     },
     "recipe_condition": {

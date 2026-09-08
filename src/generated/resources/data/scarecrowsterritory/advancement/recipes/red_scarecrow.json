@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "scarecrowsterritory:red_scarecrow"
+        "recipes": "scarecrowsterritory:red_scarecrow"
       }
     },
     "recipe_condition": {

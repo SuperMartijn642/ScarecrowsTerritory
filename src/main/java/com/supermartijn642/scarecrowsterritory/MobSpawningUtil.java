@@ -106,10 +106,10 @@ public class MobSpawningUtil {
                             break;
 
                         spawner = optional.get();
-                        groupSize = spawner.minCount() + level.getRandom().nextInt(1 + spawner.maxCount() - spawner.minCount());
+                        groupSize = spawner.count().sample(level.getRandom());
                     }
 
-                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type(), spawnPos, chunk)){
+                    if(isValidSpawnPositionForType(level, classification, structureManager, chunkgenerator, spawner, spawnPos) && densityCheck.test(spawner.type(), level, spawnPos, chunk)){
                         Mob entity = NaturalSpawner.getMobForSpawn(level, spawner.type());
                         if(entity == null)
                             return;

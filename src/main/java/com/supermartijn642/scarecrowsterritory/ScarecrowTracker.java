@@ -3,8 +3,6 @@ package com.supermartijn642.scarecrowsterritory;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.CommonUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -42,9 +40,6 @@ public class ScarecrowTracker {
         if(CommonUtils.getEnvironmentSide().isClient()){
             ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker::onChunkLoad);
             ClientChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker::onChunkUnload);
-            // Fabric doesn't fire chunk unload events when the client switches or leaves a level, so drop stale client levels here
-            ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> onClientLevelChange(level));
-            ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> onClientLevelChange(null));
         }
         PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> onBlockBreak(level, pos, state));
     }
@@ -138,7 +133,7 @@ public class ScarecrowTracker {
         CHUNKS_TO_SPAWN_MOBS.remove(level);
     }
 
-    private static void onClientLevelChange(Level newLevel){
+    static void onClientLevelChange(Level newLevel){
         // The client only ever has one level loaded, so any other client level in the maps is stale
         SCARECROWS_PER_WORLD.keySet().removeIf(level -> level.isClientSide() && level != newLevel);
         CHUNKS_TO_SPAWN_MOBS.keySet().removeIf(level -> level.isClientSide() && level != newLevel);

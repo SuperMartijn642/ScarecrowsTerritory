@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.12
+- Fixed tracked scarecrows for client levels never being cleared
+
 ## Update to Minecraft 26.3
 
 ### Scarecrows' Territory 1.1.11a

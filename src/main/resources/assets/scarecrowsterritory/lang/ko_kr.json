@@ -1,0 +1,23 @@
+{
+  "scarecrowsterritory.block.brown_scarecrow": "갈색 허수아비",
+  "scarecrowsterritory.primitive_scarecrow.info.both": "주위 %1$d 블록 범위안에서의 생성기를 활성화하고 %2$d 블록 범위안에서 수동적인 몹이 생성되게 합니다.",
+  "scarecrowsterritory.primitive_scarecrow.info.passive": "주위 %1$d 블록 범위안에서 수동적인 몹이 생성되게 합니다.",
+  "scarecrowsterritory.item_group": "Scarecrows' Territory",
+  "scarecrowsterritory.block.green_scarecrow": "초록색 허수아비",
+  "scarecrowsterritory.block.cyan_scarecrow": "청록색 허수아비",
+  "scarecrowsterritory.block.magenta_scarecrow": "자홍색 허수아비",
+  "scarecrowsterritory": "Scarecrows' Territory",
+  "scarecrowsterritory.block.light_gray_scarecrow": "회백색 허수아비",
+  "scarecrowsterritory.block.red_scarecrow": "빨간색 허수아비",
+  "scarecrowsterritory.block.yellow_scarecrow": "노란색 허수아비",
+  "scarecrowsterritory.block.pink_scarecrow": "분홍색 허수아비",
+  "scarecrowsterritory.block.primitive_scarecrow": "보라색 허수아비",
+  "scarecrowsterritory.block.lime_scarecrow": "연두색 허수아비",
+  "scarecrowsterritory.block.white_scarecrow": "하얀색 허수아비",
+  "scarecrowsterritory.block.black_scarecrow": "검은색 허수아비",
+  "scarecrowsterritory.block.blue_scarecrow": "파란색 허수아비",
+  "scarecrowsterritory.block.gray_scarecrow": "회색 허수아비",
+  "scarecrowsterritory.block.orange_scarecrow": "주황색 허수아비",
+  "scarecrowsterritory.primitive_scarecrow.info.spawners": "주위 %1$d 블록안에서의 생성기를 활성화시킵니다.",
+  "scarecrowsterritory.block.light_blue_scarecrow": "하늘색 허수아비"
+}

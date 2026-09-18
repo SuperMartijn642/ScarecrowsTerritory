@@ -187,7 +187,7 @@ public class MobSpawningUtil {
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
 
-                    if(!ScarecrowTracker.isScarecrowInRange(level, new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                    if(!ScarecrowTracker.get(level).isScarecrowInRange(level, new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), ScarecrowsTerritoryConfig.passiveMobRange.get()))
                         continue;
 
                     if(spawner == null){

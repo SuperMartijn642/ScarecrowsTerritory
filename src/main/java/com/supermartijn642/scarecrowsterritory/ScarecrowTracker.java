@@ -22,15 +22,14 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created 1/13/2021 by SuperMartijn642
  */
 public class ScarecrowTracker {
 
-    private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new ConcurrentHashMap<>();
-    private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new ConcurrentHashMap<>();
+    private static final Map<LevelAccessor,Set<BlockPos>> SCARECROWS_PER_WORLD = new HashMap<>();
+    private static final Map<LevelAccessor,Map<ChunkPos,Integer>> CHUNKS_TO_SPAWN_MOBS = new HashMap<>();
 
     public static void registerListeners(){
         ServerTickEvents.END_LEVEL_TICK.register(ScarecrowTracker::onWorldTick);

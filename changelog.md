@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.12
+- Fixed tracked scarecrows for client levels never being cleared
+
 ### Scarecrows' Territory 1.1.11d
 - Removed OpenBlocks Trophies and In Control integration
 - Fixed crash when In Control 9.3 or newer is installed

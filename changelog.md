@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.12
+- Fixed tracked scarecrows for client levels never being cleared
+
 ### Scarecrows' Territory 1.1.11a
 - Added icon and banner images for new NeoForge 26.2.0.50-beta mod list
 

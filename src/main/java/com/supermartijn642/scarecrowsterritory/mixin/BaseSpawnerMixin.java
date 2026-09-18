@@ -23,7 +23,7 @@ public class BaseSpawnerMixin {
         cancellable = true
     )
     private void isNearPlayer(Level level, BlockPos pos, CallbackInfoReturnable<Boolean> ci){
-        if(!ci.getReturnValue() && ScarecrowTracker.isScarecrowInRange(level, Vec3.atCenterOf(pos), ScarecrowsTerritoryConfig.loadSpawnerRange.get()))
+        if(!ci.getReturnValue() && ScarecrowTracker.get(level).isScarecrowInRange(level, Vec3.atCenterOf(pos), ScarecrowsTerritoryConfig.loadSpawnerRange.get()))
             ci.setReturnValue(true);
     }
 }

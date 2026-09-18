@@ -31,7 +31,7 @@ public class MobMixin implements ScarecrowMobExtension {
         Mob mob = (Mob)(Object)this;
         if((mob.level().getDifficulty() != Difficulty.PEACEFUL || !mob.getType().isAllowedInPeaceful())
             && !mob.isPersistenceRequired() && !mob.requiresCustomPersistence()){
-            if(!ScarecrowTracker.shouldEntityDespawn(mob)){
+            if(!ScarecrowTracker.get(mob.level()).shouldEntityDespawn(mob)){
                 mob.setNoActionTime(0);
                 ci.cancel();
             }
@@ -49,8 +49,8 @@ public class MobMixin implements ScarecrowMobExtension {
         if(!((ScarecrowMobExtension)mob).scarecrowsterritory$wasSpawnedByScarecrow())
             return;
         Player entity = mob.level().getNearestPlayer(mob, -1.0);
-        if(entity == null && ScarecrowTracker.shouldEntityDespawn(mob)){
-            if(ScarecrowTracker.shouldEntityDespawn(mob) && mob.removeWhenFarAway(ScarecrowsTerritoryConfig.passiveMobRange.get() * ScarecrowsTerritoryConfig.passiveMobRange.get())){
+        if(entity == null && ScarecrowTracker.get(mob.level()).shouldEntityDespawn(mob)){
+            if(mob.removeWhenFarAway(ScarecrowsTerritoryConfig.passiveMobRange.get() * ScarecrowsTerritoryConfig.passiveMobRange.get())){
                 mob.discard();
                 ci.cancel();
             }else

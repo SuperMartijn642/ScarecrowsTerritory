@@ -2,6 +2,7 @@ package com.supermartijn642.scarecrowsterritory;
 
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.world.item.DyeColor;
@@ -13,8 +14,10 @@ public class ScarecrowsTerritoryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient(){
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, level) -> ScarecrowTracker.onClientLevelChange(level));
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ScarecrowTracker.onClientLevelChange(null));
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, level) -> ScarecrowTracker.get(true).onClientLevelChange(level));
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> ScarecrowTracker.get(true).onClientLevelChange(null));
+        ClientChunkEvents.CHUNK_LOAD.register(ScarecrowTracker.get(true)::onChunkLoad);
+        ClientChunkEvents.CHUNK_UNLOAD.register(ScarecrowTracker.get(true)::onChunkUnload);
 
         ClientRegistrationHandler handler = ClientRegistrationHandler.get("scarecrowsterritory");
         for(ScarecrowType type : ScarecrowType.values()){

@@ -123,8 +123,15 @@ public class ScarecrowTracker {
         });
     }
 
-    private static void onWorldUnload(Level level){
+    private static void onWorldUnload(LevelAccessor level){
         SCARECROWS_PER_WORLD.remove(level);
+        CHUNKS_TO_SPAWN_MOBS.remove(level);
+    }
+
+    static void onClientLevelChange(Level newLevel){
+        // The client only ever has one level loaded, so any other client level in the maps is stale
+        SCARECROWS_PER_WORLD.keySet().removeIf(level -> level.isClientSide() && level != newLevel);
+        CHUNKS_TO_SPAWN_MOBS.keySet().removeIf(level -> level.isClientSide() && level != newLevel);
     }
 
     private static void onChunkLoad(Level level, LevelChunk chunk){

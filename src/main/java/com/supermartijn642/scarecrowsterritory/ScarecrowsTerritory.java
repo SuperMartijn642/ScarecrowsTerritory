@@ -18,6 +18,8 @@ public class ScarecrowsTerritory {
     public static final CreativeItemGroup GROUP = CreativeItemGroup.create("scarecrowsterritory", () -> ScarecrowType.PRIMITIVE.blocks.get(DyeColor.PURPLE).asItem());
 
     public ScarecrowsTerritory(){
+        ScarecrowTracker.registerListeners();
+
         register();
         DistExecutor.runWhenOn(Dist.CLIENT, () -> ScarecrowsTerritoryClient::register);
         registerGenerators();

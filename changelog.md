@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.12
+- Fixed tracked scarecrows for client levels never being cleared
+
 ### Scarecrows' Territory 1.1.11
 - Passive mob spawning range is now square instead of spherical
 - Decreased default spawner activation range from 8 to 5 blocks

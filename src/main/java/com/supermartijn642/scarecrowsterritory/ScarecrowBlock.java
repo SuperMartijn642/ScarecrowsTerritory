@@ -82,7 +82,7 @@ public class ScarecrowBlock extends BaseBlock implements EntityHoldingBlock, Sim
         if(this.type.is2BlocksHigh() && !level.isEmptyBlock(pos) && level.getBlockState(pos).getBlock() != Blocks.WATER){
             FluidState fluidState = level.getFluidState(pos.above());
             level.setBlockAndUpdate(pos.above(), state.setValue(BOTTOM, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER));
-            ScarecrowTracker.onBlockAdded(level, pos, state);
+            ScarecrowTracker.get(level).onBlockAdded(level, pos, state);
         }
     }
 

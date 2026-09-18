@@ -17,6 +17,8 @@ public class ScarecrowsTerritory {
     public static final CreativeItemGroup GROUP = CreativeItemGroup.create("scarecrowsterritory", () -> ScarecrowType.PRIMITIVE.blocks.get(EnumDyeColor.PURPLE).asItem());
 
     public ScarecrowsTerritory(){
+        ScarecrowTracker.registerListeners();
+
         register();
         if(CommonUtils.getEnvironmentSide().isClient())
             ScarecrowsTerritoryClient.register();

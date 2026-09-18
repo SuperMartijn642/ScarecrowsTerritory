@@ -22,7 +22,7 @@ public abstract class EntityLivingMixin {
     private void despawnEntityHead(CallbackInfo ci){
         //noinspection DataFlowIssue
         EntityLiving entity = (EntityLiving)(Object)this;
-        if(!entity.world.isRemote && !ScarecrowTracker.canDespawn(entity.world, entity.getPositionVector()))
+        if(!entity.world.isRemote && !ScarecrowTracker.get(entity.world).shouldEntityDespawn(entity))
             ci.cancel();
     }
 
@@ -41,7 +41,7 @@ public abstract class EntityLivingMixin {
         if(!entity.world.isRemote && entity.getEntityData().getBoolean("spawnedByScarecrow")){
             Entity player = entity.world.getClosestPlayerToEntity(entity, -1);
             if(player == null){
-                if(ScarecrowTracker.canDespawn(entity.world, entity.getPositionVector()))
+                if(ScarecrowTracker.get(entity.world).shouldEntityDespawn(entity))
                     entity.setDead();
             }
         }

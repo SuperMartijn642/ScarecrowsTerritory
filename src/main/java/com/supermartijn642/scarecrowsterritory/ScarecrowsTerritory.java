@@ -21,6 +21,8 @@ public class ScarecrowsTerritory {
     public static final Supplier<Boolean> ENABLE_TROPHIES_INTEGRATION = Suppliers.memoize(() -> ScarecrowsTerritoryConfig.enableTrophyIntegration.get() && CommonUtils.isModLoaded("obtrophies"));
 
     public ScarecrowsTerritory(){
+        ScarecrowTracker.registerListeners();
+
         register();
         if(CommonUtils.getEnvironmentSide().isClient())
             ScarecrowsTerritoryClient.register();

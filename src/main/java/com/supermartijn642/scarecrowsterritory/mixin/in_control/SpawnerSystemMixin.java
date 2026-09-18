@@ -69,7 +69,7 @@ public class SpawnerSystemMixin {
         if(!(level instanceof ServerLevel))
             return player;
 
-        Set<BlockPos> scarecrows = ScarecrowTracker.getScarecrows(level);
+        Set<BlockPos> scarecrows = ScarecrowTracker.get(level).getScarecrows(level);
         if(scarecrows.size() == 0)
             return player;
 
@@ -109,7 +109,7 @@ public class SpawnerSystemMixin {
         if(replacedWithScarecrow.get() && ScarecrowsTerritory.ENABLE_TROPHIES_INTEGRATION.get()){
             EntityType<?> type = ci.getReturnValue();
             if(type != null){
-                BlockPos scarecrowPos = ScarecrowTracker.getClosestScarecrow(level, pos);
+                BlockPos scarecrowPos = ScarecrowTracker.get(level).getClosestScarecrow(level, pos);
                 BlockEntity entity;
                 if(scarecrowPos == null || !((entity = level.getBlockEntity(scarecrowPos)) instanceof ScarecrowBlockEntity) || !((ScarecrowBlockEntity)entity).canTrophiesSpawn(type))
                     ci.setReturnValue(null);

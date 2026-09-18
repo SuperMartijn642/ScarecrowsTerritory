@@ -57,7 +57,7 @@ public class MobSpawningUtil {
      * {@link NaturalSpawner#spawnCategoryForPosition(MobCategory, ServerLevel, ChunkAccess, BlockPos, NaturalSpawner.SpawnPredicate, NaturalSpawner.AfterSpawnCallback)}
      */
     private static void spawnCategoryForPosition(MobCategory classification, ServerLevel level, ChunkAccess chunk, BlockPos pos, NaturalSpawner.SpawnPredicate densityCheck, NaturalSpawner.AfterSpawnCallback densityAdder){
-        BlockPos closestScarecrow = ScarecrowTracker.getClosestScarecrow(level, pos);
+        BlockPos closestScarecrow = ScarecrowTracker.get(level).getClosestScarecrow(level, pos);
         if(closestScarecrow == null || !closestScarecrow.closerThan(pos, ScarecrowsTerritoryConfig.passiveMobRange.get() + 12))
             return;
 
@@ -97,7 +97,7 @@ public class MobSpawningUtil {
                     double spawnXCenter = (double)spawnX + 0.5D;
                     double spawnZCenter = (double)spawnZ + 0.5D;
 
-                    if(!ScarecrowTracker.isScarecrowInRange(level, pos.getCenter(), ScarecrowsTerritoryConfig.passiveMobRange.get()))
+                    if(!ScarecrowTracker.get(level).isScarecrowInRange(level, pos.getCenter(), ScarecrowsTerritoryConfig.passiveMobRange.get()))
                         continue;
 
                     if(spawner == null){

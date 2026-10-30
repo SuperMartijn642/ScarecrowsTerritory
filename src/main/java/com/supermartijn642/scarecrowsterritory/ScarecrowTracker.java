@@ -84,11 +84,15 @@ public class ScarecrowTracker {
     private final Map<World,Map<ChunkPos,Integer>> chunksToSpawnMobs = new HashMap<>();
 
     public Boolean shouldEntityDespawn(EntityLivingBase entity){
-        if(!ScarecrowsTerritoryConfig.passiveMobSpawning.get() || entity.world.isRemote)
-            return true;
+        if(entity.world.isRemote)
+            return null;
 
         double range = Math.max(ScarecrowsTerritoryConfig.passiveMobRange.get(), ScarecrowsTerritoryConfig.loadSpawnerRange.get()) + ScarecrowsTerritoryConfig.noDespawnBuffer.get();
-        return !this.isScarecrowInRange(entity.world, entity.getPositionVector(), range);
+        if(this.isScarecrowInRange(entity.world, entity.getPositionVector(), range))
+            return false;
+        if(entity.getEntityData().getBoolean("spawnedByScarecrow"))
+            return true;
+        return null;
     }
 
     private void onWorldTick(World level){

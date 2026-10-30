@@ -1,3 +1,6 @@
+### Scarecrows' Territory 1.1.12a
+- Fixed scarecrow tracker allowing entities outside scarecrow range to despawn when they shouldn't
+
 ### Scarecrows' Territory 1.1.12
 - Fixed tracked scarecrows for client levels never being cleared
 
